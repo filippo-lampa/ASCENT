@@ -1,5 +1,5 @@
-# RLBasedTestPrioritizationMT
-RLBasedTestPrioritizationMT is a tool designed to execute tests on mutation testing mutants in a prioritized manner, reducing the number of tests executed while ensuring effective test adequacy.
+# ASCENT
+This is a tool designed to execute tests on mutation testing mutants in a prioritized manner, reducing the number of tests executed while ensuring effective test adequacy.
 
 ## 👾 Mutant Generation
 
@@ -103,7 +103,7 @@ npx sumo addMutationsContext
 
 ### 1. Optional (suggested)
 
-Create a Python virtual environment
+Within the ASCENT folder, create a Python virtual environment
 
 ```
 python -m venv .venv

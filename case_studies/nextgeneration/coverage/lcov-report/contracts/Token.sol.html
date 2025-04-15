@@ -1,0 +1,620 @@
+<!doctype html>
+<html lang="en">
+<head>
+    <title>Code coverage report for contracts/Token.sol</title>
+    <meta charset="utf-8" />
+    <link rel="stylesheet" href="../prettify.css" />
+    <link rel="stylesheet" href="../base.css" />
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <style type='text/css'>
+        .coverage-summary .sorter {
+            background-image: url(../sort-arrow-sprite.png);
+        }
+    </style>
+</head>
+<body>
+<div class='wrapper'>
+  <div class='pad1'>
+    <h1>
+      <a href="../index.html">all files</a> / <a href="index.html">contracts/</a> Token.sol
+    </h1>
+    <div class='clearfix'>
+      <div class='fl pad1y space-right2'>
+        <span class="strong">94.87% </span>
+        <span class="quiet">Statements</span>
+        <span class='fraction'>37/39</span>
+      </div>
+      <div class='fl pad1y space-right2'>
+        <span class="strong">57.69% </span>
+        <span class="quiet">Branches</span>
+        <span class='fraction'>15/26</span>
+      </div>
+      <div class='fl pad1y space-right2'>
+        <span class="strong">83.33% </span>
+        <span class="quiet">Functions</span>
+        <span class='fraction'>15/18</span>
+      </div>
+      <div class='fl pad1y space-right2'>
+        <span class="strong">94.59% </span>
+        <span class="quiet">Lines</span>
+        <span class='fraction'>35/37</span>
+      </div>
+    </div>
+  </div>
+  <div class='status-line high'></div>
+<pre><table class="coverage">
+<tr><td class="line-count quiet">1
+2
+3
+4
+5
+6
+7
+8
+9
+10
+11
+12
+13
+14
+15
+16
+17
+18
+19
+20
+21
+22
+23
+24
+25
+26
+27
+28
+29
+30
+31
+32
+33
+34
+35
+36
+37
+38
+39
+40
+41
+42
+43
+44
+45
+46
+47
+48
+49
+50
+51
+52
+53
+54
+55
+56
+57
+58
+59
+60
+61
+62
+63
+64
+65
+66
+67
+68
+69
+70
+71
+72
+73
+74
+75
+76
+77
+78
+79
+80
+81
+82
+83
+84
+85
+86
+87
+88
+89
+90
+91
+92
+93
+94
+95
+96
+97
+98
+99
+100
+101
+102
+103
+104
+105
+106
+107
+108
+109
+110
+111
+112
+113
+114
+115
+116
+117
+118
+119
+120
+121
+122
+123
+124
+125
+126
+127
+128
+129
+130
+131
+132
+133
+134
+135
+136
+137
+138
+139
+140
+141
+142
+143
+144
+145
+146
+147
+148
+149
+150
+151
+152
+153
+154
+155
+156
+157
+158
+159
+160
+161
+162
+163
+164
+165
+166
+167
+168
+169
+170
+171
+172
+173
+174
+175
+176
+177
+178
+179
+180
+181
+182
+183
+184
+185
+186</td><td class="line-coverage quiet"><span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-yes">50×</span>
+<span class="cline-any cline-yes">50×</span>
+<span class="cline-any cline-yes">50×</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-yes">50×</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-yes">50×</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-yes">50×</span>
+<span class="cline-any cline-yes">50×</span>
+<span class="cline-any cline-yes">50×</span>
+<span class="cline-any cline-yes">50×</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-yes">5×</span>
+<span class="cline-any cline-yes">5×</span>
+<span class="cline-any cline-yes">5×</span>
+<span class="cline-any cline-yes">2×</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-yes">5×</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-yes">9×</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-yes">1034×</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-yes">2×</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-yes">1×</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-yes">1×</span>
+<span class="cline-any cline-yes">1×</span>
+<span class="cline-any cline-yes">1×</span>
+<span class="cline-any cline-yes">1×</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-yes">2×</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-yes">3×</span>
+<span class="cline-any cline-yes">3×</span>
+<span class="cline-any cline-yes">3×</span>
+<span class="cline-any cline-yes">3×</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-yes">21×</span>
+<span class="cline-any cline-yes">16×</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-yes">14×</span>
+<span class="cline-any cline-yes">10×</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-yes">2×</span>
+<span class="cline-any cline-yes">2×</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-yes">5×</span>
+<span class="cline-any cline-yes">4×</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span></td><td class="text"><pre class="prettyprint lang-js">/**
+ * SPDX-License-Identifier: MIT
+ *
+ * Copyright (c) 2024 QWRTX SAS
+ *
+ * Permission is hereby granted, free of charge, to any person obtaining a copy
+ * of this software and associated documentation files (the "Software"), to deal
+ * in the Software without restriction, including without limitation the rights
+ * to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+ * copies of the Software, and to permit persons to whom the Software is
+ * furnished to do so, subject to the following conditions:
+ *
+ * The above copyright notice and this permission notice shall be included in
+ * copies or substantial portions of the Software.
+ *
+ * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+ * IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+ * FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+ * AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+ * LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+ * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
+ * SOFTWARE.
+ */
+&nbsp;
+pragma solidity ^0.8.20;
+&nbsp;
+import "@openzeppelin/contracts-upgradeable/proxy/utils/UUPSUpgradeable.sol";
+import "@openzeppelin/contracts-upgradeable/utils/ContextUpgradeable.sol";
+&nbsp;
+import {ERC20MetaTxUpgradeable} from "./ERC20MetaTxUpgradeable.sol";
+import {ERC20AdminUpgradeable} from "./ERC20AdminUpgradeable.sol";
+import {ERC20ControlerMinterUpgradeable} from "./ERC20ControlerMinterUpgradeable.sol";
+import {FeesHandlerUpgradeable} from "./FeesHandlerUpgradeable.sol";
+&nbsp;
+contract EURFToken is
+    ERC20MetaTxUpgradeable,
+    ERC20AdminUpgradeable,
+    ERC20ControlerMinterUpgradeable,
+    FeesHandlerUpgradeable,
+    UUPSUpgradeable
+{
+    uint8 constant DECIMALS = 6;
+&nbsp;
+    bytes32 public constant OWNER = DEFAULT_ADMIN_ROLE;
+&nbsp;
+    error InvalidForwarder();
+    error BalanceTooLow(uint256 amountNeeded, uint256 balance);
+    error AlreadyOwner(address newOwner);
+&nbsp;
+    /// @custom:oz-upgrades-unsafe-allow constructor
+    constructor() initializer {}
+&nbsp;
+    function initialize() public <span class="missing-if-branch" title="else path not taken" >E</span>initializer {
+        __UUPSUpgradeable_init();
+        __Pausable_init();
+        __AccessControlEnumerable_init();
+&nbsp;
+        _grantRole(OWNER, msg.sender);
+&nbsp;
+        __EIP712_init("EURF", "1");
+&nbsp;
+        __ERC20_init_unchained("EURF", "EURF");
+        __ERC20MetaTx_init_unchained();
+        __ERC20Admin_init_unchained();
+        __ERC20ControlerMinter_init_unchained();
+    }
+&nbsp;
+<span class="fstat-no" title="function not covered" >    function decimals() public pure override returns (uint8) {</span>
+<span class="cstat-no" title="statement not covered" >        return DECIMALS;</span>
+    }
+&nbsp;
+    /**
+     * @dev Function to update the OWNER / DEFAULT_ADMIN_ROLE
+     * @param newOwner The address of the owner
+     */
+    function setOwner(address newOwner) public {
+        <span class="missing-if-branch" title="if path not taken" >I</span>if (newOwner == address(0)) revert InvalidZeroAddress();
+        <span class="missing-if-branch" title="if path not taken" >I</span>if (newOwner == owner()) revert AlreadyOwner(newOwner);
+        grantRole(OWNER, newOwner);
+        revokeRole(OWNER, getRoleMember(OWNER, 0));
+    }
+&nbsp;
+    function owner() public view returns (address) {
+        return getRoleMember(OWNER, 0);
+    }
+&nbsp;
+<span class="fstat-no" title="function not covered" >    function _authorizeUpgrade(address newImplementation) internal override onlyRole(OWNER) {}</span>
+&nbsp;
+    //-------------------------- FORWARDER LOGIC --------------------------
+&nbsp;
+    function setTrustedForwarder(address trustedForwarder) public override <span class="missing-if-branch" title="else path not taken" >E</span>onlyRole(ADMIN) {
+        super.setTrustedForwarder(trustedForwarder);
+    }
+&nbsp;
+    function _msgSender() internal view override(ERC20MetaTxUpgradeable, ContextUpgradeable) returns (address sender) {
+        return ERC20MetaTxUpgradeable._msgSender();
+    }
+&nbsp;
+<span class="fstat-no" title="function not covered" >    function _msgData() internal view override(ERC20MetaTxUpgradeable, ContextUpgradeable) returns (bytes calldata) {</span>
+<span class="cstat-no" title="statement not covered" >        return ERC20MetaTxUpgradeable._msgData();</span>
+    }
+&nbsp;
+    //-------------------------- FEES HANDLER LOGIC --------------------------
+&nbsp;
+    /**
+     * @dev Function to set feesFaucet
+     * @param feesFaucet New feesFaucet address
+     */
+    function setFeeFaucet(address feesFaucet) public override onlyRole(ADMIN) {
+        super.setFeeFaucet(feesFaucet);
+    }
+&nbsp;
+    /**
+     * @dev Function to update tx fee rate
+     * @param newRate The address of the minter
+     */
+    function setTxFeeRate(uint256 newRate) public override onlyRole(ADMIN) {
+        super.setTxFeeRate(newRate);
+    }
+&nbsp;
+    /**
+     * @dev Function to trigger tx fee payment to feesFaucet (internal)
+     * @param from The address of the payer
+     * @param txAmount amount of the transaction in EURF
+     */
+    function _payTxFee(address from, uint256 txAmount) internal override {
+        uint256 txFees = calculateTxFee(txAmount);
+        <span class="missing-if-branch" title="if path not taken" >I</span>if (balanceOf(from) &lt; txFees + txAmount) revert BalanceTooLow(txFees + txAmount, balanceOf(from));
+        <span class="missing-if-branch" title="else path not taken" >E</span>if (_feesFaucet != address(0)) _update(from, _feesFaucet, txFees);
+        emit FeesPaid(from, txFees);
+    }
+&nbsp;
+    /**
+     * @dev Function to update gasless tx basefee
+     * @param newBaseFee new gasless basefee amount
+     */
+    function setGaslessBasefee(uint256 newBaseFee) public override <span class="missing-if-branch" title="else path not taken" >E</span>onlyRole(ADMIN) {
+        super.setGaslessBasefee(newBaseFee);
+    }
+&nbsp;
+    /**
+     * @dev Function to trigger gaslessBasefee payment from payer to paymaster
+     * Can only be called from trustedForwarder.
+     * @param payer Address of basefee payer (meta-tx signer)
+     * @param paymaster Address of paymester (meta-tx executer)
+     */
+    function payGaslessBasefee(address payer, address paymaster) external override {
+        <span class="missing-if-branch" title="if path not taken" >I</span>if (!isTrustedForwarder(msg.sender)) revert InvalidForwarder();
+        <span class="missing-if-branch" title="if path not taken" >I</span>if (balanceOf(payer) &lt; _gaslessBasefee) revert BalanceTooLow(_gaslessBasefee, balanceOf(payer));
+        _update(payer, paymaster, _gaslessBasefee);
+        emit GaslessBasefeePaid(payer, paymaster, _gaslessBasefee);
+    }
+&nbsp;
+    //-------------------------- TRANSFER W/FEES LOGIC --------------------------
+&nbsp;
+    function transferSanity(address sender, address recipient, uint256 amount) internal {
+        adminSanity(sender, recipient);
+        if (_txfeeRate &gt; 0) _payTxFee(sender, amount);
+    }
+&nbsp;
+    function transfer(address recipient, uint256 amount) public override returns (bool) {
+        transferSanity(_msgSender(), recipient, amount);
+        return super.transfer(recipient, amount);
+    }
+&nbsp;
+    function transferFrom(address sender, address recipient, uint256 amount) public override returns (bool) {
+        transferSanity(sender, recipient, amount);
+        return super.transferFrom(sender, recipient, amount);
+    }
+&nbsp;
+    function transferWithAuthorization(
+        address holder,
+        address spender,
+        uint256 value,
+        uint256 deadline,
+        uint8 v,
+        bytes32 r,
+        bytes32 s
+    ) public override returns (bool) {
+        transferSanity(holder, spender, value);
+        return super.transferWithAuthorization(holder, spender, value, deadline, v, r, s);
+    }
+&nbsp;
+    uint256[49] private __gap;
+}
+&nbsp;</pre></td></tr>
+</table></pre>
+<div class='push'></div><!-- for sticky footer -->
+</div><!-- /wrapper -->
+<div class='footer quiet pad2 space-top1 center small'>
+  Code coverage
+  generated by <a href="http://istanbul-js.org/" target="_blank">istanbul</a> at Tue Feb 25 2025 10:20:08 GMT+0100 (Ora standard dell’Europa centrale)
+</div>
+</div>
+<script src="../prettify.js"></script>
+<script>
+window.onload = function () {
+        if (typeof prettyPrint === 'function') {
+            prettyPrint();
+        }
+};
+</script>
+<script src="../sorter.js"></script>
+</body>
+</html>

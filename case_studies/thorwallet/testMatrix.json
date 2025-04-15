@@ -1,0 +1,1340 @@
+{
+ "contracts/MergeTgt.sol": {
+  "40": [
+   {
+    "title": "should let a user to deposit TGT into the merge contract",
+    "file": "test/hardhat/MergeTgt.test.ts"
+   },
+   {
+    "title": "should not let a user to transfer TITN tokens",
+    "file": "test/hardhat/MergeTgt.test.ts"
+   },
+   {
+    "title": "should let a user to bridge TITN tokens to BASE",
+    "file": "test/hardhat/MergeTgt.test.ts"
+   },
+   {
+    "title": "should get lower quotes after 90 days have elapsed",
+    "file": "test/hardhat/MergeTgt.test.ts"
+   },
+   {
+    "title": "should allow withdrawal of remaining TITN after 1 year",
+    "file": "test/hardhat/MergeTgt.test.ts"
+   }
+  ],
+  "41": [
+   {
+    "title": "should let a user to deposit TGT into the merge contract",
+    "file": "test/hardhat/MergeTgt.test.ts"
+   },
+   {
+    "title": "should not let a user to transfer TITN tokens",
+    "file": "test/hardhat/MergeTgt.test.ts"
+   },
+   {
+    "title": "should let a user to bridge TITN tokens to BASE",
+    "file": "test/hardhat/MergeTgt.test.ts"
+   },
+   {
+    "title": "should get lower quotes after 90 days have elapsed",
+    "file": "test/hardhat/MergeTgt.test.ts"
+   },
+   {
+    "title": "should allow withdrawal of remaining TITN after 1 year",
+    "file": "test/hardhat/MergeTgt.test.ts"
+   }
+  ],
+  "45": [
+   {
+    "title": "should let a user to deposit TGT into the merge contract",
+    "file": "test/hardhat/MergeTgt.test.ts"
+   },
+   {
+    "title": "should not let a user to transfer TITN tokens",
+    "file": "test/hardhat/MergeTgt.test.ts"
+   },
+   {
+    "title": "should let a user to bridge TITN tokens to BASE",
+    "file": "test/hardhat/MergeTgt.test.ts"
+   },
+   {
+    "title": "should get lower quotes after 90 days have elapsed",
+    "file": "test/hardhat/MergeTgt.test.ts"
+   },
+   {
+    "title": "should allow withdrawal of remaining TITN after 1 year",
+    "file": "test/hardhat/MergeTgt.test.ts"
+   }
+  ],
+  "46": [],
+  "50": [
+   {
+    "title": "should let a user to deposit TGT into the merge contract",
+    "file": "test/hardhat/MergeTgt.test.ts"
+   },
+   {
+    "title": "should not let a user to transfer TITN tokens",
+    "file": "test/hardhat/MergeTgt.test.ts"
+   },
+   {
+    "title": "should let a user to bridge TITN tokens to BASE",
+    "file": "test/hardhat/MergeTgt.test.ts"
+   },
+   {
+    "title": "should get lower quotes after 90 days have elapsed",
+    "file": "test/hardhat/MergeTgt.test.ts"
+   },
+   {
+    "title": "should allow withdrawal of remaining TITN after 1 year",
+    "file": "test/hardhat/MergeTgt.test.ts"
+   }
+  ],
+  "51": [],
+  "54": [
+   {
+    "title": "should let a user to deposit TGT into the merge contract",
+    "file": "test/hardhat/MergeTgt.test.ts"
+   },
+   {
+    "title": "should not let a user to transfer TITN tokens",
+    "file": "test/hardhat/MergeTgt.test.ts"
+   },
+   {
+    "title": "should let a user to bridge TITN tokens to BASE",
+    "file": "test/hardhat/MergeTgt.test.ts"
+   },
+   {
+    "title": "should get lower quotes after 90 days have elapsed",
+    "file": "test/hardhat/MergeTgt.test.ts"
+   },
+   {
+    "title": "should allow withdrawal of remaining TITN after 1 year",
+    "file": "test/hardhat/MergeTgt.test.ts"
+   }
+  ],
+  "55": [
+   {
+    "title": "should let a user to deposit TGT into the merge contract",
+    "file": "test/hardhat/MergeTgt.test.ts"
+   },
+   {
+    "title": "should not let a user to transfer TITN tokens",
+    "file": "test/hardhat/MergeTgt.test.ts"
+   },
+   {
+    "title": "should let a user to bridge TITN tokens to BASE",
+    "file": "test/hardhat/MergeTgt.test.ts"
+   },
+   {
+    "title": "should get lower quotes after 90 days have elapsed",
+    "file": "test/hardhat/MergeTgt.test.ts"
+   },
+   {
+    "title": "should allow withdrawal of remaining TITN after 1 year",
+    "file": "test/hardhat/MergeTgt.test.ts"
+   }
+  ],
+  "60": [],
+  "61": [],
+  "66": [
+   {
+    "title": "should let a user to deposit TGT into the merge contract",
+    "file": "test/hardhat/MergeTgt.test.ts"
+   },
+   {
+    "title": "should not let a user to transfer TITN tokens",
+    "file": "test/hardhat/MergeTgt.test.ts"
+   },
+   {
+    "title": "should let a user to bridge TITN tokens to BASE",
+    "file": "test/hardhat/MergeTgt.test.ts"
+   },
+   {
+    "title": "should allow withdrawal of remaining TITN after 1 year",
+    "file": "test/hardhat/MergeTgt.test.ts"
+   }
+  ],
+  "67": [],
+  "69": [
+   {
+    "title": "should let a user to deposit TGT into the merge contract",
+    "file": "test/hardhat/MergeTgt.test.ts"
+   },
+   {
+    "title": "should not let a user to transfer TITN tokens",
+    "file": "test/hardhat/MergeTgt.test.ts"
+   },
+   {
+    "title": "should let a user to bridge TITN tokens to BASE",
+    "file": "test/hardhat/MergeTgt.test.ts"
+   },
+   {
+    "title": "should allow withdrawal of remaining TITN after 1 year",
+    "file": "test/hardhat/MergeTgt.test.ts"
+   }
+  ],
+  "70": [],
+  "72": [
+   {
+    "title": "should let a user to deposit TGT into the merge contract",
+    "file": "test/hardhat/MergeTgt.test.ts"
+   },
+   {
+    "title": "should not let a user to transfer TITN tokens",
+    "file": "test/hardhat/MergeTgt.test.ts"
+   },
+   {
+    "title": "should let a user to bridge TITN tokens to BASE",
+    "file": "test/hardhat/MergeTgt.test.ts"
+   },
+   {
+    "title": "should allow withdrawal of remaining TITN after 1 year",
+    "file": "test/hardhat/MergeTgt.test.ts"
+   }
+  ],
+  "73": [],
+  "75": [
+   {
+    "title": "should let a user to deposit TGT into the merge contract",
+    "file": "test/hardhat/MergeTgt.test.ts"
+   },
+   {
+    "title": "should not let a user to transfer TITN tokens",
+    "file": "test/hardhat/MergeTgt.test.ts"
+   },
+   {
+    "title": "should let a user to bridge TITN tokens to BASE",
+    "file": "test/hardhat/MergeTgt.test.ts"
+   },
+   {
+    "title": "should allow withdrawal of remaining TITN after 1 year",
+    "file": "test/hardhat/MergeTgt.test.ts"
+   }
+  ],
+  "76": [],
+  "81": [
+   {
+    "title": "should let a user to deposit TGT into the merge contract",
+    "file": "test/hardhat/MergeTgt.test.ts"
+   },
+   {
+    "title": "should not let a user to transfer TITN tokens",
+    "file": "test/hardhat/MergeTgt.test.ts"
+   },
+   {
+    "title": "should let a user to bridge TITN tokens to BASE",
+    "file": "test/hardhat/MergeTgt.test.ts"
+   },
+   {
+    "title": "should allow withdrawal of remaining TITN after 1 year",
+    "file": "test/hardhat/MergeTgt.test.ts"
+   }
+  ],
+  "82": [
+   {
+    "title": "should let a user to deposit TGT into the merge contract",
+    "file": "test/hardhat/MergeTgt.test.ts"
+   },
+   {
+    "title": "should not let a user to transfer TITN tokens",
+    "file": "test/hardhat/MergeTgt.test.ts"
+   },
+   {
+    "title": "should let a user to bridge TITN tokens to BASE",
+    "file": "test/hardhat/MergeTgt.test.ts"
+   },
+   {
+    "title": "should allow withdrawal of remaining TITN after 1 year",
+    "file": "test/hardhat/MergeTgt.test.ts"
+   }
+  ],
+  "83": [
+   {
+    "title": "should let a user to deposit TGT into the merge contract",
+    "file": "test/hardhat/MergeTgt.test.ts"
+   },
+   {
+    "title": "should not let a user to transfer TITN tokens",
+    "file": "test/hardhat/MergeTgt.test.ts"
+   },
+   {
+    "title": "should let a user to bridge TITN tokens to BASE",
+    "file": "test/hardhat/MergeTgt.test.ts"
+   },
+   {
+    "title": "should allow withdrawal of remaining TITN after 1 year",
+    "file": "test/hardhat/MergeTgt.test.ts"
+   }
+  ],
+  "85": [
+   {
+    "title": "should let a user to deposit TGT into the merge contract",
+    "file": "test/hardhat/MergeTgt.test.ts"
+   },
+   {
+    "title": "should not let a user to transfer TITN tokens",
+    "file": "test/hardhat/MergeTgt.test.ts"
+   },
+   {
+    "title": "should let a user to bridge TITN tokens to BASE",
+    "file": "test/hardhat/MergeTgt.test.ts"
+   },
+   {
+    "title": "should allow withdrawal of remaining TITN after 1 year",
+    "file": "test/hardhat/MergeTgt.test.ts"
+   }
+  ],
+  "89": [],
+  "93": [],
+  "97": [
+   {
+    "title": "should let a user to deposit TGT into the merge contract",
+    "file": "test/hardhat/MergeTgt.test.ts"
+   },
+   {
+    "title": "should not let a user to transfer TITN tokens",
+    "file": "test/hardhat/MergeTgt.test.ts"
+   },
+   {
+    "title": "should let a user to bridge TITN tokens to BASE",
+    "file": "test/hardhat/MergeTgt.test.ts"
+   },
+   {
+    "title": "should allow withdrawal of remaining TITN after 1 year",
+    "file": "test/hardhat/MergeTgt.test.ts"
+   }
+  ],
+  "99": [
+   {
+    "title": "should let a user to deposit TGT into the merge contract",
+    "file": "test/hardhat/MergeTgt.test.ts"
+   },
+   {
+    "title": "should not let a user to transfer TITN tokens",
+    "file": "test/hardhat/MergeTgt.test.ts"
+   },
+   {
+    "title": "should let a user to bridge TITN tokens to BASE",
+    "file": "test/hardhat/MergeTgt.test.ts"
+   },
+   {
+    "title": "should allow withdrawal of remaining TITN after 1 year",
+    "file": "test/hardhat/MergeTgt.test.ts"
+   }
+  ],
+  "100": [],
+  "103": [
+   {
+    "title": "should let a user to deposit TGT into the merge contract",
+    "file": "test/hardhat/MergeTgt.test.ts"
+   },
+   {
+    "title": "should not let a user to transfer TITN tokens",
+    "file": "test/hardhat/MergeTgt.test.ts"
+   },
+   {
+    "title": "should let a user to bridge TITN tokens to BASE",
+    "file": "test/hardhat/MergeTgt.test.ts"
+   },
+   {
+    "title": "should allow withdrawal of remaining TITN after 1 year",
+    "file": "test/hardhat/MergeTgt.test.ts"
+   }
+  ],
+  "104": [
+   {
+    "title": "should let a user to deposit TGT into the merge contract",
+    "file": "test/hardhat/MergeTgt.test.ts"
+   },
+   {
+    "title": "should not let a user to transfer TITN tokens",
+    "file": "test/hardhat/MergeTgt.test.ts"
+   },
+   {
+    "title": "should let a user to bridge TITN tokens to BASE",
+    "file": "test/hardhat/MergeTgt.test.ts"
+   },
+   {
+    "title": "should allow withdrawal of remaining TITN after 1 year",
+    "file": "test/hardhat/MergeTgt.test.ts"
+   }
+  ],
+  "106": [
+   {
+    "title": "should let a user to deposit TGT into the merge contract",
+    "file": "test/hardhat/MergeTgt.test.ts"
+   },
+   {
+    "title": "should not let a user to transfer TITN tokens",
+    "file": "test/hardhat/MergeTgt.test.ts"
+   },
+   {
+    "title": "should let a user to bridge TITN tokens to BASE",
+    "file": "test/hardhat/MergeTgt.test.ts"
+   },
+   {
+    "title": "should allow withdrawal of remaining TITN after 1 year",
+    "file": "test/hardhat/MergeTgt.test.ts"
+   }
+  ],
+  "107": [
+   {
+    "title": "should let a user to deposit TGT into the merge contract",
+    "file": "test/hardhat/MergeTgt.test.ts"
+   },
+   {
+    "title": "should not let a user to transfer TITN tokens",
+    "file": "test/hardhat/MergeTgt.test.ts"
+   },
+   {
+    "title": "should let a user to bridge TITN tokens to BASE",
+    "file": "test/hardhat/MergeTgt.test.ts"
+   },
+   {
+    "title": "should allow withdrawal of remaining TITN after 1 year",
+    "file": "test/hardhat/MergeTgt.test.ts"
+   }
+  ],
+  "109": [
+   {
+    "title": "should let a user to deposit TGT into the merge contract",
+    "file": "test/hardhat/MergeTgt.test.ts"
+   },
+   {
+    "title": "should not let a user to transfer TITN tokens",
+    "file": "test/hardhat/MergeTgt.test.ts"
+   },
+   {
+    "title": "should let a user to bridge TITN tokens to BASE",
+    "file": "test/hardhat/MergeTgt.test.ts"
+   },
+   {
+    "title": "should allow withdrawal of remaining TITN after 1 year",
+    "file": "test/hardhat/MergeTgt.test.ts"
+   }
+  ],
+  "111": [
+   {
+    "title": "should let a user to deposit TGT into the merge contract",
+    "file": "test/hardhat/MergeTgt.test.ts"
+   },
+   {
+    "title": "should not let a user to transfer TITN tokens",
+    "file": "test/hardhat/MergeTgt.test.ts"
+   },
+   {
+    "title": "should let a user to bridge TITN tokens to BASE",
+    "file": "test/hardhat/MergeTgt.test.ts"
+   },
+   {
+    "title": "should allow withdrawal of remaining TITN after 1 year",
+    "file": "test/hardhat/MergeTgt.test.ts"
+   }
+  ],
+  "115": [
+   {
+    "title": "should allow withdrawal of remaining TITN after 1 year",
+    "file": "test/hardhat/MergeTgt.test.ts"
+   }
+  ],
+  "117": [
+   {
+    "title": "should allow withdrawal of remaining TITN after 1 year",
+    "file": "test/hardhat/MergeTgt.test.ts"
+   }
+  ],
+  "118": [],
+  "121": [
+   {
+    "title": "should allow withdrawal of remaining TITN after 1 year",
+    "file": "test/hardhat/MergeTgt.test.ts"
+   }
+  ],
+  "123": [
+   {
+    "title": "should allow withdrawal of remaining TITN after 1 year",
+    "file": "test/hardhat/MergeTgt.test.ts"
+   }
+  ],
+  "125": [
+   {
+    "title": "should allow withdrawal of remaining TITN after 1 year",
+    "file": "test/hardhat/MergeTgt.test.ts"
+   }
+  ],
+  "128": [
+   {
+    "title": "should allow withdrawal of remaining TITN after 1 year",
+    "file": "test/hardhat/MergeTgt.test.ts"
+   }
+  ],
+  "131": [
+   {
+    "title": "should allow withdrawal of remaining TITN after 1 year",
+    "file": "test/hardhat/MergeTgt.test.ts"
+   }
+  ],
+  "132": [
+   {
+    "title": "should allow withdrawal of remaining TITN after 1 year",
+    "file": "test/hardhat/MergeTgt.test.ts"
+   }
+  ],
+  "135": [
+   {
+    "title": "should allow withdrawal of remaining TITN after 1 year",
+    "file": "test/hardhat/MergeTgt.test.ts"
+   }
+  ],
+  "136": [
+   {
+    "title": "should allow withdrawal of remaining TITN after 1 year",
+    "file": "test/hardhat/MergeTgt.test.ts"
+   }
+  ],
+  "138": [
+   {
+    "title": "should allow withdrawal of remaining TITN after 1 year",
+    "file": "test/hardhat/MergeTgt.test.ts"
+   }
+  ],
+  "141": [
+   {
+    "title": "should allow withdrawal of remaining TITN after 1 year",
+    "file": "test/hardhat/MergeTgt.test.ts"
+   }
+  ],
+  "142": [
+   {
+    "title": "should allow withdrawal of remaining TITN after 1 year",
+    "file": "test/hardhat/MergeTgt.test.ts"
+   }
+  ],
+  "144": [
+   {
+    "title": "should allow withdrawal of remaining TITN after 1 year",
+    "file": "test/hardhat/MergeTgt.test.ts"
+   }
+  ],
+  "145": [
+   {
+    "title": "should allow withdrawal of remaining TITN after 1 year",
+    "file": "test/hardhat/MergeTgt.test.ts"
+   }
+  ],
+  "148": [
+   {
+    "title": "should allow withdrawal of remaining TITN after 1 year",
+    "file": "test/hardhat/MergeTgt.test.ts"
+   }
+  ],
+  "150": [
+   {
+    "title": "should allow withdrawal of remaining TITN after 1 year",
+    "file": "test/hardhat/MergeTgt.test.ts"
+   }
+  ],
+  "154": [
+   {
+    "title": "should let a user to deposit TGT into the merge contract",
+    "file": "test/hardhat/MergeTgt.test.ts"
+   },
+   {
+    "title": "should not let a user to transfer TITN tokens",
+    "file": "test/hardhat/MergeTgt.test.ts"
+   },
+   {
+    "title": "should let a user to bridge TITN tokens to BASE",
+    "file": "test/hardhat/MergeTgt.test.ts"
+   },
+   {
+    "title": "should get lower quotes after 90 days have elapsed",
+    "file": "test/hardhat/MergeTgt.test.ts"
+   },
+   {
+    "title": "should allow withdrawal of remaining TITN after 1 year",
+    "file": "test/hardhat/MergeTgt.test.ts"
+   }
+  ],
+  "156": [
+   {
+    "title": "should let a user to deposit TGT into the merge contract",
+    "file": "test/hardhat/MergeTgt.test.ts"
+   },
+   {
+    "title": "should not let a user to transfer TITN tokens",
+    "file": "test/hardhat/MergeTgt.test.ts"
+   },
+   {
+    "title": "should let a user to bridge TITN tokens to BASE",
+    "file": "test/hardhat/MergeTgt.test.ts"
+   },
+   {
+    "title": "should get lower quotes after 90 days have elapsed",
+    "file": "test/hardhat/MergeTgt.test.ts"
+   },
+   {
+    "title": "should allow withdrawal of remaining TITN after 1 year",
+    "file": "test/hardhat/MergeTgt.test.ts"
+   }
+  ],
+  "157": [
+   {
+    "title": "should let a user to deposit TGT into the merge contract",
+    "file": "test/hardhat/MergeTgt.test.ts"
+   },
+   {
+    "title": "should not let a user to transfer TITN tokens",
+    "file": "test/hardhat/MergeTgt.test.ts"
+   },
+   {
+    "title": "should let a user to bridge TITN tokens to BASE",
+    "file": "test/hardhat/MergeTgt.test.ts"
+   },
+   {
+    "title": "should get lower quotes after 90 days have elapsed",
+    "file": "test/hardhat/MergeTgt.test.ts"
+   },
+   {
+    "title": "should allow withdrawal of remaining TITN after 1 year",
+    "file": "test/hardhat/MergeTgt.test.ts"
+   }
+  ],
+  "158": [
+   {
+    "title": "should let a user to deposit TGT into the merge contract",
+    "file": "test/hardhat/MergeTgt.test.ts"
+   },
+   {
+    "title": "should not let a user to transfer TITN tokens",
+    "file": "test/hardhat/MergeTgt.test.ts"
+   },
+   {
+    "title": "should let a user to bridge TITN tokens to BASE",
+    "file": "test/hardhat/MergeTgt.test.ts"
+   },
+   {
+    "title": "should get lower quotes after 90 days have elapsed",
+    "file": "test/hardhat/MergeTgt.test.ts"
+   },
+   {
+    "title": "should allow withdrawal of remaining TITN after 1 year",
+    "file": "test/hardhat/MergeTgt.test.ts"
+   }
+  ],
+  "160": [
+   {
+    "title": "should get lower quotes after 90 days have elapsed",
+    "file": "test/hardhat/MergeTgt.test.ts"
+   }
+  ],
+  "161": [
+   {
+    "title": "should get lower quotes after 90 days have elapsed",
+    "file": "test/hardhat/MergeTgt.test.ts"
+   }
+  ],
+  "163": [
+   {
+    "title": "should get lower quotes after 90 days have elapsed",
+    "file": "test/hardhat/MergeTgt.test.ts"
+   }
+  ],
+  "168": [
+   {
+    "title": "should let a user to deposit TGT into the merge contract",
+    "file": "test/hardhat/MergeTgt.test.ts"
+   },
+   {
+    "title": "should not let a user to transfer TITN tokens",
+    "file": "test/hardhat/MergeTgt.test.ts"
+   },
+   {
+    "title": "should let a user to bridge TITN tokens to BASE",
+    "file": "test/hardhat/MergeTgt.test.ts"
+   },
+   {
+    "title": "should get lower quotes after 90 days have elapsed",
+    "file": "test/hardhat/MergeTgt.test.ts"
+   },
+   {
+    "title": "should allow withdrawal of remaining TITN after 1 year",
+    "file": "test/hardhat/MergeTgt.test.ts"
+   }
+  ],
+  "169": [
+   {
+    "title": "should let a user to deposit TGT into the merge contract",
+    "file": "test/hardhat/MergeTgt.test.ts"
+   },
+   {
+    "title": "should not let a user to transfer TITN tokens",
+    "file": "test/hardhat/MergeTgt.test.ts"
+   },
+   {
+    "title": "should let a user to bridge TITN tokens to BASE",
+    "file": "test/hardhat/MergeTgt.test.ts"
+   },
+   {
+    "title": "should get lower quotes after 90 days have elapsed",
+    "file": "test/hardhat/MergeTgt.test.ts"
+   },
+   {
+    "title": "should allow withdrawal of remaining TITN after 1 year",
+    "file": "test/hardhat/MergeTgt.test.ts"
+   }
+  ],
+  "173": [
+   {
+    "title": "should let a user to deposit TGT into the merge contract",
+    "file": "test/hardhat/MergeTgt.test.ts"
+   },
+   {
+    "title": "should not let a user to transfer TITN tokens",
+    "file": "test/hardhat/MergeTgt.test.ts"
+   },
+   {
+    "title": "should let a user to bridge TITN tokens to BASE",
+    "file": "test/hardhat/MergeTgt.test.ts"
+   },
+   {
+    "title": "should get lower quotes after 90 days have elapsed",
+    "file": "test/hardhat/MergeTgt.test.ts"
+   },
+   {
+    "title": "should allow withdrawal of remaining TITN after 1 year",
+    "file": "test/hardhat/MergeTgt.test.ts"
+   }
+  ],
+  "174": [
+   {
+    "title": "should let a user to deposit TGT into the merge contract",
+    "file": "test/hardhat/MergeTgt.test.ts"
+   },
+   {
+    "title": "should not let a user to transfer TITN tokens",
+    "file": "test/hardhat/MergeTgt.test.ts"
+   },
+   {
+    "title": "should let a user to bridge TITN tokens to BASE",
+    "file": "test/hardhat/MergeTgt.test.ts"
+   },
+   {
+    "title": "should get lower quotes after 90 days have elapsed",
+    "file": "test/hardhat/MergeTgt.test.ts"
+   },
+   {
+    "title": "should allow withdrawal of remaining TITN after 1 year",
+    "file": "test/hardhat/MergeTgt.test.ts"
+   }
+  ],
+  "175": [
+   {
+    "title": "should let a user to deposit TGT into the merge contract",
+    "file": "test/hardhat/MergeTgt.test.ts"
+   },
+   {
+    "title": "should not let a user to transfer TITN tokens",
+    "file": "test/hardhat/MergeTgt.test.ts"
+   },
+   {
+    "title": "should let a user to bridge TITN tokens to BASE",
+    "file": "test/hardhat/MergeTgt.test.ts"
+   },
+   {
+    "title": "should get lower quotes after 90 days have elapsed",
+    "file": "test/hardhat/MergeTgt.test.ts"
+   },
+   {
+    "title": "should allow withdrawal of remaining TITN after 1 year",
+    "file": "test/hardhat/MergeTgt.test.ts"
+   }
+  ],
+  "179": [],
+  "183": []
+ },
+ "contracts/mocks/Tgt.sol": {
+  "18": [
+   {
+    "title": "should let a user to deposit TGT into the merge contract",
+    "file": "test/hardhat/MergeTgt.test.ts"
+   },
+   {
+    "title": "should not let a user to transfer TITN tokens",
+    "file": "test/hardhat/MergeTgt.test.ts"
+   },
+   {
+    "title": "should let a user to bridge TITN tokens to BASE",
+    "file": "test/hardhat/MergeTgt.test.ts"
+   },
+   {
+    "title": "should get lower quotes after 90 days have elapsed",
+    "file": "test/hardhat/MergeTgt.test.ts"
+   },
+   {
+    "title": "should allow withdrawal of remaining TITN after 1 year",
+    "file": "test/hardhat/MergeTgt.test.ts"
+   }
+  ],
+  "28": [
+   {
+    "title": "should let a user to deposit TGT into the merge contract",
+    "file": "test/hardhat/MergeTgt.test.ts"
+   },
+   {
+    "title": "should not let a user to transfer TITN tokens",
+    "file": "test/hardhat/MergeTgt.test.ts"
+   },
+   {
+    "title": "should let a user to bridge TITN tokens to BASE",
+    "file": "test/hardhat/MergeTgt.test.ts"
+   },
+   {
+    "title": "should allow withdrawal of remaining TITN after 1 year",
+    "file": "test/hardhat/MergeTgt.test.ts"
+   }
+  ],
+  "30": [
+   {
+    "title": "should let a user to deposit TGT into the merge contract",
+    "file": "test/hardhat/MergeTgt.test.ts"
+   },
+   {
+    "title": "should not let a user to transfer TITN tokens",
+    "file": "test/hardhat/MergeTgt.test.ts"
+   },
+   {
+    "title": "should let a user to bridge TITN tokens to BASE",
+    "file": "test/hardhat/MergeTgt.test.ts"
+   },
+   {
+    "title": "should allow withdrawal of remaining TITN after 1 year",
+    "file": "test/hardhat/MergeTgt.test.ts"
+   }
+  ],
+  "31": [
+   {
+    "title": "should let a user to deposit TGT into the merge contract",
+    "file": "test/hardhat/MergeTgt.test.ts"
+   },
+   {
+    "title": "should not let a user to transfer TITN tokens",
+    "file": "test/hardhat/MergeTgt.test.ts"
+   },
+   {
+    "title": "should let a user to bridge TITN tokens to BASE",
+    "file": "test/hardhat/MergeTgt.test.ts"
+   },
+   {
+    "title": "should allow withdrawal of remaining TITN after 1 year",
+    "file": "test/hardhat/MergeTgt.test.ts"
+   }
+  ],
+  "34": [
+   {
+    "title": "should let a user to deposit TGT into the merge contract",
+    "file": "test/hardhat/MergeTgt.test.ts"
+   },
+   {
+    "title": "should not let a user to transfer TITN tokens",
+    "file": "test/hardhat/MergeTgt.test.ts"
+   },
+   {
+    "title": "should let a user to bridge TITN tokens to BASE",
+    "file": "test/hardhat/MergeTgt.test.ts"
+   },
+   {
+    "title": "should allow withdrawal of remaining TITN after 1 year",
+    "file": "test/hardhat/MergeTgt.test.ts"
+   }
+  ],
+  "43": [
+   {
+    "title": "should let a user to deposit TGT into the merge contract",
+    "file": "test/hardhat/MergeTgt.test.ts"
+   },
+   {
+    "title": "should not let a user to transfer TITN tokens",
+    "file": "test/hardhat/MergeTgt.test.ts"
+   },
+   {
+    "title": "should let a user to bridge TITN tokens to BASE",
+    "file": "test/hardhat/MergeTgt.test.ts"
+   },
+   {
+    "title": "should allow withdrawal of remaining TITN after 1 year",
+    "file": "test/hardhat/MergeTgt.test.ts"
+   }
+  ],
+  "44": [
+   {
+    "title": "should let a user to deposit TGT into the merge contract",
+    "file": "test/hardhat/MergeTgt.test.ts"
+   },
+   {
+    "title": "should not let a user to transfer TITN tokens",
+    "file": "test/hardhat/MergeTgt.test.ts"
+   },
+   {
+    "title": "should let a user to bridge TITN tokens to BASE",
+    "file": "test/hardhat/MergeTgt.test.ts"
+   },
+   {
+    "title": "should allow withdrawal of remaining TITN after 1 year",
+    "file": "test/hardhat/MergeTgt.test.ts"
+   }
+  ],
+  "47": [
+   {
+    "title": "should let a user to deposit TGT into the merge contract",
+    "file": "test/hardhat/MergeTgt.test.ts"
+   },
+   {
+    "title": "should not let a user to transfer TITN tokens",
+    "file": "test/hardhat/MergeTgt.test.ts"
+   },
+   {
+    "title": "should let a user to bridge TITN tokens to BASE",
+    "file": "test/hardhat/MergeTgt.test.ts"
+   },
+   {
+    "title": "should allow withdrawal of remaining TITN after 1 year",
+    "file": "test/hardhat/MergeTgt.test.ts"
+   }
+  ]
+ },
+ "contracts/Titn.sol": {
+  "23": [
+   {
+    "title": "should let a user to deposit TGT into the merge contract",
+    "file": "test/hardhat/MergeTgt.test.ts"
+   },
+   {
+    "title": "should not let a user to transfer TITN tokens",
+    "file": "test/hardhat/MergeTgt.test.ts"
+   },
+   {
+    "title": "should let a user to bridge TITN tokens to BASE",
+    "file": "test/hardhat/MergeTgt.test.ts"
+   },
+   {
+    "title": "should get lower quotes after 90 days have elapsed",
+    "file": "test/hardhat/MergeTgt.test.ts"
+   },
+   {
+    "title": "should allow withdrawal of remaining TITN after 1 year",
+    "file": "test/hardhat/MergeTgt.test.ts"
+   },
+   {
+    "title": "should send a token from A address to B address via each OFT",
+    "file": "test/hardhat/Titn.test.ts"
+   },
+   {
+    "title": "should bridge tokens back from ARB to BASE",
+    "file": "test/hardhat/Titn.test.ts"
+   }
+  ],
+  "24": [
+   {
+    "title": "should let a user to deposit TGT into the merge contract",
+    "file": "test/hardhat/MergeTgt.test.ts"
+   },
+   {
+    "title": "should not let a user to transfer TITN tokens",
+    "file": "test/hardhat/MergeTgt.test.ts"
+   },
+   {
+    "title": "should let a user to bridge TITN tokens to BASE",
+    "file": "test/hardhat/MergeTgt.test.ts"
+   },
+   {
+    "title": "should get lower quotes after 90 days have elapsed",
+    "file": "test/hardhat/MergeTgt.test.ts"
+   },
+   {
+    "title": "should allow withdrawal of remaining TITN after 1 year",
+    "file": "test/hardhat/MergeTgt.test.ts"
+   },
+   {
+    "title": "should send a token from A address to B address via each OFT",
+    "file": "test/hardhat/Titn.test.ts"
+   },
+   {
+    "title": "should bridge tokens back from ARB to BASE",
+    "file": "test/hardhat/Titn.test.ts"
+   }
+  ],
+  "25": [
+   {
+    "title": "should let a user to deposit TGT into the merge contract",
+    "file": "test/hardhat/MergeTgt.test.ts"
+   },
+   {
+    "title": "should not let a user to transfer TITN tokens",
+    "file": "test/hardhat/MergeTgt.test.ts"
+   },
+   {
+    "title": "should let a user to bridge TITN tokens to BASE",
+    "file": "test/hardhat/MergeTgt.test.ts"
+   },
+   {
+    "title": "should get lower quotes after 90 days have elapsed",
+    "file": "test/hardhat/MergeTgt.test.ts"
+   },
+   {
+    "title": "should allow withdrawal of remaining TITN after 1 year",
+    "file": "test/hardhat/MergeTgt.test.ts"
+   },
+   {
+    "title": "should send a token from A address to B address via each OFT",
+    "file": "test/hardhat/Titn.test.ts"
+   },
+   {
+    "title": "should bridge tokens back from ARB to BASE",
+    "file": "test/hardhat/Titn.test.ts"
+   }
+  ],
+  "34": [
+   {
+    "title": "should let a user to deposit TGT into the merge contract",
+    "file": "test/hardhat/MergeTgt.test.ts"
+   },
+   {
+    "title": "should not let a user to transfer TITN tokens",
+    "file": "test/hardhat/MergeTgt.test.ts"
+   },
+   {
+    "title": "should let a user to bridge TITN tokens to BASE",
+    "file": "test/hardhat/MergeTgt.test.ts"
+   },
+   {
+    "title": "should get lower quotes after 90 days have elapsed",
+    "file": "test/hardhat/MergeTgt.test.ts"
+   },
+   {
+    "title": "should allow withdrawal of remaining TITN after 1 year",
+    "file": "test/hardhat/MergeTgt.test.ts"
+   }
+  ],
+  "35": [
+   {
+    "title": "should let a user to deposit TGT into the merge contract",
+    "file": "test/hardhat/MergeTgt.test.ts"
+   },
+   {
+    "title": "should not let a user to transfer TITN tokens",
+    "file": "test/hardhat/MergeTgt.test.ts"
+   },
+   {
+    "title": "should let a user to bridge TITN tokens to BASE",
+    "file": "test/hardhat/MergeTgt.test.ts"
+   },
+   {
+    "title": "should get lower quotes after 90 days have elapsed",
+    "file": "test/hardhat/MergeTgt.test.ts"
+   },
+   {
+    "title": "should allow withdrawal of remaining TITN after 1 year",
+    "file": "test/hardhat/MergeTgt.test.ts"
+   }
+  ],
+  "39": [],
+  "44": [
+   {
+    "title": "should let a user to bridge TITN tokens to BASE",
+    "file": "test/hardhat/MergeTgt.test.ts"
+   }
+  ],
+  "45": [
+   {
+    "title": "should let a user to bridge TITN tokens to BASE",
+    "file": "test/hardhat/MergeTgt.test.ts"
+   }
+  ],
+  "49": [],
+  "57": [
+   {
+    "title": "should let a user to deposit TGT into the merge contract",
+    "file": "test/hardhat/MergeTgt.test.ts"
+   },
+   {
+    "title": "should not let a user to transfer TITN tokens",
+    "file": "test/hardhat/MergeTgt.test.ts"
+   },
+   {
+    "title": "should let a user to bridge TITN tokens to BASE",
+    "file": "test/hardhat/MergeTgt.test.ts"
+   },
+   {
+    "title": "should allow withdrawal of remaining TITN after 1 year",
+    "file": "test/hardhat/MergeTgt.test.ts"
+   }
+  ],
+  "58": [
+   {
+    "title": "should let a user to deposit TGT into the merge contract",
+    "file": "test/hardhat/MergeTgt.test.ts"
+   },
+   {
+    "title": "should not let a user to transfer TITN tokens",
+    "file": "test/hardhat/MergeTgt.test.ts"
+   },
+   {
+    "title": "should let a user to bridge TITN tokens to BASE",
+    "file": "test/hardhat/MergeTgt.test.ts"
+   },
+   {
+    "title": "should allow withdrawal of remaining TITN after 1 year",
+    "file": "test/hardhat/MergeTgt.test.ts"
+   }
+  ],
+  "62": [
+   {
+    "title": "should let a user to deposit TGT into the merge contract",
+    "file": "test/hardhat/MergeTgt.test.ts"
+   },
+   {
+    "title": "should not let a user to transfer TITN tokens",
+    "file": "test/hardhat/MergeTgt.test.ts"
+   },
+   {
+    "title": "should let a user to bridge TITN tokens to BASE",
+    "file": "test/hardhat/MergeTgt.test.ts"
+   },
+   {
+    "title": "should get lower quotes after 90 days have elapsed",
+    "file": "test/hardhat/MergeTgt.test.ts"
+   },
+   {
+    "title": "should allow withdrawal of remaining TITN after 1 year",
+    "file": "test/hardhat/MergeTgt.test.ts"
+   }
+  ],
+  "63": [
+   {
+    "title": "should let a user to deposit TGT into the merge contract",
+    "file": "test/hardhat/MergeTgt.test.ts"
+   },
+   {
+    "title": "should not let a user to transfer TITN tokens",
+    "file": "test/hardhat/MergeTgt.test.ts"
+   },
+   {
+    "title": "should let a user to bridge TITN tokens to BASE",
+    "file": "test/hardhat/MergeTgt.test.ts"
+   },
+   {
+    "title": "should get lower quotes after 90 days have elapsed",
+    "file": "test/hardhat/MergeTgt.test.ts"
+   },
+   {
+    "title": "should allow withdrawal of remaining TITN after 1 year",
+    "file": "test/hardhat/MergeTgt.test.ts"
+   }
+  ],
+  "73": [
+   {
+    "title": "should let a user to deposit TGT into the merge contract",
+    "file": "test/hardhat/MergeTgt.test.ts"
+   },
+   {
+    "title": "should not let a user to transfer TITN tokens",
+    "file": "test/hardhat/MergeTgt.test.ts"
+   },
+   {
+    "title": "should let a user to bridge TITN tokens to BASE",
+    "file": "test/hardhat/MergeTgt.test.ts"
+   },
+   {
+    "title": "should get lower quotes after 90 days have elapsed",
+    "file": "test/hardhat/MergeTgt.test.ts"
+   },
+   {
+    "title": "should allow withdrawal of remaining TITN after 1 year",
+    "file": "test/hardhat/MergeTgt.test.ts"
+   }
+  ],
+  "76": [
+   {
+    "title": "should let a user to deposit TGT into the merge contract",
+    "file": "test/hardhat/MergeTgt.test.ts"
+   },
+   {
+    "title": "should not let a user to transfer TITN tokens",
+    "file": "test/hardhat/MergeTgt.test.ts"
+   },
+   {
+    "title": "should let a user to bridge TITN tokens to BASE",
+    "file": "test/hardhat/MergeTgt.test.ts"
+   },
+   {
+    "title": "should get lower quotes after 90 days have elapsed",
+    "file": "test/hardhat/MergeTgt.test.ts"
+   },
+   {
+    "title": "should allow withdrawal of remaining TITN after 1 year",
+    "file": "test/hardhat/MergeTgt.test.ts"
+   }
+  ],
+  "85": [
+   {
+    "title": "should not let a user to transfer TITN tokens",
+    "file": "test/hardhat/MergeTgt.test.ts"
+   },
+   {
+    "title": "should let a user to bridge TITN tokens to BASE",
+    "file": "test/hardhat/MergeTgt.test.ts"
+   }
+  ],
+  "101": [
+   {
+    "title": "should let a user to deposit TGT into the merge contract",
+    "file": "test/hardhat/MergeTgt.test.ts"
+   },
+   {
+    "title": "should not let a user to transfer TITN tokens",
+    "file": "test/hardhat/MergeTgt.test.ts"
+   },
+   {
+    "title": "should let a user to bridge TITN tokens to BASE",
+    "file": "test/hardhat/MergeTgt.test.ts"
+   },
+   {
+    "title": "should get lower quotes after 90 days have elapsed",
+    "file": "test/hardhat/MergeTgt.test.ts"
+   },
+   {
+    "title": "should allow withdrawal of remaining TITN after 1 year",
+    "file": "test/hardhat/MergeTgt.test.ts"
+   },
+   {
+    "title": "should send a token from A address to B address via each OFT",
+    "file": "test/hardhat/Titn.test.ts"
+   },
+   {
+    "title": "should bridge tokens back from ARB to BASE",
+    "file": "test/hardhat/Titn.test.ts"
+   }
+  ],
+  "103": [
+   {
+    "title": "should let a user to deposit TGT into the merge contract",
+    "file": "test/hardhat/MergeTgt.test.ts"
+   },
+   {
+    "title": "should not let a user to transfer TITN tokens",
+    "file": "test/hardhat/MergeTgt.test.ts"
+   },
+   {
+    "title": "should let a user to bridge TITN tokens to BASE",
+    "file": "test/hardhat/MergeTgt.test.ts"
+   },
+   {
+    "title": "should get lower quotes after 90 days have elapsed",
+    "file": "test/hardhat/MergeTgt.test.ts"
+   },
+   {
+    "title": "should allow withdrawal of remaining TITN after 1 year",
+    "file": "test/hardhat/MergeTgt.test.ts"
+   },
+   {
+    "title": "should send a token from A address to B address via each OFT",
+    "file": "test/hardhat/Titn.test.ts"
+   },
+   {
+    "title": "should bridge tokens back from ARB to BASE",
+    "file": "test/hardhat/Titn.test.ts"
+   }
+  ],
+  "106": [
+   {
+    "title": "should let a user to deposit TGT into the merge contract",
+    "file": "test/hardhat/MergeTgt.test.ts"
+   },
+   {
+    "title": "should not let a user to transfer TITN tokens",
+    "file": "test/hardhat/MergeTgt.test.ts"
+   },
+   {
+    "title": "should let a user to bridge TITN tokens to BASE",
+    "file": "test/hardhat/MergeTgt.test.ts"
+   },
+   {
+    "title": "should get lower quotes after 90 days have elapsed",
+    "file": "test/hardhat/MergeTgt.test.ts"
+   },
+   {
+    "title": "should allow withdrawal of remaining TITN after 1 year",
+    "file": "test/hardhat/MergeTgt.test.ts"
+   },
+   {
+    "title": "should send a token from A address to B address via each OFT",
+    "file": "test/hardhat/Titn.test.ts"
+   },
+   {
+    "title": "should bridge tokens back from ARB to BASE",
+    "file": "test/hardhat/Titn.test.ts"
+   }
+  ],
+  "107": [
+   {
+    "title": "should let a user to deposit TGT into the merge contract",
+    "file": "test/hardhat/MergeTgt.test.ts"
+   },
+   {
+    "title": "should not let a user to transfer TITN tokens",
+    "file": "test/hardhat/MergeTgt.test.ts"
+   },
+   {
+    "title": "should let a user to bridge TITN tokens to BASE",
+    "file": "test/hardhat/MergeTgt.test.ts"
+   },
+   {
+    "title": "should get lower quotes after 90 days have elapsed",
+    "file": "test/hardhat/MergeTgt.test.ts"
+   },
+   {
+    "title": "should allow withdrawal of remaining TITN after 1 year",
+    "file": "test/hardhat/MergeTgt.test.ts"
+   },
+   {
+    "title": "should send a token from A address to B address via each OFT",
+    "file": "test/hardhat/Titn.test.ts"
+   },
+   {
+    "title": "should bridge tokens back from ARB to BASE",
+    "file": "test/hardhat/Titn.test.ts"
+   }
+  ],
+  "111": [
+   {
+    "title": "should let a user to deposit TGT into the merge contract",
+    "file": "test/hardhat/MergeTgt.test.ts"
+   },
+   {
+    "title": "should not let a user to transfer TITN tokens",
+    "file": "test/hardhat/MergeTgt.test.ts"
+   },
+   {
+    "title": "should let a user to bridge TITN tokens to BASE",
+    "file": "test/hardhat/MergeTgt.test.ts"
+   },
+   {
+    "title": "should get lower quotes after 90 days have elapsed",
+    "file": "test/hardhat/MergeTgt.test.ts"
+   },
+   {
+    "title": "should allow withdrawal of remaining TITN after 1 year",
+    "file": "test/hardhat/MergeTgt.test.ts"
+   },
+   {
+    "title": "should send a token from A address to B address via each OFT",
+    "file": "test/hardhat/Titn.test.ts"
+   },
+   {
+    "title": "should bridge tokens back from ARB to BASE",
+    "file": "test/hardhat/Titn.test.ts"
+   }
+  ]
+ }
+}

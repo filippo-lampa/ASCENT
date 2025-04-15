@@ -1,0 +1,1019 @@
+<!doctype html>
+<html lang="en">
+<head>
+    <title>Code coverage report for contracts/QuadGovernance.sol</title>
+    <meta charset="utf-8" />
+    <link rel="stylesheet" href="../prettify.css" />
+    <link rel="stylesheet" href="../base.css" />
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <style type='text/css'>
+        .coverage-summary .sorter {
+            background-image: url(../sort-arrow-sprite.png);
+        }
+    </style>
+</head>
+<body>
+<div class='wrapper'>
+  <div class='pad1'>
+    <h1>
+      <a href="../index.html">all files</a> / <a href="index.html">contracts/</a> QuadGovernance.sol
+    </h1>
+    <div class='clearfix'>
+      <div class='fl pad1y space-right2'>
+        <span class="strong">100% </span>
+        <span class="quiet">Statements</span>
+        <span class='fraction'>80/80</span>
+      </div>
+      <div class='fl pad1y space-right2'>
+        <span class="strong">95.24% </span>
+        <span class="quiet">Branches</span>
+        <span class='fraction'>80/84</span>
+      </div>
+      <div class='fl pad1y space-right2'>
+        <span class="strong">100% </span>
+        <span class="quiet">Functions</span>
+        <span class='fraction'>19/19</span>
+      </div>
+      <div class='fl pad1y space-right2'>
+        <span class="strong">100% </span>
+        <span class="quiet">Lines</span>
+        <span class='fraction'>105/105</span>
+      </div>
+    </div>
+  </div>
+  <div class='status-line high'></div>
+<pre><table class="coverage">
+<tr><td class="line-count quiet">1
+2
+3
+4
+5
+6
+7
+8
+9
+10
+11
+12
+13
+14
+15
+16
+17
+18
+19
+20
+21
+22
+23
+24
+25
+26
+27
+28
+29
+30
+31
+32
+33
+34
+35
+36
+37
+38
+39
+40
+41
+42
+43
+44
+45
+46
+47
+48
+49
+50
+51
+52
+53
+54
+55
+56
+57
+58
+59
+60
+61
+62
+63
+64
+65
+66
+67
+68
+69
+70
+71
+72
+73
+74
+75
+76
+77
+78
+79
+80
+81
+82
+83
+84
+85
+86
+87
+88
+89
+90
+91
+92
+93
+94
+95
+96
+97
+98
+99
+100
+101
+102
+103
+104
+105
+106
+107
+108
+109
+110
+111
+112
+113
+114
+115
+116
+117
+118
+119
+120
+121
+122
+123
+124
+125
+126
+127
+128
+129
+130
+131
+132
+133
+134
+135
+136
+137
+138
+139
+140
+141
+142
+143
+144
+145
+146
+147
+148
+149
+150
+151
+152
+153
+154
+155
+156
+157
+158
+159
+160
+161
+162
+163
+164
+165
+166
+167
+168
+169
+170
+171
+172
+173
+174
+175
+176
+177
+178
+179
+180
+181
+182
+183
+184
+185
+186
+187
+188
+189
+190
+191
+192
+193
+194
+195
+196
+197
+198
+199
+200
+201
+202
+203
+204
+205
+206
+207
+208
+209
+210
+211
+212
+213
+214
+215
+216
+217
+218
+219
+220
+221
+222
+223
+224
+225
+226
+227
+228
+229
+230
+231
+232
+233
+234
+235
+236
+237
+238
+239
+240
+241
+242
+243
+244
+245
+246
+247
+248
+249
+250
+251
+252
+253
+254
+255
+256
+257
+258
+259
+260
+261
+262
+263
+264
+265
+266
+267
+268
+269
+270
+271
+272
+273
+274
+275
+276
+277
+278
+279
+280
+281
+282
+283
+284
+285
+286
+287
+288
+289
+290
+291
+292
+293
+294
+295
+296
+297
+298
+299
+300
+301
+302
+303
+304
+305
+306
+307
+308
+309
+310
+311
+312
+313
+314
+315
+316
+317
+318
+319</td><td class="line-coverage quiet"><span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-yes">489×</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-yes">489×</span>
+<span class="cline-any cline-yes">489×</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-yes">489×</span>
+<span class="cline-any cline-yes">489×</span>
+<span class="cline-any cline-yes">489×</span>
+<span class="cline-any cline-yes">489×</span>
+<span class="cline-any cline-yes">489×</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-yes">489×</span>
+<span class="cline-any cline-yes">489×</span>
+<span class="cline-any cline-yes">489×</span>
+<span class="cline-any cline-yes">489×</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-yes">489×</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-yes">489×</span>
+<span class="cline-any cline-yes">489×</span>
+<span class="cline-any cline-yes">489×</span>
+<span class="cline-any cline-yes">489×</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-yes">166×</span>
+<span class="cline-any cline-yes">165×</span>
+<span class="cline-any cline-yes">164×</span>
+<span class="cline-any cline-yes">163×</span>
+<span class="cline-any cline-yes">163×</span>
+<span class="cline-any cline-yes">163×</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-yes">166×</span>
+<span class="cline-any cline-yes">165×</span>
+<span class="cline-any cline-yes">164×</span>
+<span class="cline-any cline-yes">163×</span>
+<span class="cline-any cline-yes">163×</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-yes">163×</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-yes">8×</span>
+<span class="cline-any cline-yes">7×</span>
+<span class="cline-any cline-yes">6×</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-yes">5×</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-yes">3×</span>
+<span class="cline-any cline-yes">2×</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-yes">1×</span>
+<span class="cline-any cline-yes">1×</span>
+<span class="cline-any cline-yes">1×</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-yes">5×</span>
+<span class="cline-any cline-yes">4×</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-yes">3×</span>
+<span class="cline-any cline-yes">3×</span>
+<span class="cline-any cline-yes">3×</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-yes">5×</span>
+<span class="cline-any cline-yes">4×</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-yes">3×</span>
+<span class="cline-any cline-yes">3×</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-yes">11×</span>
+<span class="cline-any cline-yes">10×</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-yes">9×</span>
+<span class="cline-any cline-yes">9×</span>
+<span class="cline-any cline-yes">2×</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-yes">7×</span>
+<span class="cline-any cline-yes">13×</span>
+<span class="cline-any cline-yes">7×</span>
+<span class="cline-any cline-yes">7×</span>
+<span class="cline-any cline-yes">7×</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-yes">9×</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-yes">6×</span>
+<span class="cline-any cline-yes">5×</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-yes">4×</span>
+<span class="cline-any cline-yes">4×</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-yes">4×</span>
+<span class="cline-any cline-yes">3×</span>
+<span class="cline-any cline-yes">2×</span>
+<span class="cline-any cline-yes">2×</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-yes">2×</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-yes">5×</span>
+<span class="cline-any cline-yes">4×</span>
+<span class="cline-any cline-yes">3×</span>
+<span class="cline-any cline-yes">3×</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-yes">3×</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-yes">167×</span>
+<span class="cline-any cline-yes">166×</span>
+<span class="cline-any cline-yes">165×</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-yes">164×</span>
+<span class="cline-any cline-yes">163×</span>
+<span class="cline-any cline-yes">163×</span>
+<span class="cline-any cline-yes">163×</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-yes">4×</span>
+<span class="cline-any cline-yes">3×</span>
+<span class="cline-any cline-yes">2×</span>
+<span class="cline-any cline-yes">2×</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-yes">2×</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-yes">172×</span>
+<span class="cline-any cline-yes">171×</span>
+<span class="cline-any cline-yes">170×</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-yes">169×</span>
+<span class="cline-any cline-yes">169×</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-yes">169×</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-yes">167×</span>
+<span class="cline-any cline-yes">166×</span>
+<span class="cline-any cline-yes">165×</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-yes">164×</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-yes">164×</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-yes">163×</span>
+<span class="cline-any cline-yes">163×</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-yes">18×</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-yes">2×</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-yes">45×</span>
+<span class="cline-any cline-yes">45×</span>
+<span class="cline-any cline-yes">43×</span>
+<span class="cline-any cline-yes">43×</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-yes">10×</span>
+<span class="cline-any cline-yes">10×</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span></td><td class="text"><pre class="prettyprint lang-js">//SPDX-License-Identifier: MIT
+pragma solidity ^0.8.4;
+&nbsp;
+import "@openzeppelin/contracts-upgradeable/token/ERC20/extensions/IERC20MetadataUpgradeable.sol";
+import "@openzeppelin/contracts-upgradeable/access/AccessControlUpgradeable.sol";
+import "@openzeppelin/contracts-upgradeable/proxy/utils/UUPSUpgradeable.sol";
+import "./interfaces/IQuadPassport.sol";
+import "./interfaces/IUniswapAnchoredView.sol";
+&nbsp;
+/// @title Governance Contract for Quadrata Passport
+/// @author Fabrice Cheng
+/// @notice All admin functions to govern the QuadPassport contract
+contract QuadGovernanceStore {
+    // Admin Functions
+    bytes32[] public supportedAttributes;
+    mapping(uint256 =&gt; bool) public eligibleTokenId;
+    mapping(bytes32 =&gt; bool) public eligibleAttributes;
+    mapping(bytes32 =&gt; bool) public eligibleAttributesByDID;
+    // Price in $USD (1e6 decimals)
+    mapping(bytes32 =&gt; uint256) public pricePerAttribute;
+    // Price in $ETH
+    mapping(bytes32 =&gt; uint256) public mintPricePerAttribute;
+&nbsp;
+    mapping(address =&gt; bool) public eligibleTokenPayments;
+    mapping(address =&gt; address) public issuersTreasury;
+&nbsp;
+    bytes32 public constant ISSUER_ROLE = keccak256("ISSUER_ROLE");
+    bytes32 public constant PAUSER_ROLE = keccak256("PAUSER_ROLE");
+    bytes32 public constant GOVERNANCE_ROLE = keccak256("GOVERNANCE_ROLE");
+&nbsp;
+    uint256 public revSplitIssuer; // 50 means 50%;
+    uint256 public passportVersion;
+    uint256 public mintPrice; // Price in $ETH
+    IQuadPassport public passport;
+    address public oracle;
+    address public treasury;
+}
+&nbsp;
+contract QuadGovernance is AccessControlUpgradeable, UUPSUpgradeable, QuadGovernanceStore {
+    event AllowTokenPayment(address _tokenAddr, bool _isAllowed);
+    event AttributePriceUpdated(bytes32 _attribute, uint256 _oldPrice, uint256 _price);
+    event AttributeMintPriceUpdated(bytes32 _attribute, uint256 _oldPrice, uint256 _price);
+    event EligibleTokenUpdated(uint256 _tokenId, bool _eligibleStatus);
+    event EligibleAttributeUpdated(bytes32 _attribute, bool _eligibleStatus);
+    event EligibleAttributeByDIDUpdated(bytes32 _attribute, bool _eligibleStatus);
+    event IssuerAdded(address _issuer, address _newTreasury);
+    event PassportAddressUpdated(address _oldAddress, address _address);
+    event PassportVersionUpdated(uint256 _oldVersion, uint256 _version);
+    event PassportMintPriceUpdated(uint256 _oldMintPrice, uint256 _mintPrice);
+    event OracleUpdated(address _oldAddress, address _address);
+    event RevenueSplitIssuerUpdated(uint256 _oldSplit, uint256 _split);
+    event TreasuryUpdated(address _oldAddress, address _address);
+&nbsp;
+    /// @dev Initializer (constructor)
+    /// @param _admin address of the admin account
+    function initialize(address _admin) public <span class="missing-if-branch" title="else path not taken" >E</span>initializer {
+        <span class="missing-if-branch" title="else path not taken" >E</span>require(_admin != address(0), "ADMIN_ADDRESS_ZERO");
+&nbsp;
+        eligibleTokenId[1] = true;   // INITIAL PASSPORT_ID
+        passportVersion = 1;  // Passport Version
+&nbsp;
+        // Add DID, COUNTRY, AML as valid attributes
+        eligibleAttributes[keccak256("DID")] = true;
+        eligibleAttributes[keccak256("COUNTRY")] = true;
+        eligibleAttributesByDID[keccak256("AML")] = true;
+        supportedAttributes.push(keccak256("DID"));
+        supportedAttributes.push(keccak256("COUNTRY"));
+&nbsp;
+        // Set pricing
+        pricePerAttribute[keccak256("DID")] = 2 * 1e6; // $2
+        mintPricePerAttribute[keccak256("AML")] = 0.01 ether;
+        mintPricePerAttribute[keccak256("COUNTRY")] = 0.01 ether;
+        mintPrice = 0.03 ether;
+&nbsp;
+        // Revenue split with issuers
+        revSplitIssuer = 50;  // 50%
+&nbsp;
+        // Set Roles
+        _setRoleAdmin(PAUSER_ROLE, GOVERNANCE_ROLE);
+        _setRoleAdmin(ISSUER_ROLE, GOVERNANCE_ROLE);
+        _setupRole(GOVERNANCE_ROLE, _admin);
+        _setupRole(DEFAULT_ADMIN_ROLE, _admin);
+    }
+&nbsp;
+    /// @dev Set QuadPassport treasury wallet to withdraw the protocol fees
+    /// @notice Restricted behind a TimelockController
+    /// @param _treasury address of the treasury
+    function setTreasury(address _treasury) external {
+        require(hasRole(GOVERNANCE_ROLE, _msgSender()), "INVALID_ADMIN");
+        require(_treasury != address(0), "TREASURY_ADDRESS_ZERO");
+        require(_treasury != treasury, "TREASURY_ADDRESS_ALREADY_SET");
+        address oldTreasury = treasury;
+        treasury = _treasury;
+        emit TreasuryUpdated(oldTreasury, _treasury);
+    }
+&nbsp;
+    /// @dev Set QuadPassport contract address
+    /// @notice Restricted behind a TimelockController
+    /// @param _passportAddr address of the QuadPassport contract
+    function setPassportContractAddress(address _passportAddr) external {
+        require(hasRole(GOVERNANCE_ROLE, _msgSender()), "INVALID_ADMIN");
+        require(_passportAddr != address(0), "PASSPORT_ADDRESS_ZERO");
+        require(address(passport) != _passportAddr, "PASSPORT_ADDRESS_ALREADY_SET");
+        address _oldPassport = address(passport);
+        passport = IQuadPassport(_passportAddr);
+&nbsp;
+        emit PassportAddressUpdated(_oldPassport, address(passport));
+    }
+&nbsp;
+    /// @dev Set the QuadGovernance address in the QuadPassport contract
+    /// @notice Restricted behind a TimelockController
+    /// @param _newGovernance address of the QuadGovernance contract
+    function updateGovernanceInPassport(address _newGovernance) external {
+        require(hasRole(GOVERNANCE_ROLE, _msgSender()), "INVALID_ADMIN");
+        require(_newGovernance != address(0), "GOVERNANCE_ADDRESS_ZERO");
+        require(address(passport) != address(0), "PASSPORT_NOT_SET");
+&nbsp;
+        passport.setGovernance(_newGovernance);
+    }
+&nbsp;
+    /// @dev Set the QuadPassport deployed version
+    /// @notice Restricted behind a TimelockController
+    /// @param _version current version of the QuadPassport
+    function setPassportVersion(uint256 _version) external {
+        require(hasRole(GOVERNANCE_ROLE, _msgSender()), "INVALID_ADMIN");
+        require(_version &gt; passportVersion, "PASSPORT_VERSION_INCREMENTAL");
+&nbsp;
+        uint256 oldVersion = passportVersion;
+        passportVersion = _version;
+        emit PassportVersionUpdated(oldVersion, passportVersion);
+    }
+&nbsp;
+    /// @dev Set the price for minting the QuadPassport
+    /// @notice Restricted behind a TimelockController
+    /// @param _mintPrice price in wei for minting a passport
+    function setMintPrice(uint256 _mintPrice) external {
+        require(hasRole(GOVERNANCE_ROLE, _msgSender()), "INVALID_ADMIN");
+        require(mintPrice != _mintPrice, "MINT_PRICE_ALREADY_SET");
+&nbsp;
+        uint256 oldMintPrice = mintPrice;
+        mintPrice = _mintPrice;
+        emit PassportMintPriceUpdated(oldMintPrice, mintPrice);
+    }
+&nbsp;
+    /// @dev Set the eligibility status for a tokenId passport
+    /// @notice Restricted behind a TimelockController
+    /// @param _tokenId tokenId of the passport
+    /// @param _eligibleStatus eligiblity boolean for the tokenId
+    function setEligibleTokenId(uint256 _tokenId, bool _eligibleStatus) external {
+        require(hasRole(GOVERNANCE_ROLE, _msgSender()), "INVALID_ADMIN");
+        require(eligibleTokenId[_tokenId] != _eligibleStatus, "TOKEN_ELIGIBILITY_ALREADY_SET");
+&nbsp;
+        eligibleTokenId[_tokenId] = _eligibleStatus;
+        emit EligibleTokenUpdated(_tokenId, _eligibleStatus);
+    }
+&nbsp;
+    /// @dev Set the eligibility status for an attribute type
+    /// @notice Restricted behind a TimelockController
+    /// @param _attribute keccak256 of the attribute name (ex: keccak256("COUNTRY"))
+    /// @param _eligibleStatus eligiblity boolean for the attribute
+    function setEligibleAttribute(bytes32 _attribute, bool _eligibleStatus) external {
+        require(hasRole(GOVERNANCE_ROLE, _msgSender()), "INVALID_ADMIN");
+        require(eligibleAttributes[_attribute] != _eligibleStatus, "ATTRIBUTE_ELIGIBILITY_SET");
+&nbsp;
+        eligibleAttributes[_attribute] = _eligibleStatus;
+        if (_eligibleStatus) {
+            supportedAttributes.push(_attribute);
+        } else {
+            for (uint256 i = 0; i &lt; supportedAttributes.length; i++) {
+                if (supportedAttributes[i] == _attribute) {
+                    supportedAttributes[i] = supportedAttributes[supportedAttributes.length - 1];
+                    supportedAttributes.pop();
+                    break;
+                }
+            }
+        }
+        emit EligibleAttributeUpdated(_attribute, _eligibleStatus);
+    }
+&nbsp;
+&nbsp;
+    /// @dev Set the eligibility status for an attribute type grouped by DID (Applicable to AML only for now)
+    /// @notice Restricted behind a TimelockController
+    /// @param _attribute keccak256 of the attribute name (ex: keccak256("AML"))
+    /// @param _eligibleStatus eligiblity boolean for the attribute
+    function setEligibleAttributeByDID(bytes32 _attribute, bool _eligibleStatus) external {
+        require(hasRole(GOVERNANCE_ROLE, _msgSender()), "INVALID_ADMIN");
+        require(eligibleAttributesByDID[_attribute] != _eligibleStatus, "ATTRIBUTE_ELIGIBILITY_SET");
+&nbsp;
+        eligibleAttributesByDID[_attribute] = _eligibleStatus;
+        emit EligibleAttributeByDIDUpdated(_attribute, _eligibleStatus);
+    }
+&nbsp;
+    /// @dev Set the price to update/set a single attribute after owning a passport
+    /// @notice Restricted behind a TimelockController
+    /// @param _attribute keccak256 of the attribute name (ex: keccak256("COUNTRY"))
+    /// @param _price price (wei)
+    function setAttributePrice(bytes32 _attribute, uint256 _price) external {
+        require(hasRole(GOVERNANCE_ROLE, _msgSender()), "INVALID_ADMIN");
+        require(pricePerAttribute[_attribute] != _price, "ATTRIBUTE_PRICE_ALREADY_SET");
+        uint256 oldPrice = pricePerAttribute[_attribute];
+        pricePerAttribute[_attribute] = _price;
+&nbsp;
+        emit AttributePriceUpdated(_attribute, oldPrice, _price);
+    }
+&nbsp;
+&nbsp;
+    /// @dev Set the price to update/set a single attribute after owning a passport
+    /// @notice Restricted behind a TimelockController
+    /// @param _attribute keccak256 of the attribute name (ex: keccak256("COUNTRY"))
+    /// @param _price price (wei)
+    function setAttributeMintPrice(bytes32 _attribute, uint256 _price) external {
+        require(hasRole(GOVERNANCE_ROLE, _msgSender()), "INVALID_ADMIN");
+        require(mintPricePerAttribute[_attribute] != _price, "ATTRIBUTE_MINT_PRICE_ALREADY_SET");
+        uint256 oldPrice = mintPricePerAttribute[_attribute];
+        mintPricePerAttribute[_attribute] = _price;
+&nbsp;
+        emit AttributeMintPriceUpdated(_attribute, oldPrice, _price);
+    }
+&nbsp;
+    /// @dev Set the UniswapAnchorView oracle (Using Compound)
+    /// @notice Restricted behind a TimelockController
+    /// @param _oracleAddr address of UniswapAnchorView contract
+    function setOracle(address _oracleAddr) external {
+        require(hasRole(GOVERNANCE_ROLE, _msgSender()), "INVALID_ADMIN");
+        require(_oracleAddr != address(0), "ORACLE_ADDRESS_ZERO");
+        require(oracle != _oracleAddr, "ORACLE_ADDRESS_ALREADY_SET");
+        // Safety check to ensure that address is a valid Oracle
+        IUniswapAnchoredView(_oracleAddr).price("ETH");
+        address oldAddress = oracle;
+        oracle = _oracleAddr;
+        emit OracleUpdated(oldAddress, _oracleAddr);
+    }
+&nbsp;
+&nbsp;
+    /// @dev Set the revenue split percentage between Issuers and Quadrata Protocol
+    /// @notice Restricted behind a TimelockController
+    /// @param _split percentage split (`50` equals 50%)
+    function setRevSplitIssuer(uint256 _split) external {
+        require(hasRole(GOVERNANCE_ROLE, _msgSender()), "INVALID_ADMIN");
+        require(revSplitIssuer != _split, "REV_SPLIT_ALREADY_SET");
+        uint256 oldSplit = revSplitIssuer;
+        revSplitIssuer = _split;
+&nbsp;
+        emit RevenueSplitIssuerUpdated(oldSplit, _split);
+    }
+&nbsp;
+    /// @dev Add a new issuer
+    /// @notice Restricted behind a TimelockController
+    /// @param _issuer address generating the signature authorizing minting/setting attributes
+    /// @param _treasury address of the issuer treasury to withdraw the fees
+    function addIssuer(address _issuer, address _treasury) external {
+        require(hasRole(GOVERNANCE_ROLE, _msgSender()), "INVALID_ADMIN");
+        require(_treasury != address(0), "TREASURY_ISSUER_ADDRESS_ZERO");
+        require(_issuer != address(0), "ISSUER_ADDRESS_ZERO");
+&nbsp;
+        grantRole(ISSUER_ROLE, _issuer);
+        issuersTreasury[_issuer] = _treasury;
+&nbsp;
+        emit IssuerAdded(_issuer, _treasury);
+    }
+&nbsp;
+    /// @dev Authorize or Denied a payment to be received in Toke
+    /// @notice Restricted behind a TimelockController
+    /// @param _tokenAddr address of the ERC20 token for payment
+    /// @param _isAllowed authorize or deny this token
+    function allowTokenPayment(
+        address _tokenAddr,
+        bool _isAllowed
+    ) external  {
+        require(hasRole(GOVERNANCE_ROLE, _msgSender()), "INVALID_ADMIN");
+        require(_tokenAddr != address(0), "TOKEN_PAYMENT_ADDRESS_ZERO");
+        require(
+            eligibleTokenPayments[_tokenAddr] != _isAllowed,
+            "TOKEN_PAYMENT_STATUS_SET"
+        );
+        IERC20MetadataUpgradeable erc20 = IERC20MetadataUpgradeable(_tokenAddr);
+        // SafeCheck call to make sure that _tokenAddr is a valid ERC20 address
+        erc20.totalSupply();
+&nbsp;
+        eligibleTokenPayments[_tokenAddr] = true;
+        emit AllowTokenPayment(_tokenAddr, _isAllowed);
+    }
+&nbsp;
+    /// @dev Get number of eligible attributes currently supported
+    /// @notice Restricted behind a TimelockController
+    /// @return length of eligible attributes
+    function getSupportedAttributesLength() external view returns(uint256) {
+        return supportedAttributes.length;
+    }
+&nbsp;
+    function _authorizeUpgrade(address) internal override view {
+        require(hasRole(GOVERNANCE_ROLE, _msgSender()), "INVALID_ADMIN");
+    }
+&nbsp;
+    /**
+     * @notice Get the official price for a ERC20 token
+     * @param _tokenAddr Address of the ERC20 token
+     * @return Price denominated in USD, with 6 decimals
+     */
+&nbsp;
+    /// @dev Get the price in USD of a token using UniswapAnchorView
+    /// @param _tokenAddr address of the ERC20 token
+    /// @return price in USD
+    function getPrice(address _tokenAddr) external view returns (uint) {
+        <span class="missing-if-branch" title="else path not taken" >E</span>require(oracle != address(0), "ORACLE_ADDRESS_ZERO");
+        require(eligibleTokenPayments[_tokenAddr], "TOKEN_PAYMENT_NOT_ALLOWED");
+        IERC20MetadataUpgradeable erc20 = IERC20MetadataUpgradeable(_tokenAddr);
+        return IUniswapAnchoredView(oracle).price(erc20.symbol());
+    }
+&nbsp;
+    /// @dev Get the price in USD for $ETH using UniswapAnchorView
+    /// @return price in USD for $ETH
+    function getPriceETH() external view returns (uint) {
+        <span class="missing-if-branch" title="else path not taken" >E</span>require(oracle != address(0), "ORACLE_ADDRESS_ZERO");
+        return IUniswapAnchoredView(oracle).price("ETH");
+    }
+}
+&nbsp;
+&nbsp;</pre></td></tr>
+</table></pre>
+<div class='push'></div><!-- for sticky footer -->
+</div><!-- /wrapper -->
+<div class='footer quiet pad2 space-top1 center small'>
+  Code coverage
+  generated by <a href="http://istanbul-js.org/" target="_blank">istanbul</a> at Fri Dec 13 2024 09:03:44 GMT+0100 (Central European Standard Time)
+</div>
+</div>
+<script src="../prettify.js"></script>
+<script>
+window.onload = function () {
+        if (typeof prettyPrint === 'function') {
+            prettyPrint();
+        }
+};
+</script>
+<script src="../sorter.js"></script>
+</body>
+</html>

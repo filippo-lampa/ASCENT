@@ -1,0 +1,575 @@
+<!doctype html>
+<html lang="en">
+<head>
+    <title>Code coverage report for contracts/Forwarder.sol</title>
+    <meta charset="utf-8" />
+    <link rel="stylesheet" href="../prettify.css" />
+    <link rel="stylesheet" href="../base.css" />
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <style type='text/css'>
+        .coverage-summary .sorter {
+            background-image: url(../sort-arrow-sprite.png);
+        }
+    </style>
+</head>
+<body>
+<div class='wrapper'>
+  <div class='pad1'>
+    <h1>
+      <a href="../index.html">all files</a> / <a href="index.html">contracts/</a> Forwarder.sol
+    </h1>
+    <div class='clearfix'>
+      <div class='fl pad1y space-right2'>
+        <span class="strong">63.64% </span>
+        <span class="quiet">Statements</span>
+        <span class='fraction'>21/33</span>
+      </div>
+      <div class='fl pad1y space-right2'>
+        <span class="strong">54.55% </span>
+        <span class="quiet">Branches</span>
+        <span class='fraction'>12/22</span>
+      </div>
+      <div class='fl pad1y space-right2'>
+        <span class="strong">63.64% </span>
+        <span class="quiet">Functions</span>
+        <span class='fraction'>7/11</span>
+      </div>
+      <div class='fl pad1y space-right2'>
+        <span class="strong">68.42% </span>
+        <span class="quiet">Lines</span>
+        <span class='fraction'>26/38</span>
+      </div>
+    </div>
+  </div>
+  <div class='status-line medium'></div>
+<pre><table class="coverage">
+<tr><td class="line-count quiet">1
+2
+3
+4
+5
+6
+7
+8
+9
+10
+11
+12
+13
+14
+15
+16
+17
+18
+19
+20
+21
+22
+23
+24
+25
+26
+27
+28
+29
+30
+31
+32
+33
+34
+35
+36
+37
+38
+39
+40
+41
+42
+43
+44
+45
+46
+47
+48
+49
+50
+51
+52
+53
+54
+55
+56
+57
+58
+59
+60
+61
+62
+63
+64
+65
+66
+67
+68
+69
+70
+71
+72
+73
+74
+75
+76
+77
+78
+79
+80
+81
+82
+83
+84
+85
+86
+87
+88
+89
+90
+91
+92
+93
+94
+95
+96
+97
+98
+99
+100
+101
+102
+103
+104
+105
+106
+107
+108
+109
+110
+111
+112
+113
+114
+115
+116
+117
+118
+119
+120
+121
+122
+123
+124
+125
+126
+127
+128
+129
+130
+131
+132
+133
+134
+135
+136
+137
+138
+139
+140
+141
+142
+143
+144
+145
+146
+147
+148
+149
+150
+151
+152
+153
+154
+155
+156
+157
+158
+159
+160
+161
+162
+163
+164
+165
+166
+167
+168
+169
+170
+171</td><td class="line-coverage quiet"><span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-yes">10×</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-yes">10×</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-yes">10×</span>
+<span class="cline-any cline-yes">10×</span>
+<span class="cline-any cline-yes">10×</span>
+<span class="cline-any cline-yes">10×</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-yes">9×</span>
+<span class="cline-any cline-yes">8×</span>
+<span class="cline-any cline-yes">7×</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-yes">7×</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-yes">7×</span>
+<span class="cline-any cline-yes">7×</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-yes">7×</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-yes">5×</span>
+<span class="cline-any cline-yes">5×</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-yes">3×</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-yes">3×</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-yes">9×</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-yes">7×</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-yes">10×</span>
+<span class="cline-any cline-yes">10×</span>
+<span class="cline-any cline-yes">10×</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-yes">8×</span>
+<span class="cline-any cline-yes">8×</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-yes">8×</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-yes">8×</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span></td><td class="text"><pre class="prettyprint lang-js">/**
+ * SPDX-License-Identifier: MIT
+ *
+ * Copyright (c) 2024 QWRTX SAS
+ *
+ * Permission is hereby granted, free of charge, to any person obtaining a copy
+ * of this software and associated documentation files (the "Software"), to deal
+ * in the Software without restriction, including without limitation the rights
+ * to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+ * copies of the Software, and to permit persons to whom the Software is
+ * furnished to do so, subject to the following conditions:
+ *
+ * The above copyright notice and this permission notice shall be included in
+ * copies or substantial portions of the Software.
+ *
+ * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+ * IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+ * FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+ * AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+ * LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+ * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
+ * SOFTWARE.
+ */
+pragma solidity ^0.8.20;
+pragma experimental ABIEncoderV2;
+&nbsp;
+import "@openzeppelin/contracts/utils/cryptography/ECDSA.sol";
+import "@openzeppelin/contracts-upgradeable/access/OwnableUpgradeable.sol";
+import "./Token.sol";
+&nbsp;
+contract Forwarder is OwnableUpgradeable {
+    struct ForwardRequest {
+        address from;
+        address to;
+        uint256 value;
+        uint256 gas;
+        uint256 nonce;
+        bytes data;
+    }
+&nbsp;
+    using ECDSA for bytes32;
+    string public constant GENERIC_PARAMS =
+        "address from,address to,uint256 value,uint256 gas,uint256 nonce,bytes data";
+&nbsp;
+    mapping(bytes32 =&gt; bool) public typeHashes;
+&nbsp;
+    // Nonces of senders, used to prevent replay attacks
+    mapping(address =&gt; uint256) private nonces;
+&nbsp;
+    EURFToken private _eurf;
+    address private _eurfAddress;
+&nbsp;
+    event RequestTypeRegistered(bytes32 indexed typeHash, string typeStr);
+&nbsp;
+    // solhint-disable-next-line no-empty-blocks
+    receive() external payable {}
+&nbsp;
+<span class="fstat-no" title="function not covered" >    function nonce(address from) public view returns (uint256) {</span>
+<span class="cstat-no" title="statement not covered" >        return nonces[from];</span>
+    }
+&nbsp;
+<span class="fstat-no" title="function not covered" >    function getEURF() public view returns (address) {</span>
+<span class="cstat-no" title="statement not covered" >        return _eurfAddress;</span>
+    }
+&nbsp;
+    function initialize(address ngeurToken) public <span class="missing-if-branch" title="else path not taken" >E</span>initializer {
+        __Ownable_init(_msgSender());
+&nbsp;
+        <span class="missing-if-branch" title="else path not taken" >E</span>require(ngeurToken != address(0), "NGEUR Forwarder: NGEUR Token address can't be address 0");
+&nbsp;
+        string memory requestType = string(abi.encodePacked("ForwardRequest(", GENERIC_PARAMS, ")"));
+        registerRequestTypeInternal(requestType);
+        _eurfAddress = ngeurToken;
+        _eurf = EURFToken(ngeurToken);
+    }
+&nbsp;
+<span class="fstat-no" title="function not covered" >    function verify(</span>
+        ForwardRequest calldata req,
+        bytes32 domainSeparator,
+        bytes32 requestTypeHash,
+        bytes calldata suffixData,
+        bytes calldata sig
+    ) external view {
+<span class="cstat-no" title="statement not covered" >        _verifyNonce(req)</span>;
+<span class="cstat-no" title="statement not covered" >        _verifySig(req, domainSeparator, requestTypeHash, suffixData, sig)</span>;
+&nbsp;
+<span class="cstat-no" title="statement not covered" >        bytes4 transferSelector = bytes4(keccak256("transfer(address,uint256)"));</span>
+<span class="cstat-no" title="statement not covered" >        bytes4 reqTransferSelector = bytes4(req.data[:4]);</span>
+&nbsp;
+<span class="cstat-no" title="statement not covered" >        require(reqTransferSelector == transferSelector, "NGEUR Forwarder: can only forward transfer transactions")</span>;
+    }
+&nbsp;
+    function execute(
+        ForwardRequest calldata req,
+        bytes32 domainSeparator,
+        bytes32 requestTypeHash,
+        bytes calldata suffixData,
+        bytes calldata sig
+    ) external payable returns (bool success, bytes memory ret) {
+        _verifyNonce(req);
+        _verifySig(req, domainSeparator, requestTypeHash, suffixData, sig);
+        _updateNonce(req);
+&nbsp;
+        <span class="missing-if-branch" title="else path not taken" >E</span>require(req.to == _eurfAddress, "NGEUR Forwarder: can only forward NGEUR transactions");
+&nbsp;
+        bytes4 transferSelector = bytes4(keccak256("transfer(address,uint256)"));
+        bytes4 reqTransferSelector = bytes4(req.data[:4]);
+&nbsp;
+        require(reqTransferSelector == transferSelector, "NGEUR Forwarder: can only forward transfer transactions");
+&nbsp;
+        // solhint-disable-next-line avoid-low-level-calls
+        (success, ret) = req.to.call{gas: req.gas, value: req.value}(abi.encodePacked(req.data, req.from));
+        require(success, "NGEUR Forwarder: failed tx execution");
+&nbsp;
+        _eurf.payGaslessBasefee(req.from, _msgSender());
+&nbsp;
+        return (success, ret);
+    }
+&nbsp;
+    function _verifyNonce(ForwardRequest memory req) internal view {
+        require(nonces[req.from] == req.nonce, "NGEUR Forwarder: nonce mismatch");
+    }
+&nbsp;
+    function _updateNonce(ForwardRequest memory req) internal {
+        nonces[req.from]++;
+    }
+&nbsp;
+<span class="fstat-no" title="function not covered" >    function registerRequestType(string calldata typeName, string calldata typeSuffix) external onlyOwner {</span>
+<span class="cstat-no" title="statement not covered" >        for (uint i = 0; i &lt; bytes(typeName).length; i++) {</span>
+<span class="cstat-no" title="statement not covered" >            bytes1 c = bytes(typeName)[i];</span>
+<span class="cstat-no" title="statement not covered" >            require(c != "(" &amp;&amp; c != ")", "NGEUR Forwarder: invalid typename")</span>;
+        }
+&nbsp;
+<span class="cstat-no" title="statement not covered" >        string memory requestType = string(abi.encodePacked(typeName, "(", GENERIC_PARAMS, ",", typeSuffix));</span>
+<span class="cstat-no" title="statement not covered" >        registerRequestTypeInternal(requestType)</span>;
+    }
+&nbsp;
+    function registerRequestTypeInternal(string memory requestType) internal {
+        bytes32 requestTypehash = keccak256(bytes(requestType));
+        typeHashes[requestTypehash] = true;
+        emit RequestTypeRegistered(requestTypehash, string(requestType));
+    }
+&nbsp;
+    function _verifySig(
+        ForwardRequest memory req,
+        bytes32 domainSeparator,
+        bytes32 requestTypeHash,
+        bytes memory suffixData,
+        bytes memory sig
+    ) internal view {
+        <span class="missing-if-branch" title="else path not taken" >E</span>require(typeHashes[requestTypeHash], "NGEUR Forwarder: invalid request typehash");
+        bytes32 digest = keccak256(
+            abi.encodePacked("\x19\x01", domainSeparator, keccak256(_getEncoded(req, requestTypeHash, suffixData)))
+        );
+        require(digest.recover(sig) == req.from, "NGEUR Forwarder: signature mismatch");
+    }
+&nbsp;
+    function _getEncoded(
+        ForwardRequest memory req,
+        bytes32 requestTypeHash,
+        bytes memory suffixData
+    ) public pure returns (bytes memory) {
+        return
+            abi.encodePacked(
+                requestTypeHash,
+                abi.encode(req.from, req.to, req.value, req.gas, req.nonce, keccak256(req.data)),
+                suffixData
+            );
+    }
+}
+&nbsp;</pre></td></tr>
+</table></pre>
+<div class='push'></div><!-- for sticky footer -->
+</div><!-- /wrapper -->
+<div class='footer quiet pad2 space-top1 center small'>
+  Code coverage
+  generated by <a href="http://istanbul-js.org/" target="_blank">istanbul</a> at Tue Feb 25 2025 10:20:08 GMT+0100 (Ora standard dell’Europa centrale)
+</div>
+</div>
+<script src="../prettify.js"></script>
+<script>
+window.onload = function () {
+        if (typeof prettyPrint === 'function') {
+            prettyPrint();
+        }
+};
+</script>
+<script src="../sorter.js"></script>
+</body>
+</html>

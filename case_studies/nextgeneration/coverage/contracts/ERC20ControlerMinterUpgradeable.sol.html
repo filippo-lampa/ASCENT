@@ -1,0 +1,593 @@
+<!doctype html>
+<html lang="en">
+<head>
+    <title>Code coverage report for contracts/ERC20ControlerMinterUpgradeable.sol</title>
+    <meta charset="utf-8" />
+    <link rel="stylesheet" href="../prettify.css" />
+    <link rel="stylesheet" href="../base.css" />
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <style type='text/css'>
+        .coverage-summary .sorter {
+            background-image: url(../sort-arrow-sprite.png);
+        }
+    </style>
+</head>
+<body>
+<div class='wrapper'>
+  <div class='pad1'>
+    <h1>
+      <a href="../index.html">all files</a> / <a href="index.html">contracts/</a> ERC20ControlerMinterUpgradeable.sol
+    </h1>
+    <div class='clearfix'>
+      <div class='fl pad1y space-right2'>
+        <span class="strong">82.05% </span>
+        <span class="quiet">Statements</span>
+        <span class='fraction'>32/39</span>
+      </div>
+      <div class='fl pad1y space-right2'>
+        <span class="strong">80% </span>
+        <span class="quiet">Branches</span>
+        <span class='fraction'>24/30</span>
+      </div>
+      <div class='fl pad1y space-right2'>
+        <span class="strong">66.67% </span>
+        <span class="quiet">Functions</span>
+        <span class='fraction'>10/15</span>
+      </div>
+      <div class='fl pad1y space-right2'>
+        <span class="strong">86.54% </span>
+        <span class="quiet">Lines</span>
+        <span class='fraction'>45/52</span>
+      </div>
+    </div>
+  </div>
+  <div class='status-line high'></div>
+<pre><table class="coverage">
+<tr><td class="line-count quiet">1
+2
+3
+4
+5
+6
+7
+8
+9
+10
+11
+12
+13
+14
+15
+16
+17
+18
+19
+20
+21
+22
+23
+24
+25
+26
+27
+28
+29
+30
+31
+32
+33
+34
+35
+36
+37
+38
+39
+40
+41
+42
+43
+44
+45
+46
+47
+48
+49
+50
+51
+52
+53
+54
+55
+56
+57
+58
+59
+60
+61
+62
+63
+64
+65
+66
+67
+68
+69
+70
+71
+72
+73
+74
+75
+76
+77
+78
+79
+80
+81
+82
+83
+84
+85
+86
+87
+88
+89
+90
+91
+92
+93
+94
+95
+96
+97
+98
+99
+100
+101
+102
+103
+104
+105
+106
+107
+108
+109
+110
+111
+112
+113
+114
+115
+116
+117
+118
+119
+120
+121
+122
+123
+124
+125
+126
+127
+128
+129
+130
+131
+132
+133
+134
+135
+136
+137
+138
+139
+140
+141
+142
+143
+144
+145
+146
+147
+148
+149
+150
+151
+152
+153
+154
+155
+156
+157
+158
+159
+160
+161
+162
+163
+164
+165
+166
+167
+168
+169
+170
+171
+172
+173
+174
+175
+176
+177</td><td class="line-coverage quiet"><span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-yes">50×</span>
+<span class="cline-any cline-yes">50×</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-yes">50×</span>
+<span class="cline-any cline-yes">50×</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-yes">11×</span>
+<span class="cline-any cline-yes">6×</span>
+<span class="cline-any cline-yes">5×</span>
+<span class="cline-any cline-yes">5×</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-yes">5×</span>
+<span class="cline-any cline-yes">1×</span>
+<span class="cline-any cline-yes">4×</span>
+<span class="cline-any cline-yes">4×</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-yes">9×</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-yes">3×</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-yes">44×</span>
+<span class="cline-any cline-yes">44×</span>
+<span class="cline-any cline-yes">44×</span>
+<span class="cline-any cline-yes">44×</span>
+<span class="cline-any cline-yes">44×</span>
+<span class="cline-any cline-yes">44×</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-yes">10×</span>
+<span class="cline-any cline-yes">10×</span>
+<span class="cline-any cline-yes">7×</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-yes">4×</span>
+<span class="cline-any cline-yes">4×</span>
+<span class="cline-any cline-yes">1×</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-yes">1×</span>
+<span class="cline-any cline-yes">1×</span>
+<span class="cline-any cline-yes">1×</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-yes">4×</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-yes">70×</span>
+<span class="cline-any cline-yes">4×</span>
+<span class="cline-any cline-yes">66×</span>
+<span class="cline-any cline-yes">66×</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-yes">65×</span>
+<span class="cline-any cline-yes">4×</span>
+<span class="cline-any cline-yes">4×</span>
+<span class="cline-any cline-yes">3×</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-yes">64×</span>
+<span class="cline-any cline-yes">64×</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-yes">7×</span>
+<span class="cline-any cline-yes">3×</span>
+<span class="cline-any cline-yes">4×</span>
+<span class="cline-any cline-yes">3×</span>
+<span class="cline-any cline-yes">2×</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span></td><td class="text"><pre class="prettyprint lang-js">// SPDX-License-Identifier: MIT
+pragma solidity ^0.8.20;
+&nbsp;
+import "@openzeppelin/contracts-upgradeable/access/extensions/AccessControlEnumerableUpgradeable.sol";
+import "@openzeppelin/contracts-upgradeable/token/ERC20/ERC20Upgradeable.sol";
+&nbsp;
+abstract contract ERC20ControlerMinterUpgradeable is ERC20Upgradeable, AccessControlEnumerableUpgradeable {
+    bytes32 public constant MINTER_ROLE = keccak256("MINTER_ROLE");
+    bytes32 public constant MASTER_MINTER = keccak256("MASTER_MINTER");
+&nbsp;
+    mapping(address =&gt; uint256) public minterAllowed;
+&nbsp;
+    bytes32 public constant CONTROLLER = keccak256("CONTROLLER");
+&nbsp;
+    bool public _operating;
+    address internal _operatingController;
+&nbsp;
+    event MinterAllowanceUpdated(address indexed minter, uint256 minterAllowedAmount);
+    event Mint(address indexed minter, address indexed to, uint256 amount);
+    event Burn(address indexed minter, uint256 amount);
+    event SwitchOperatingState(address indexed controler, bool state);
+&nbsp;
+    error AlreadyMasterMinter(address account);
+    error NotController(address account);
+    error SafetySwitchOnUnauthorized(address account);
+    error OperationsOff();
+    error NotMinter(address account);
+    error mintingAllowedAmountExceeded(uint256 amount, uint256 mintingAllowedAmount);
+    error InvalidAmount(uint256 amount);
+&nbsp;
+<span class="fstat-no" title="function not covered" >    function __ERC20ControlerMinter_init(string memory name, string memory symbol) public onlyInitializing {</span>
+<span class="cstat-no" title="statement not covered" >        __ERC20_init(name, symbol)</span>;
+<span class="cstat-no" title="statement not covered" >        __AccessControlEnumerable_init()</span>;
+<span class="cstat-no" title="statement not covered" >        __ERC20ControlerMinter_init_unchained()</span>;
+    }
+&nbsp;
+    function __ERC20ControlerMinter_init_unchained() internal <span class="missing-if-branch" title="else path not taken" >E</span>onlyInitializing {
+        _setRoleAdmin(MINTER_ROLE, MASTER_MINTER);
+        _grantRole(MASTER_MINTER, address(0));
+&nbsp;
+        _operating = true;
+        _operatingController = address(0);
+    }
+&nbsp;
+    //-------------------------- CONTROLLER LOGIC --------------------------
+&nbsp;
+<span class="fstat-no" title="function not covered" >    function addController(address newController) external {</span>
+<span class="cstat-no" title="statement not covered" >        grantRole(CONTROLLER, newController)</span>;
+    }
+&nbsp;
+<span class="fstat-no" title="function not covered" >    function removeController(address controller) external {</span>
+<span class="cstat-no" title="statement not covered" >        revokeRole(CONTROLLER, controller)</span>;
+    }
+&nbsp;
+<span class="fstat-no" title="function not covered" >    function isController(address account) public view returns (bool) {</span>
+<span class="cstat-no" title="statement not covered" >        return hasRole(CONTROLLER, account);</span>
+    }
+&nbsp;
+    /**
+     * @dev Function to toggle the operating state of the contract.
+     * When called by a CONTROLLER, it switches the contract between operating and non-operating states.
+     * In non-operating state, certain functions are disabled (e.g., minting and burning).
+     */
+    function safetySwitch() public {
+        if (_operating) {
+            if (!hasRole(CONTROLLER, _msgSender())) revert NotController(_msgSender());
+            _operating = false;
+            _operatingController = _msgSender();
+        } else {
+            if (!hasRole(DEFAULT_ADMIN_ROLE, _msgSender()) &amp;&amp; _operatingController != _msgSender())
+                revert SafetySwitchOnUnauthorized(_msgSender());
+            _operating = true;
+            _operatingController = address(0);
+        }
+        emit SwitchOperatingState(_msgSender(), _operating);
+    }
+&nbsp;
+    /**
+     * @dev Function to check the current operating state of the contract.
+     * Returns a tuple containing the operating status, the controler who switched the state, and the lock time.
+     */
+    function isOperating() public view returns (bool, address) {
+        return (_operating, _operatingController);
+    }
+&nbsp;
+    //-------------------------- MINTING LOGIC --------------------------
+&nbsp;
+    function setMasterMinter(address newMasterMinter) external {
+        address formerMasterMinter = getRoleMember(MASTER_MINTER, 0);
+        <span class="missing-if-branch" title="if path not taken" >I</span>if (formerMasterMinter == newMasterMinter) revert AlreadyMasterMinter(newMasterMinter);
+        revokeRole(MASTER_MINTER, formerMasterMinter);
+        emit MinterAllowanceUpdated(formerMasterMinter, 0);
+        grantRole(MASTER_MINTER, newMasterMinter);
+        emit MinterAllowanceUpdated(newMasterMinter, type(uint256).max);
+    }
+&nbsp;
+<span class="fstat-no" title="function not covered" >    function isMasterMinter(address account) public view returns (bool) {</span>
+<span class="cstat-no" title="statement not covered" >        return hasRole(MASTER_MINTER, account);</span>
+    }
+&nbsp;
+    /**
+     * @dev Function to add/update a new minter
+     * @param minter The address of the minter
+     * @param minterAllowedAmount The minting amount allowed for the minter
+     */
+    function addMinter(address minter, uint256 minterAllowedAmount) external {
+        minterAllowed[minter] = minterAllowedAmount;
+        grantRole(MINTER_ROLE, minter);
+        emit MinterAllowanceUpdated(minter, minterAllowedAmount);
+    }
+&nbsp;
+    /**
+     * @dev Function to remove a minter
+     * @param minter The address of the minter to remove
+     */
+    function removeMinter(address minter) external {
+        minterAllowed[minter] = 0;
+        revokeRole(MINTER_ROLE, minter);
+        emit MinterAllowanceUpdated(minter, 0);
+    }
+&nbsp;
+    /**
+     * @dev Function to update the minting allowance of a minter
+     * @param minter The address of the minter
+     * @param minterAllowedAmount The new minting amount allowed for the minter
+     */
+    function updateMintingAllowance(
+        address minter,
+        uint256 minterAllowedAmount
+    ) external virtual onlyRole(MASTER_MINTER) {
+        <span class="missing-if-branch" title="if path not taken" >I</span>if (!hasRole(MINTER_ROLE, minter)) revert NotMinter(minter);
+        minterAllowed[minter] = minterAllowedAmount;
+        emit MinterAllowanceUpdated(minter, minterAllowedAmount);
+    }
+&nbsp;
+    function getMinterAllowance(address minter) public view returns (uint256) {
+        return minterAllowed[minter];
+    }
+&nbsp;
+    /**
+     * @dev Function to mint tokens
+     * @param to The address that will receive the minted tokens.
+     * @param amount The amount of tokens to mint. Must be less than or equal
+     * to the minterAllowance of the caller.
+     */
+    function mint(address to, uint256 amount) public virtual {
+        if (!hasRole(MASTER_MINTER, _msgSender()) &amp;&amp; !hasRole(MINTER_ROLE, _msgSender()))
+            revert NotMinter(_msgSender());
+        <span class="missing-if-branch" title="if path not taken" >I</span>if (amount &lt;= 0) revert InvalidAmount(amount);
+        if (!_operating) revert OperationsOff();
+&nbsp;
+        // MINTER_ROLE allowance management
+        if (hasRole(MINTER_ROLE, _msgSender())) {
+            uint256 mintingAllowedAmount = minterAllowed[_msgSender()];
+            if (amount &gt; mintingAllowedAmount) revert mintingAllowedAmountExceeded(amount, mintingAllowedAmount);
+            minterAllowed[_msgSender()] = mintingAllowedAmount - amount;
+        }
+&nbsp;
+        _mint(to, amount);
+        emit Mint(_msgSender(), to, amount);
+    }
+&nbsp;
+    /**
+     * @dev allows a minter to burn some of its own tokens
+     * Validates that caller is a minter and that sender is not blacklisted
+     * amount is less than or equal to the minter's account balance
+     * @param amount uint256 the amount of tokens to be burned
+     */
+    function burn(uint256 amount) public virtual {
+        if (!hasRole(MASTER_MINTER, _msgSender()) &amp;&amp; !hasRole(MINTER_ROLE, _msgSender()))
+            revert NotMinter(_msgSender());
+        if (!_operating) revert OperationsOff();
+        _burn(_msgSender(), amount);
+        emit Burn(_msgSender(), amount);
+    }
+}
+&nbsp;</pre></td></tr>
+</table></pre>
+<div class='push'></div><!-- for sticky footer -->
+</div><!-- /wrapper -->
+<div class='footer quiet pad2 space-top1 center small'>
+  Code coverage
+  generated by <a href="http://istanbul-js.org/" target="_blank">istanbul</a> at Tue Feb 25 2025 10:20:08 GMT+0100 (Ora standard dell’Europa centrale)
+</div>
+</div>
+<script src="../prettify.js"></script>
+<script>
+window.onload = function () {
+        if (typeof prettyPrint === 'function') {
+            prettyPrint();
+        }
+};
+</script>
+<script src="../sorter.js"></script>
+</body>
+</html>

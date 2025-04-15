@@ -1,0 +1,126 @@
+{
+ "stats": {
+  "suites": 4,
+  "tests": 8,
+  "passes": 8,
+  "pending": 0,
+  "failures": 0
+ },
+ "tests": [
+  {
+   "title": "should let a user to deposit TGT into the merge contract",
+   "fullTitle": "MergeTgt tests General tests should let a user to deposit TGT into the merge contract",
+   "file": "test/hardhat/MergeTgt.test.ts",
+   "currentRetry": 0,
+   "err": {}
+  },
+  {
+   "title": "should not let a user to transfer TITN tokens",
+   "fullTitle": "MergeTgt tests General tests should not let a user to transfer TITN tokens",
+   "file": "test/hardhat/MergeTgt.test.ts",
+   "currentRetry": 0,
+   "err": {}
+  },
+  {
+   "title": "should not let a user to transfer TITN tokens",
+   "fullTitle": "MergeTgt tests General tests should not let a user to transfer TITN tokens",
+   "file": "test/hardhat/MergeTgt.test.ts",
+   "currentRetry": 0,
+   "err": {}
+  },
+  {
+   "title": "should let a user to bridge TITN tokens to BASE",
+   "fullTitle": "MergeTgt tests General tests should let a user to bridge TITN tokens to BASE",
+   "file": "test/hardhat/MergeTgt.test.ts",
+   "currentRetry": 0,
+   "err": {}
+  },
+  {
+   "title": "should get lower quotes after 90 days have elapsed",
+   "fullTitle": "MergeTgt tests Time-based tests should get lower quotes after 90 days have elapsed",
+   "file": "test/hardhat/MergeTgt.test.ts",
+   "currentRetry": 0,
+   "err": {}
+  },
+  {
+   "title": "should allow withdrawal of remaining TITN after 1 year",
+   "fullTitle": "MergeTgt tests Time-based tests should allow withdrawal of remaining TITN after 1 year",
+   "file": "test/hardhat/MergeTgt.test.ts",
+   "currentRetry": 0,
+   "err": {}
+  },
+  {
+   "title": "should send a token from A address to B address via each OFT",
+   "fullTitle": "Titn tests should send a token from A address to B address via each OFT",
+   "file": "test/hardhat/Titn.test.ts",
+   "currentRetry": 0,
+   "err": {}
+  },
+  {
+   "title": "should bridge tokens back from ARB to BASE",
+   "fullTitle": "Titn tests should bridge tokens back from ARB to BASE",
+   "file": "test/hardhat/Titn.test.ts",
+   "currentRetry": 0,
+   "err": {}
+  }
+ ],
+ "failures": [],
+ "passes": [
+  {
+   "title": "should let a user to deposit TGT into the merge contract",
+   "fullTitle": "MergeTgt tests General tests should let a user to deposit TGT into the merge contract",
+   "file": "test/hardhat/MergeTgt.test.ts",
+   "currentRetry": 0,
+   "err": {}
+  },
+  {
+   "title": "should not let a user to transfer TITN tokens",
+   "fullTitle": "MergeTgt tests General tests should not let a user to transfer TITN tokens",
+   "file": "test/hardhat/MergeTgt.test.ts",
+   "currentRetry": 0,
+   "err": {}
+  },
+  {
+   "title": "should not let a user to transfer TITN tokens",
+   "fullTitle": "MergeTgt tests General tests should not let a user to transfer TITN tokens",
+   "file": "test/hardhat/MergeTgt.test.ts",
+   "currentRetry": 0,
+   "err": {}
+  },
+  {
+   "title": "should let a user to bridge TITN tokens to BASE",
+   "fullTitle": "MergeTgt tests General tests should let a user to bridge TITN tokens to BASE",
+   "file": "test/hardhat/MergeTgt.test.ts",
+   "currentRetry": 0,
+   "err": {}
+  },
+  {
+   "title": "should get lower quotes after 90 days have elapsed",
+   "fullTitle": "MergeTgt tests Time-based tests should get lower quotes after 90 days have elapsed",
+   "file": "test/hardhat/MergeTgt.test.ts",
+   "currentRetry": 0,
+   "err": {}
+  },
+  {
+   "title": "should allow withdrawal of remaining TITN after 1 year",
+   "fullTitle": "MergeTgt tests Time-based tests should allow withdrawal of remaining TITN after 1 year",
+   "file": "test/hardhat/MergeTgt.test.ts",
+   "currentRetry": 0,
+   "err": {}
+  },
+  {
+   "title": "should send a token from A address to B address via each OFT",
+   "fullTitle": "Titn tests should send a token from A address to B address via each OFT",
+   "file": "test/hardhat/Titn.test.ts",
+   "currentRetry": 0,
+   "err": {}
+  },
+  {
+   "title": "should bridge tokens back from ARB to BASE",
+   "fullTitle": "Titn tests should bridge tokens back from ARB to BASE",
+   "file": "test/hardhat/Titn.test.ts",
+   "currentRetry": 0,
+   "err": {}
+  }
+ ]
+}

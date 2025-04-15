@@ -1,0 +1,1349 @@
+digraph G {
+	graph [bb="0,0,1665.7,4221",
+		compound=true,
+		page=100,
+		rankdir=LR,
+		ratio=auto
+	];
+	node [label="\N",
+		shape=plaintext
+	];
+	subgraph clusterERC20AdminUpgradeable {
+		graph [bb="672.75,3490,1655.7,4213",
+			bgcolor=lightgray,
+			color=lightgray,
+			label=ERC20AdminUpgradeable,
+			lheight=0.21,
+			lp="1164.2,4201.5",
+			lwidth=2.61,
+			style=filled
+		];
+		"ERC20AdminUpgradeable.__ERC20Admin_init"	[color=white,
+			height=0.5,
+			label=__ERC20Admin_init,
+			pos="782.14,3813",
+			shape="",
+			width=2.8164];
+		"ERC20AdminUpgradeable.__ERC20Admin_init_unchained"	[height=0.5,
+			label=__ERC20Admin_init_unchained,
+			pos="1182.8,3786",
+			shape="",
+			width=4.2607];
+		"ERC20AdminUpgradeable.__ERC20Admin_init" -> "ERC20AdminUpgradeable.__ERC20Admin_init_unchained"	[color=green,
+			pos="e,1049.6,3795 877.1,3806.6 925.53,3803.4 985.6,3799.3 1039.6,3795.6"];
+		"ERC20AdminUpgradeable.__ERC20_init"	[height=0.5,
+			label=__ERC20_init,
+			pos="1182.8,3840",
+			shape="",
+			width=1.9859];
+		"ERC20AdminUpgradeable.__ERC20Admin_init" -> "ERC20AdminUpgradeable.__ERC20_init"	[color=green,
+			pos="e,1113.4,3835.4 877.1,3819.4 945.92,3824 1038.3,3830.3 1103.2,3834.7"];
+		"ERC20AdminUpgradeable.__Pausable_init"	[height=0.5,
+			label=__Pausable_init,
+			pos="1182.8,3624",
+			shape="",
+			width=2.2567];
+		"ERC20AdminUpgradeable.__ERC20Admin_init" -> "ERC20AdminUpgradeable.__Pausable_init"	[color=green,
+			pos="e,1101.4,3624.4 826.55,3796.7 869.65,3779 935.84,3747.4 982.32,3705 1003.6,3685.6 994.09,3666.6 1018.3,3651 1039.9,3637.1 1066.2,\
+3629.6 1091.4,3625.7"];
+		"ERC20AdminUpgradeable.__AccessControlEnumerable_init"	[height=0.5,
+			label=__AccessControlEnumerable_init,
+			pos="1182.8,3894",
+			shape="",
+			width=4.4954];
+		"ERC20AdminUpgradeable.__ERC20Admin_init" -> "ERC20AdminUpgradeable.__AccessControlEnumerable_init"	[color=green,
+			pos="e,1087.4,3879.4 841.88,3827.6 889.32,3839 957.9,3855.1 1018.3,3867 1037.4,3870.8 1057.8,3874.4 1077.5,3877.8"];
+		"ERC20AdminUpgradeable._grantRole"	[height=0.5,
+			label=_grantRole,
+			pos="1516.4,4002",
+			shape="",
+			width=1.6971];
+		"ERC20AdminUpgradeable.__ERC20Admin_init_unchained" -> "ERC20AdminUpgradeable._grantRole"	[color=green,
+			pos="e,1456.3,4005.7 1326,3792.7 1336.9,3797.7 1346.8,3804.3 1355.2,3813 1405.6,3865.1 1325.6,3922 1375.2,3975 1393.2,3994.3 1420.5,4002.2 \
+1446.2,4004.9"];
+		"ERC20AdminUpgradeable.address"	[height=0.5,
+			label=address,
+			pos="1516.4,3948",
+			shape="",
+			width=1.3179];
+		"ERC20AdminUpgradeable.__ERC20Admin_init_unchained" -> "ERC20AdminUpgradeable.address"	[color=green,
+			pos="e,1469.9,3951.6 1324.7,3792.9 1335.9,3797.8 1346.3,3804.4 1355.2,3813 1390.2,3847.1 1340.8,3886.4 1375.2,3921 1397,3943 1430.9,3949.9 \
+1459.9,3951.3"];
+		"ERC20AdminUpgradeable.setAdministrator"	[color=blue,
+			height=0.5,
+			label=setAdministrator,
+			pos="782.14,4110",
+			shape="",
+			width=2.4914];
+		"ERC20AdminUpgradeable.revokeRole"	[height=0.5,
+			label=revokeRole,
+			pos="1182.8,4110",
+			shape="",
+			width=1.7332];
+		"ERC20AdminUpgradeable.setAdministrator" -> "ERC20AdminUpgradeable.revokeRole"	[color=green,
+			pos="e,1120.3,4110 872.1,4110 943.76,4110 1043.2,4110 1109.9,4110"];
+		"ERC20AdminUpgradeable.getRoleMember"	[height=0.5,
+			label=getRoleMember,
+			pos="1182.8,4164",
+			shape="",
+			width=2.3651];
+		"ERC20AdminUpgradeable.setAdministrator" -> "ERC20AdminUpgradeable.getRoleMember"	[color=green,
+			pos="e,1110.5,4154.3 857.18,4120 926.17,4129.4 1028.8,4143.3 1100.2,4152.9"];
+		"ERC20AdminUpgradeable.grantRole"	[height=0.5,
+			label=grantRole,
+			pos="1182.8,4056",
+			shape="",
+			width=1.5707];
+		"ERC20AdminUpgradeable.setAdministrator" -> "ERC20AdminUpgradeable.grantRole"	[color=green,
+			pos="e,1130.3,4063 857.18,4100 932.93,4089.7 1049.3,4073.9 1120.2,4064.3"];
+		"ERC20AdminUpgradeable.isAdministrator"	[color=green,
+			height=0.5,
+			label=isAdministrator,
+			pos="1182.8,3732",
+			shape="",
+			width=2.3109];
+		"ERC20AdminUpgradeable.hasRole"	[height=0.5,
+			label=hasRole,
+			pos="1516.4,3894",
+			shape="",
+			width=1.3179];
+		"ERC20AdminUpgradeable.isAdministrator" -> "ERC20AdminUpgradeable.hasRole"	[color=green,
+			pos="e,1469.9,3897.6 1260.8,3725.6 1293.9,3727.1 1330.6,3735 1355.2,3759 1390.2,3793.1 1340.8,3832.4 1375.2,3867 1397,3889 1430.9,3895.9 \
+1459.9,3897.3"];
+		"ERC20AdminUpgradeable.setBlacklist"	[color=white,
+			height=0.5,
+			label=setBlacklist,
+			pos="1182.8,4002",
+			shape="",
+			width=1.8054];
+		"ERC20AdminUpgradeable.BlacklistUnchangedError"	[height=0.5,
+			label=BlacklistUnchangedError,
+			pos="1516.4,4056",
+			shape="",
+			width=3.5747];
+		"ERC20AdminUpgradeable.setBlacklist" -> "ERC20AdminUpgradeable.BlacklistUnchangedError"	[color=green,
+			pos="e,1433.9,4042.1 1239.8,4010.7 1273.3,4015.9 1316.7,4022.7 1355.2,4029 1377.5,4032.6 1401.6,4036.6 1424.1,4040.4"];
+		"ERC20AdminUpgradeable.blacklist"	[color=blue,
+			height=0.5,
+			label=blacklist,
+			pos="782.14,4056",
+			shape="",
+			width=1.3902];
+		"ERC20AdminUpgradeable.blacklist" -> "ERC20AdminUpgradeable.setBlacklist"	[color=green,
+			pos="e,1124.2,4009.8 829.25,4049.8 899.32,4040.3 1033,4022.2 1114.1,4011.2"];
+		"ERC20AdminUpgradeable.unblacklist"	[color=blue,
+			height=0.5,
+			label=unblacklist,
+			pos="782.14,4002",
+			shape="",
+			width=1.7151];
+		"ERC20AdminUpgradeable.unblacklist" -> "ERC20AdminUpgradeable.setBlacklist"	[color=green,
+			pos="e,1117.5,4002 844.11,4002 914.73,4002 1031.1,4002 1107,4002"];
+		"ERC20AdminUpgradeable.isBlacklisted"	[height=0.5,
+			label=isBlacklisted,
+			pos="1516.4,3840",
+			shape="",
+			width=1.9318];
+		"ERC20AdminUpgradeable.pause"	[color=blue,
+			height=0.5,
+			label=pause,
+			pos="782.14,3948",
+			shape="",
+			width=1.0652];
+		"ERC20AdminUpgradeable._pause"	[height=0.5,
+			label=_pause,
+			pos="1182.8,3948",
+			shape="",
+			width=1.1735];
+		"ERC20AdminUpgradeable.pause" -> "ERC20AdminUpgradeable._pause"	[color=green,
+			pos="e,1140.5,3948 820.64,3948 892.38,3948 1049.1,3948 1130.5,3948"];
+		"ERC20AdminUpgradeable.unpause"	[color=blue,
+			height=0.5,
+			label=unpause,
+			pos="782.14,3678",
+			shape="",
+			width=1.3902];
+		"ERC20AdminUpgradeable._unpause"	[height=0.5,
+			label=_unpause,
+			pos="1182.8,3678",
+			shape="",
+			width=1.4985];
+		"ERC20AdminUpgradeable.unpause" -> "ERC20AdminUpgradeable._unpause"	[color=green,
+			pos="e,1128.8,3678 832.42,3678 904.58,3678 1039,3678 1118.4,3678"];
+		"ERC20AdminUpgradeable.adminSanity"	[color=white,
+			height=0.5,
+			label=adminSanity,
+			pos="1182.8,3570",
+			shape="",
+			width=1.9318];
+		"ERC20AdminUpgradeable.adminSanity" -> "ERC20AdminUpgradeable.isBlacklisted"	[color=green,
+			pos="e,1449.2,3835.2 1228.2,3556.3 1267.5,3551.2 1323.3,3554 1355.2,3588 1388.2,3623.2 1342.8,3768.3 1375.2,3804 1391.4,3821.8 1415.5,\
+3830 1439.1,3833.8"];
+		"ERC20AdminUpgradeable.adminSanity" -> "ERC20AdminUpgradeable.isBlacklisted"	[color=green,
+			pos="e,1464.4,3852 1252.7,3570.4 1288.3,3571.5 1329.5,3578.6 1355.2,3606 1388.2,3641.2 1342.8,3786.3 1375.2,3822 1394.8,3843.7 1426.2,\
+3851.1 1454.2,3851.9"];
+		"ERC20AdminUpgradeable.adminSanity" -> "ERC20AdminUpgradeable.address"	[color=green,
+			pos="e,1470.3,3952.4 1245.8,3562.2 1283,3561.2 1328.2,3567.4 1355.2,3597 1403.7,3650.4 1327.6,3866.8 1375.2,3921 1395.9,3944.6 1430.4,\
+3951.4 1460,3952.3"];
+		"ERC20AdminUpgradeable.adminSanity" -> "ERC20AdminUpgradeable.hasRole"	[color=green,
+			pos="e,1470.4,3898.4 1245.7,3562.3 1282.8,3561.4 1328,3567.5 1355.2,3597 1395.9,3641.3 1335.2,3822.1 1375.2,3867 1396.1,3890.4 1430.6,\
+3897.3 1460.1,3898.3"];
+		"ERC20AdminUpgradeable._msgSender"	[height=0.5,
+			label=_msgSender,
+			pos="1516.4,3516",
+			shape="",
+			width=1.8776];
+		"ERC20AdminUpgradeable.adminSanity" -> "ERC20AdminUpgradeable._msgSender"	[color=green,
+			pos="e,1459.1,3525.6 1242.9,3560.8 1275.9,3555.7 1317.9,3549.1 1355.2,3543 1386.1,3538 1420.3,3532.2 1449.1,3527.3"];
+		"ERC20AdminUpgradeable.paused"	[height=0.5,
+			label=paused,
+			pos="1516.4,3570",
+			shape="",
+			width=1.2277];
+		"ERC20AdminUpgradeable.adminSanity" -> "ERC20AdminUpgradeable.paused"	[color=green,
+			pos="e,1472.1,3570 1252.5,3570 1314.6,3570 1404.9,3570 1461.9,3570"];
+		"ERC20AdminUpgradeable.PausedError"	[height=0.5,
+			label=PausedError,
+			pos="1516.4,3624",
+			shape="",
+			width=1.9318];
+		"ERC20AdminUpgradeable.adminSanity" -> "ERC20AdminUpgradeable.PausedError"	[color=green,
+			pos="e,1458,3614.2 1242.9,3579.2 1275.9,3584.3 1317.9,3590.9 1355.2,3597 1385.7,3602 1419.5,3607.6 1448.1,3612.5"];
+		"ERC20AdminUpgradeable.SenderBlacklistedError"	[height=0.5,
+			label=SenderBlacklistedError,
+			pos="1516.4,3678",
+			shape="",
+			width=3.34];
+		"ERC20AdminUpgradeable.adminSanity" -> "ERC20AdminUpgradeable.SenderBlacklistedError"	[color=green,
+			pos="e,1408.9,3669.8 1250,3565.2 1284.8,3566.2 1326.2,3573.2 1355.2,3597 1375,3613.2 1355.7,3634.5 1375.2,3651 1382.5,3657.2 1390.8,3662.1 \
+1399.6,3666"];
+		"ERC20AdminUpgradeable.RecipientBlacklistedError"	[height=0.5,
+			label=RecipientBlacklistedError,
+			pos="1516.4,3732",
+			shape="",
+			width=3.6469];
+		"ERC20AdminUpgradeable.adminSanity" -> "ERC20AdminUpgradeable.RecipientBlacklistedError"	[color=green,
+			pos="e,1402,3723 1247.5,3563.3 1283.7,3563.2 1327.2,3569.8 1355.2,3597 1390.2,3631.1 1340.8,3670.4 1375.2,3705 1380.5,3710.3 1386.5,3714.8 \
+1392.9,3718.5"];
+		"ERC20AdminUpgradeable.TransferToContractError"	[height=0.5,
+			label=TransferToContractError,
+			pos="1516.4,3786",
+			shape="",
+			width=3.5205];
+		"ERC20AdminUpgradeable.adminSanity" -> "ERC20AdminUpgradeable.TransferToContractError"	[color=green,
+			pos="e,1402.5,3778 1246.4,3562.7 1283.2,3562.2 1327.6,3568.5 1355.2,3597 1405.6,3649.1 1325.6,3706 1375.2,3759 1380.5,3764.7 1386.6,3769.4 \
+1393.2,3773.2"];
+		"ERC20AdminUpgradeable.forceTransfer"	[color=blue,
+			height=0.5,
+			label=forceTransfer,
+			pos="782.14,3569",
+			shape="",
+			width=2.0401];
+		"ERC20AdminUpgradeable.forceTransfer" -> "ERC20AdminUpgradeable.adminSanity"	[color=green,
+			pos="e,1112.9,3569.8 855.79,3569.2 925.56,3569.4 1030.7,3569.6 1102.6,3569.8"];
+		"ERC20AdminUpgradeable._update"	[height=0.5,
+			label=_update,
+			pos="1182.8,3516",
+			shape="",
+			width=1.3179];
+		"ERC20AdminUpgradeable.forceTransfer" -> "ERC20AdminUpgradeable._update"	[color=green,
+			pos="e,1137.6,3521.9 847.18,3560.5 924.8,3550.2 1054.2,3533 1127.3,3523.2"];
+	}
+	subgraph clusterERC20ControlerMinterUpgradeable {
+		graph [bb="242.88,1317,1355.2,2094",
+			bgcolor=lightgray,
+			color=lightgray,
+			label=ERC20ControlerMinterUpgradeable,
+			lheight=0.21,
+			lp="799.04,2082.5",
+			lwidth=3.60,
+			style=filled
+		];
+		"ERC20ControlerMinterUpgradeable.__ERC20ControlerMinter_init"	[color=green,
+			height=0.5,
+			label=__ERC20ControlerMinter_init,
+			pos="398.42,1991",
+			shape="",
+			width=4.0982];
+		"ERC20ControlerMinterUpgradeable.__ERC20ControlerMinter_init_unchained"	[height=0.5,
+			label=__ERC20ControlerMinter_init_unchained,
+			pos="782.14,2045",
+			shape="",
+			width=5.5606];
+		"ERC20ControlerMinterUpgradeable.__ERC20ControlerMinter_init" -> "ERC20ControlerMinterUpgradeable.__ERC20ControlerMinter_init_unchained"	[color=green,
+			pos="e,669.44,2030.1 492.25,2005 520.99,2009.2 552.78,2013.9 581.96,2018 606.97,2021.5 633.76,2025.2 659.33,2028.7"];
+		"ERC20ControlerMinterUpgradeable.__ERC20_init"	[height=0.5,
+			label=__ERC20_init,
+			pos="782.14,1775",
+			shape="",
+			width=1.9859];
+		"ERC20ControlerMinterUpgradeable.__ERC20ControlerMinter_init" -> "ERC20ControlerMinterUpgradeable.__ERC20_init"	[color=green,
+			pos="e,710.5,1773.4 410.68,1972.9 435.92,1934 501.17,1842.9 581.96,1802 618.1,1783.7 662.42,1776.4 700.07,1774"];
+		"ERC20ControlerMinterUpgradeable.__AccessControlEnumerable_init"	[height=0.5,
+			label=__AccessControlEnumerable_init,
+			pos="782.14,1991",
+			shape="",
+			width=4.4954];
+		"ERC20ControlerMinterUpgradeable.__ERC20ControlerMinter_init" -> "ERC20ControlerMinterUpgradeable.__AccessControlEnumerable_init"	[color=green,
+			pos="e,620.01,1991 546.18,1991 567.04,1991 588.65,1991 609.93,1991"];
+		"ERC20ControlerMinterUpgradeable._setRoleAdmin"	[height=0.5,
+			label=_setRoleAdmin,
+			pos="1182.8,2045",
+			shape="",
+			width=2.2026];
+		"ERC20ControlerMinterUpgradeable.__ERC20ControlerMinter_init_unchained" -> "ERC20ControlerMinterUpgradeable._setRoleAdmin"	[color=green,
+			pos="e,1103,2045 982.45,2045 1021.3,2045 1060.1,2045 1093,2045"];
+		"ERC20ControlerMinterUpgradeable._grantRole"	[height=0.5,
+			label=_grantRole,
+			pos="1182.8,1559",
+			shape="",
+			width=1.6971];
+		"ERC20ControlerMinterUpgradeable.__ERC20ControlerMinter_init_unchained" -> "ERC20ControlerMinterUpgradeable._grantRole"	[color=green,
+			pos="e,1126,1552.3 958.79,2036.3 967.41,2031.4 975.35,2025.3 982.32,2018 1048.7,1948.1 953,1656.8 1018.3,1586 1042.5,1559.8 1081.7,1552.6 \
+1115.6,1552.2"];
+		"ERC20ControlerMinterUpgradeable.address"	[height=0.5,
+			label=address,
+			pos="1182.8,1991",
+			shape="",
+			width=1.3179];
+		"ERC20ControlerMinterUpgradeable.__ERC20ControlerMinter_init_unchained" -> "ERC20ControlerMinterUpgradeable.address"	[color=green,
+			pos="e,1135.4,1992.8 863.8,2028.5 941.49,2016.2 1057,2000.8 1125.3,1993.8"];
+		"ERC20ControlerMinterUpgradeable.__ERC20ControlerMinter_init_unchained" -> "ERC20ControlerMinterUpgradeable.address"	[color=green,
+			pos="e,1142.2,2000.6 924.52,2032.3 996.93,2023.2 1080.5,2011.3 1132.2,2002.3"];
+		"ERC20ControlerMinterUpgradeable.addController"	[color=blue,
+			height=0.5,
+			label=addController,
+			pos="398.42,1533",
+			shape="",
+			width=2.0943];
+		"ERC20ControlerMinterUpgradeable.grantRole"	[height=0.5,
+			label=grantRole,
+			pos="782.14,1505",
+			shape="",
+			width=1.5707];
+		"ERC20ControlerMinterUpgradeable.addController" -> "ERC20ControlerMinterUpgradeable.grantRole"	[color=green,
+			pos="e,726.8,1509 470.77,1527.8 541.38,1522.6 648.5,1514.7 716.62,1509.7"];
+		"ERC20ControlerMinterUpgradeable.removeController"	[color=blue,
+			height=0.5,
+			label=removeController,
+			pos="398.42,1775",
+			shape="",
+			width=2.5817];
+		"ERC20ControlerMinterUpgradeable.revokeRole"	[height=0.5,
+			label=revokeRole,
+			pos="782.14,1721",
+			shape="",
+			width=1.7332];
+		"ERC20ControlerMinterUpgradeable.removeController" -> "ERC20ControlerMinterUpgradeable.revokeRole"	[color=green,
+			pos="e,724.88,1728.4 472.23,1764 505.64,1759 545.8,1753.1 581.96,1748 626.2,1741.7 676.02,1735 714.77,1729.8"];
+		"ERC20ControlerMinterUpgradeable.isController"	[color=green,
+			height=0.5,
+			label=isController,
+			pos="782.14,1883",
+			shape="",
+			width=1.8234];
+		"ERC20ControlerMinterUpgradeable.hasRole"	[height=0.5,
+			label=hasRole,
+			pos="1182.8,1775",
+			shape="",
+			width=1.3179];
+		"ERC20ControlerMinterUpgradeable.isController" -> "ERC20ControlerMinterUpgradeable.hasRole"	[color=green,
+			pos="e,1135.3,1773.1 845.97,1887.4 887.59,1887.3 941.78,1881.3 982.32,1856 1006.8,1840.7 994.09,1817.6 1018.3,1802 1049.9,1781.6 1091.7,\
+1775 1125.2,1773.4"];
+		"ERC20ControlerMinterUpgradeable.safetySwitch"	[color=green,
+			height=0.5,
+			label=safetySwitch,
+			pos="782.14,1829",
+			shape="",
+			width=1.9679];
+		"ERC20ControlerMinterUpgradeable.safetySwitch" -> "ERC20ControlerMinterUpgradeable.address"	[color=green,
+			pos="e,1146.1,1979.5 851.04,1824.7 891.92,1825.2 943.41,1831.7 982.32,1856 1006.8,1871.3 996.66,1890.9 1018.3,1910 1053.1,1940.6 1101.5,\
+1962.7 1136.6,1976"];
+		"ERC20ControlerMinterUpgradeable.safetySwitch" -> "ERC20ControlerMinterUpgradeable.hasRole"	[color=green,
+			pos="e,1135.3,1776.8 835.66,1817.1 910.72,1804.3 1048.1,1785.7 1125.3,1777.8"];
+		"ERC20ControlerMinterUpgradeable.safetySwitch" -> "ERC20ControlerMinterUpgradeable.hasRole"	[color=green,
+			pos="e,1142.5,1784.5 851.66,1825 931.65,1816.3 1061.9,1798.5 1132.5,1786.3"];
+		"ERC20ControlerMinterUpgradeable._msgSender"	[color=white,
+			height=0.5,
+			label=_msgSender,
+			pos="1182.8,1667",
+			shape="",
+			width=1.8776];
+		"ERC20ControlerMinterUpgradeable.safetySwitch" -> "ERC20ControlerMinterUpgradeable._msgSender"	[color=green,
+			pos="e,1177.3,1648.9 790.34,1810.7 818.59,1781.7 923.2,1797 982.32,1748 1021.3,1715.7 979.83,1672.8 1018.3,1640 1063.9,1601.1 1143.5,\
+1607.6 1171.6,1640.5"];
+		"ERC20ControlerMinterUpgradeable.safetySwitch" -> "ERC20ControlerMinterUpgradeable._msgSender"	[color=green,
+			pos="e,1171.9,1649 804.9,1811.9 844.93,1802.6 930.86,1808.6 982.32,1766 1021.3,1733.7 979.83,1690.8 1018.3,1658 1060.1,1622.3 1130.5,\
+1624.9 1163.6,1643.4"];
+		"ERC20ControlerMinterUpgradeable.safetySwitch" -> "ERC20ControlerMinterUpgradeable._msgSender"	[color=green,
+			pos="e,1152.4,1650.8 846.98,1821.5 889.86,1820.2 945.1,1814.8 982.32,1784 1021.3,1751.7 979.83,1708.8 1018.3,1676 1052.5,1646.9 1105.7,\
+1643.2 1142.1,1648.9"];
+		"ERC20ControlerMinterUpgradeable.safetySwitch" -> "ERC20ControlerMinterUpgradeable._msgSender"	[color=green,
+			pos="e,1117,1662.7 846.52,1836.6 889.46,1838.2 944.97,1832.9 982.32,1802 1021.3,1769.7 979.83,1726.8 1018.3,1694 1042.5,1673.4 1076.3,\
+1665.5 1106.8,1663.3"];
+		"ERC20ControlerMinterUpgradeable.safetySwitch" -> "ERC20ControlerMinterUpgradeable._msgSender"	[color=green,
+			pos="e,1128.1,1677.7 811.89,1845.4 854.25,1857.1 933.68,1860.3 982.32,1820 1021.3,1787.7 979.83,1744.8 1018.3,1712 1045.5,1688.8 1084.7,\
+1681.8 1118,1678.6"];
+		"ERC20ControlerMinterUpgradeable.safetySwitch" -> "ERC20ControlerMinterUpgradeable._msgSender"	[color=green,
+			pos="e,1166.1,1684.6 794.18,1847 827.08,1872.9 925.62,1885 982.32,1838 1021.3,1805.7 979.83,1762.8 1018.3,1730 1057.2,1696.8 1120.8,1696.7 \
+1156.1,1687.7"];
+		"ERC20ControlerMinterUpgradeable.safetySwitch" -> "ERC20ControlerMinterUpgradeable._msgSender"	[color=green,
+			pos="e,1176.1,1685.3 788.37,1847.2 813.33,1888.9 921.72,1906.2 982.32,1856 1021.3,1823.7 979.83,1780.8 1018.3,1748 1062.5,1710.3 1138.7,\
+1715.3 1168.9,1692.5"];
+		"ERC20ControlerMinterUpgradeable.NotController"	[height=0.5,
+			label=NotController,
+			pos="1182.8,1829",
+			shape="",
+			width=2.0943];
+		"ERC20ControlerMinterUpgradeable.safetySwitch" -> "ERC20ControlerMinterUpgradeable.NotController"	[color=green,
+			pos="e,1107.2,1829 853.03,1829 921.06,1829 1024.5,1829 1097.2,1829"];
+		"ERC20ControlerMinterUpgradeable.SafetySwitchOnUnauthorized"	[height=0.5,
+			label=SafetySwitchOnUnauthorized,
+			pos="1182.8,1883",
+			shape="",
+			width=4.1344];
+		"ERC20ControlerMinterUpgradeable.safetySwitch" -> "ERC20ControlerMinterUpgradeable.SafetySwitchOnUnauthorized"	[color=green,
+			pos="e,1082.9,1869.6 844.99,1837.4 905.66,1845.6 999.47,1858.3 1072.7,1868.2"];
+		"ERC20ControlerMinterUpgradeable.isOperating"	[color=green,
+			height=0.5,
+			label=isOperating,
+			pos="398.42,1667",
+			shape="",
+			width=1.8234];
+		"ERC20ControlerMinterUpgradeable.setMasterMinter"	[color=blue,
+			height=0.5,
+			label=setMasterMinter,
+			pos="398.42,1613",
+			shape="",
+			width=2.4914];
+		"ERC20ControlerMinterUpgradeable.setMasterMinter" -> "ERC20ControlerMinterUpgradeable.grantRole"	[color=green,
+			pos="e,725.43,1504.9 451.66,1598.5 480.43,1589.5 516.23,1576.4 545.96,1560 563.71,1550.2 563.27,1539.9 581.96,1532 624.13,1514.3 675.34,\
+1507.6 715.27,1505.4"];
+		"ERC20ControlerMinterUpgradeable.setMasterMinter" -> "ERC20ControlerMinterUpgradeable.revokeRole"	[color=green,
+			pos="e,721.48,1725.3 485.93,1617.3 506.84,1621.4 528.24,1628.3 545.96,1640 570.04,1655.9 557.5,1678.7 581.96,1694 620.28,1718 670.81,\
+1724.6 711.39,1725.3"];
+		"ERC20ControlerMinterUpgradeable.getRoleMember"	[height=0.5,
+			label=getRoleMember,
+			pos="782.14,1937",
+			shape="",
+			width=2.3651];
+		"ERC20ControlerMinterUpgradeable.setMasterMinter" -> "ERC20ControlerMinterUpgradeable.getRoleMember"	[color=green,
+			pos="e,711.05,1947 487.93,1611.7 509.55,1615.7 530.8,1624.1 545.96,1640 629.41,1727.7 496.45,1824.3 581.96,1910 612.4,1940.5 659.85,1947.9 \
+700.79,1947.3"];
+		"ERC20ControlerMinterUpgradeable.AlreadyMasterMinter"	[height=0.5,
+			label=AlreadyMasterMinter,
+			pos="782.14,1667",
+			shape="",
+			width=3.0872];
+		"ERC20ControlerMinterUpgradeable.setMasterMinter" -> "ERC20ControlerMinterUpgradeable.AlreadyMasterMinter"	[color=green,
+			pos="e,695.32,1655.6 470.91,1623.8 504.59,1628.8 545.32,1634.8 581.96,1640 615.62,1644.8 652.5,1649.8 685.29,1654.2"];
+		"ERC20ControlerMinterUpgradeable.type"	[height=0.5,
+			label=type,
+			pos="782.14,1559",
+			shape="",
+			width=0.86659];
+		"ERC20ControlerMinterUpgradeable.setMasterMinter" -> "ERC20ControlerMinterUpgradeable.type"	[color=green,
+			pos="e,751.43,1562.9 470.91,1602.2 504.59,1597.2 545.32,1591.2 581.96,1586 637.26,1578.2 701.28,1569.6 741.49,1564.2"];
+		"ERC20ControlerMinterUpgradeable.isMasterMinter"	[color=green,
+			height=0.5,
+			label=isMasterMinter,
+			pos="782.14,1613",
+			shape="",
+			width=2.3109];
+		"ERC20ControlerMinterUpgradeable.isMasterMinter" -> "ERC20ControlerMinterUpgradeable.hasRole"	[color=green,
+			pos="e,1136.7,1779.4 857.42,1605.1 898.52,1604.8 948.06,1611.6 982.32,1640 1021.3,1672.3 979.83,1715.2 1018.3,1748 1047.9,1773.2 1091.8,\
+1779.3 1126.7,1779.5"];
+		"ERC20ControlerMinterUpgradeable.addMinter"	[color=blue,
+			height=0.5,
+			label=addMinter,
+			pos="398.42,1479",
+			shape="",
+			width=1.661];
+		"ERC20ControlerMinterUpgradeable.addMinter" -> "ERC20ControlerMinterUpgradeable.grantRole"	[color=green,
+			pos="e,726.52,1501.3 456.98,1482.9 526.56,1487.7 643.34,1495.6 716.11,1500.6"];
+		"ERC20ControlerMinterUpgradeable.removeMinter"	[color=blue,
+			height=0.5,
+			label=removeMinter,
+			pos="398.42,1721",
+			shape="",
+			width=2.1484];
+		"ERC20ControlerMinterUpgradeable.removeMinter" -> "ERC20ControlerMinterUpgradeable.revokeRole"	[color=green,
+			pos="e,719.57,1721 476.21,1721 544.2,1721 642.69,1721 709.18,1721"];
+		"ERC20ControlerMinterUpgradeable.updateMintingAllowance"	[color=blue,
+			height=0.5,
+			label=updateMintingAllowance,
+			pos="782.14,1451",
+			shape="",
+			width=3.5025];
+		"ERC20ControlerMinterUpgradeable.updateMintingAllowance" -> "ERC20ControlerMinterUpgradeable.hasRole"	[color=green,
+			pos="e,1137.8,1780.8 889.24,1441.5 923.14,1444.1 958.1,1453.7 982.32,1478 1067.8,1563.7 934.06,1661.1 1018.3,1748 1046,1776.6 1091.5,\
+1782.1 1127.5,1781.2"];
+		"ERC20ControlerMinterUpgradeable.NotMinter"	[height=0.5,
+			label=NotMinter,
+			pos="1182.8,1613",
+			shape="",
+			width=1.661];
+		"ERC20ControlerMinterUpgradeable.updateMintingAllowance" -> "ERC20ControlerMinterUpgradeable.NotMinter"	[color=green,
+			pos="e,1124.6,1617.5 903.82,1446.2 932.1,1450.5 960.35,1459.8 982.32,1478 1021.3,1510.3 979.83,1553.2 1018.3,1586 1044.5,1608.3 1081.9,\
+1615.7 1114.3,1617.2"];
+		"ERC20ControlerMinterUpgradeable.getMinterAllowance"	[color=green,
+			height=0.5,
+			label=getMinterAllowance,
+			pos="398.42,1398",
+			shape="",
+			width=2.9067];
+		"ERC20ControlerMinterUpgradeable.mint"	[color=green,
+			height=0.5,
+			label=mint,
+			pos="782.14,1343",
+			shape="",
+			width=0.9027];
+		"ERC20ControlerMinterUpgradeable.mint" -> "ERC20ControlerMinterUpgradeable.hasRole"	[color=green,
+			pos="e,1140.1,1766.9 802.72,1328.8 842.88,1313.1 934.81,1302.6 982.32,1352 1040.8,1412.8 960.74,1668.3 1018.3,1730 1046.2,1759.9 1093.5,\
+1764.9 1130.1,1766.5"];
+		"ERC20ControlerMinterUpgradeable.mint" -> "ERC20ControlerMinterUpgradeable.hasRole"	[color=green,
+			pos="e,1137.9,1781 812.78,1336.9 856.66,1329.8 938.43,1324.3 982.32,1370 1040.8,1430.8 960.74,1686.3 1018.3,1748 1045.6,1777.2 1091.3,\
+1782.7 1127.5,1781.6"];
+		"ERC20ControlerMinterUpgradeable.mint" -> "ERC20ControlerMinterUpgradeable.hasRole"	[color=green,
+			pos="e,1158.2,1790.5 813.14,1348.5 857.11,1347.8 938.56,1342.5 982.32,1388 1040.8,1448.8 960.74,1704.3 1018.3,1766 1051.1,1801.2 1110.9,\
+1801.9 1148.3,1793.2"];
+		"ERC20ControlerMinterUpgradeable.mint" -> "ERC20ControlerMinterUpgradeable._msgSender"	[color=green,
+			pos="e,1175.9,1648.9 788.24,1325.2 813.53,1282 926.49,1260 982.32,1316 1067.8,1401.7 934.06,1499.1 1018.3,1586 1058.8,1627.7 1137.1,1620.4 \
+1168.4,1642"];
+		"ERC20ControlerMinterUpgradeable.mint" -> "ERC20ControlerMinterUpgradeable._msgSender"	[color=green,
+			pos="e,1164.2,1649.6 793.2,1325.7 825.83,1297.8 929.57,1281.1 982.32,1334 1067.8,1419.7 934.06,1517.1 1018.3,1604 1053.6,1640.4 1117.7,\
+1639.5 1154.2,1647.1"];
+		"ERC20ControlerMinterUpgradeable.mint" -> "ERC20ControlerMinterUpgradeable._msgSender"	[color=green,
+			pos="e,1124.1,1657.9 802.57,1329 842.45,1313.5 933.89,1303.5 982.32,1352 1067.8,1437.7 934.06,1535.1 1018.3,1622 1042.6,1647.1 1080.7,\
+1654.4 1113.9,1657.2"];
+		"ERC20ControlerMinterUpgradeable.mint" -> "ERC20ControlerMinterUpgradeable._msgSender"	[color=green,
+			pos="e,1119.3,1673.3 812.92,1337.1 856.61,1330.3 937.71,1325.3 982.32,1370 1067.8,1455.7 934.06,1553.1 1018.3,1640 1041.4,1663.9 1077,\
+1671.7 1109,1673.1"];
+		"ERC20ControlerMinterUpgradeable.mint" -> "ERC20ControlerMinterUpgradeable._msgSender"	[color=green,
+			pos="e,1154.5,1683.5 813.28,1348.7 857.06,1348.3 937.83,1343.4 982.32,1388 1067.8,1473.7 934.06,1571.1 1018.3,1658 1050.6,1691.3 1107.1,\
+1693.4 1144.5,1685.8"];
+		"ERC20ControlerMinterUpgradeable.mint" -> "ERC20ControlerMinterUpgradeable._msgSender"	[color=green,
+			pos="e,1171.9,1685 800.2,1358 838.71,1368 932.9,1356.5 982.32,1406 1067.8,1491.7 934.06,1589.1 1018.3,1676 1056.7,1715.6 1129.4,1711 \
+1163.4,1691"];
+		"ERC20ControlerMinterUpgradeable.mint" -> "ERC20ControlerMinterUpgradeable._msgSender"	[color=green,
+			pos="e,1177.3,1685 790.24,1360.6 818.98,1389 927.85,1369.4 982.32,1424 1067.8,1509.7 934.06,1607.1 1018.3,1694 1060.1,1737.1 1142.4,1727.9 \
+1171.4,1693.7"];
+		"ERC20ControlerMinterUpgradeable.mint" -> "ERC20ControlerMinterUpgradeable.NotMinter"	[color=green,
+			pos="e,1126.3,1619 813.1,1337.2 856.63,1330.7 937.11,1326.1 982.32,1370 1052.2,1437.8 949.45,1517.2 1018.3,1586 1043.5,1611.1 1082.5,\
+1618.3 1116.1,1619"];
+		"ERC20ControlerMinterUpgradeable.InvalidAmount"	[height=0.5,
+			label=InvalidAmount,
+			pos="1182.8,1397",
+			shape="",
+			width=2.1845];
+		"ERC20ControlerMinterUpgradeable.mint" -> "ERC20ControlerMinterUpgradeable.InvalidAmount"	[color=green,
+			pos="e,1114.6,1387.9 814.09,1347.2 875.91,1355.6 1016.3,1374.6 1104.6,1386.6"];
+		"ERC20ControlerMinterUpgradeable.OperationsOff"	[height=0.5,
+			label=OperationsOff,
+			pos="1182.8,1505",
+			shape="",
+			width=2.0943];
+		"ERC20ControlerMinterUpgradeable.mint" -> "ERC20ControlerMinterUpgradeable.OperationsOff"	[color=green,
+			pos="e,1108.9,1508.9 813.66,1338 856.44,1332.8 934.35,1330.3 982.32,1370 1021.3,1402.3 979.83,1445.2 1018.3,1478 1040.3,1496.8 1070.3,\
+1505 1098.6,1508"];
+		"ERC20ControlerMinterUpgradeable.mintingAllowedAmountExceeded"	[height=0.5,
+			label=mintingAllowedAmountExceeded,
+			pos="1182.8,1451",
+			shape="",
+			width=4.5677];
+		"ERC20ControlerMinterUpgradeable.mint" -> "ERC20ControlerMinterUpgradeable.mintingAllowedAmountExceeded"	[color=green,
+			pos="e,1052.2,1440 814.43,1339.7 856.05,1336.9 930.39,1337.5 982.32,1370 1006.8,1385.3 994.09,1408.4 1018.3,1424 1026,1428.9 1034.2,1433 \
+1042.8,1436.5"];
+		"ERC20ControlerMinterUpgradeable._mint"	[height=0.5,
+			label=_mint,
+			pos="1182.8,1343",
+			shape="",
+			width=1.011];
+		"ERC20ControlerMinterUpgradeable.mint" -> "ERC20ControlerMinterUpgradeable._mint"	[color=green,
+			pos="e,1146.2,1343 814.75,1343 884.96,1343 1054.1,1343 1135.9,1343"];
+		"ERC20ControlerMinterUpgradeable.burn"	[color=green,
+			height=0.5,
+			label=burn,
+			pos="782.14,1397",
+			shape="",
+			width=0.9027];
+		"ERC20ControlerMinterUpgradeable.burn" -> "ERC20ControlerMinterUpgradeable.hasRole"	[color=green,
+			pos="e,1135,1773.9 808.47,1386.2 851.01,1375.5 936.61,1368.2 982.32,1415 1083.5,1518.7 918.62,1633.9 1018.3,1739 1045.1,1767.2 1089.1,\
+1773.2 1124.8,1773.8"];
+		"ERC20ControlerMinterUpgradeable.burn" -> "ERC20ControlerMinterUpgradeable.hasRole"	[color=green,
+			pos="e,1146.9,1786.8 814.89,1396.6 859.14,1392.9 938.81,1388.4 982.32,1433 1083.5,1536.7 918.62,1651.9 1018.3,1757 1048.2,1788.5 1099.6,\
+1792.2 1136.8,1788.2"];
+		"ERC20ControlerMinterUpgradeable.burn" -> "ERC20ControlerMinterUpgradeable._msgSender"	[color=green,
+			pos="e,1164.6,1649.6 793.13,1379.8 825.55,1352.1 928.72,1336 982.32,1388 1052.2,1455.8 949.45,1535.2 1018.3,1604 1054.3,1639.9 1118.4,\
+1639.1 1154.7,1647"];
+		"ERC20ControlerMinterUpgradeable.burn" -> "ERC20ControlerMinterUpgradeable._msgSender"	[color=green,
+			pos="e,1124.8,1657.6 802.74,1383 842.55,1367.8 933.23,1358.4 982.32,1406 1052.2,1473.8 949.45,1553.2 1018.3,1622 1043.1,1646.8 1081.4,\
+1654.1 1114.6,1656.9"];
+		"ERC20ControlerMinterUpgradeable.burn" -> "ERC20ControlerMinterUpgradeable._msgSender"	[color=green,
+			pos="e,1118.8,1673 813.1,1391.2 856.63,1384.7 937.11,1380.1 982.32,1424 1052.2,1491.8 949.45,1571.2 1018.3,1640 1041.6,1663.3 1076.8,\
+1671.1 1108.6,1672.7"];
+		"ERC20ControlerMinterUpgradeable.burn" -> "ERC20ControlerMinterUpgradeable._msgSender"	[color=green,
+			pos="e,1154.3,1683.4 813.1,1402.9 856.63,1402.7 937.11,1398.1 982.32,1442 1052.2,1509.8 949.45,1589.2 1018.3,1658 1051.1,1690.7 1107.2,\
+1693 1144.4,1685.7"];
+		"ERC20ControlerMinterUpgradeable.burn" -> "ERC20ControlerMinterUpgradeable._msgSender"	[color=green,
+			pos="e,1172,1685 800.08,1412.1 838.37,1422.3 932.1,1411.3 982.32,1460 1052.2,1527.8 949.45,1607.2 1018.3,1676 1057.4,1715 1129.8,1710.7 \
+1163.5,1690.9"];
+		"ERC20ControlerMinterUpgradeable.burn" -> "ERC20ControlerMinterUpgradeable.NotMinter"	[color=green,
+			pos="e,1125.6,1618.5 813.15,1391.5 856.39,1385.4 936.08,1381.5 982.32,1424 1036.6,1473.9 964.75,1535.3 1018.3,1586 1043.9,1610.2 1082.3,\
+1617.4 1115.5,1618.4"];
+		"ERC20ControlerMinterUpgradeable.burn" -> "ERC20ControlerMinterUpgradeable.OperationsOff"	[color=green,
+			pos="e,1107.2,1505.3 814.43,1393.7 856.05,1390.9 930.39,1391.5 982.32,1424 1006.8,1439.3 994.09,1462.4 1018.3,1478 1041.5,1492.9 1070.2,\
+1500.5 1097,1504.1"];
+		"ERC20ControlerMinterUpgradeable._burn"	[height=0.5,
+			label=_burn,
+			pos="1182.8,1721",
+			shape="",
+			width=1.0291];
+		"ERC20ControlerMinterUpgradeable.burn" -> "ERC20ControlerMinterUpgradeable._burn"	[color=green,
+			pos="e,1147,1726.1 812.92,1391.1 856.61,1384.3 937.71,1379.3 982.32,1424 1067.8,1509.7 934.06,1607.1 1018.3,1694 1048.5,1725.1 1099.9,\
+1729 1136.9,1726.8"];
+	}
+	subgraph clusterERC20MetaTxUpgradeable {
+		graph [bb="640.9,2352,1625.8,3021",
+			bgcolor=lightgray,
+			color=lightgray,
+			label=ERC20MetaTxUpgradeable,
+			lheight=0.21,
+			lp="1133.4,3009.5",
+			lwidth=2.72,
+			style=filled
+		];
+		"ERC20MetaTxUpgradeable.__ERC20MetaTx_init"	[color=white,
+			height=0.5,
+			label=__ERC20MetaTx_init,
+			pos="782.14,2918",
+			shape="",
+			width=2.9608];
+		"ERC20MetaTxUpgradeable.__ERC20MetaTx_init_unchained"	[height=0.5,
+			label=__ERC20MetaTx_init_unchained,
+			pos="1182.8,2432",
+			shape="",
+			width=4.4232];
+		"ERC20MetaTxUpgradeable.__ERC20MetaTx_init" -> "ERC20MetaTxUpgradeable.__ERC20MetaTx_init_unchained"	[color=green,
+			pos="e,1043.4,2440.8 817.44,2901 863.57,2876.1 944.2,2825.1 982.32,2756 1014.4,2697.8 972.33,2507 1018.3,2459 1023.2,2453.9 1028.6,2449.5 \
+1034.5,2445.8"];
+		"ERC20MetaTxUpgradeable.__Context_init_unchained"	[height=0.5,
+			label=__Context_init_unchained,
+			pos="1182.8,2918",
+			shape="",
+			width=3.5566];
+		"ERC20MetaTxUpgradeable.__ERC20MetaTx_init" -> "ERC20MetaTxUpgradeable.__Context_init_unchained"	[color=green,
+			pos="e,1054.5,2918 888.91,2918 936.59,2918 993.51,2918 1044.4,2918"];
+		"ERC20MetaTxUpgradeable.__EIP712_init_unchained"	[height=0.5,
+			label=__EIP712_init_unchained,
+			pos="1182.8,2972",
+			shape="",
+			width=3.5025];
+		"ERC20MetaTxUpgradeable.__ERC20MetaTx_init" -> "ERC20MetaTxUpgradeable.__EIP712_init_unchained"	[color=green,
+			pos="e,1090.6,2959.6 865.73,2929.2 928.09,2937.6 1014,2949.3 1080.5,2958.3"];
+		"ERC20MetaTxUpgradeable.address"	[height=0.5,
+			label=address,
+			pos="1516.4,2432",
+			shape="",
+			width=1.3179];
+		"ERC20MetaTxUpgradeable.__ERC20MetaTx_init_unchained" -> "ERC20MetaTxUpgradeable.address"	[color=green,
+			pos="e,1468.7,2432 1342.3,2432 1383.9,2432 1426.2,2432 1458.5,2432"];
+		"ERC20MetaTxUpgradeable.permit"	[color=green,
+			height=0.5,
+			label=permit,
+			pos="782.14,2729",
+			shape="",
+			width=1.1735];
+		"ERC20MetaTxUpgradeable._useNonce"	[height=0.5,
+			label=_useNonce,
+			pos="1182.8,2648",
+			shape="",
+			width=1.679];
+		"ERC20MetaTxUpgradeable.permit" -> "ERC20MetaTxUpgradeable._useNonce"	[color=green,
+			pos="e,1126.4,2654.6 822.09,2722.7 862.53,2715.7 927.44,2703.5 982.32,2688 998.69,2683.4 1001.9,2679.3 1018.3,2675 1050.2,2666.7 1086.3,\
+2660.4 1116.4,2656"];
+		"ERC20MetaTxUpgradeable.DeadLineExpired"	[height=0.5,
+			label=DeadLineExpired,
+			pos="1182.8,2702",
+			shape="",
+			width=2.5276];
+		"ERC20MetaTxUpgradeable.permit" -> "ERC20MetaTxUpgradeable.DeadLineExpired"	[color=green,
+			pos="e,1096.5,2707.8 823.92,2726.2 885.23,2722.1 1002.8,2714.1 1086.5,2708.5"];
+		"ERC20MetaTxUpgradeable._hashTypedDataV4"	[height=0.5,
+			label=_hashTypedDataV4,
+			pos="1182.8,2756",
+			shape="",
+			width=2.7623];
+		"ERC20MetaTxUpgradeable.permit" -> "ERC20MetaTxUpgradeable._hashTypedDataV4"	[color=green,
+			pos="e,1089.4,2749.7 823.92,2731.8 883.51,2735.8 996.29,2743.4 1079.4,2749.1"];
+		"ERC20MetaTxUpgradeable.InvalidSignature"	[height=0.5,
+			label=InvalidSignature,
+			pos="1182.8,2810",
+			shape="",
+			width=2.4553];
+		"ERC20MetaTxUpgradeable.permit" -> "ERC20MetaTxUpgradeable.InvalidSignature"	[color=green,
+			pos="e,1111.2,2799.3 818.85,2737.9 864.81,2749.2 947.22,2769 1018.3,2783 1045.2,2788.3 1074.7,2793.4 1101.2,2797.7"];
+		"ERC20MetaTxUpgradeable._approve"	[height=0.5,
+			label=_approve,
+			pos="1182.8,2864",
+			shape="",
+			width=1.4624];
+		"ERC20MetaTxUpgradeable.permit" -> "ERC20MetaTxUpgradeable._approve"	[color=green,
+			pos="e,1131.6,2859.2 808.35,2743.3 850.47,2766.6 938.41,2812.5 1018.3,2837 1051.7,2847.2 1090.1,2853.8 1121.3,2857.9"];
+		"ERC20MetaTxUpgradeable.transferWithAuthorization"	[color=green,
+			height=0.5,
+			label=transferWithAuthorization,
+			pos="782.14,2661",
+			shape="",
+			width=3.7011];
+		"ERC20MetaTxUpgradeable.transferWithAuthorization" -> "ERC20MetaTxUpgradeable._useNonce"	[color=green,
+			pos="e,1122.6,2649.9 911.73,2656.8 978.46,2654.6 1057.3,2652.1 1112.5,2650.3"];
+		"ERC20MetaTxUpgradeable.transferWithAuthorization" -> "ERC20MetaTxUpgradeable.DeadLineExpired"	[color=green,
+			pos="e,1101.6,2693.8 888.65,2671.9 951.78,2678.3 1031.2,2686.5 1091.4,2692.7"];
+		"ERC20MetaTxUpgradeable.transferWithAuthorization" -> "ERC20MetaTxUpgradeable._hashTypedDataV4"	[color=green,
+			pos="e,1090.9,2748.9 883.34,2672.8 915.87,2678.9 951.5,2688.1 982.32,2702 1000.6,2710.2 999.93,2721.1 1018.3,2729 1037.8,2737.3 1059.7,\
+2743.1 1080.9,2747.1"];
+		"ERC20MetaTxUpgradeable.transferWithAuthorization" -> "ERC20MetaTxUpgradeable.InvalidSignature"	[color=green,
+			pos="e,1094.4,2811.2 906.22,2667.7 933.48,2674 960.66,2684.6 982.32,2702 1013,2726.7 987.15,2758.9 1018.3,2783 1037.1,2797.5 1060.8,2805.5 \
+1084.3,2809.6"];
+		"ERC20MetaTxUpgradeable._update"	[height=0.5,
+			label=_update,
+			pos="1182.8,2594",
+			shape="",
+			width=1.3179];
+		"ERC20MetaTxUpgradeable.transferWithAuthorization" -> "ERC20MetaTxUpgradeable._update"	[color=green,
+			pos="e,1137.2,2599.1 891.17,2650.6 920.95,2646.6 953.09,2641.2 982.32,2634 998.84,2629.9 1001.9,2625.3 1018.3,2621 1054.1,2611.7 1095.2,\
+2604.9 1127.2,2600.5"];
+		"ERC20MetaTxUpgradeable.nonce"	[color=green,
+			height=0.5,
+			label=nonce,
+			pos="782.14,2607",
+			shape="",
+			width=1.0652];
+		"ERC20MetaTxUpgradeable.DOMAIN_SEPARATOR"	[color=blue,
+			height=0.5,
+			label=DOMAIN_SEPARATOR,
+			pos="782.14,2540",
+			shape="",
+			width=3.1775];
+		"ERC20MetaTxUpgradeable._domainSeparatorV4"	[height=0.5,
+			label=_domainSeparatorV4,
+			pos="1182.8,2540",
+			shape="",
+			width=2.997];
+		"ERC20MetaTxUpgradeable.DOMAIN_SEPARATOR" -> "ERC20MetaTxUpgradeable._domainSeparatorV4"	[color=green,
+			pos="e,1074.6,2540 896.57,2540 949.11,2540 1011.5,2540 1064.5,2540"];
+		"ERC20MetaTxUpgradeable.setTrustedForwarder"	[color=green,
+			height=0.5,
+			label=setTrustedForwarder,
+			pos="1182.8,2378",
+			shape="",
+			width=3.0511];
+		"ERC20MetaTxUpgradeable.setTrustedForwarder" -> "ERC20MetaTxUpgradeable.address"	[color=green,
+			pos="e,1472.9,2424.7 1263.2,2390.3 1292.1,2394.9 1325.2,2400.1 1355.2,2405 1391.1,2410.9 1431.5,2417.7 1462.7,2423"];
+		"ERC20MetaTxUpgradeable.InvalidZeroAddress"	[height=0.5,
+			label=InvalidZeroAddress,
+			pos="1516.4,2378",
+			shape="",
+			width=2.8164];
+		"ERC20MetaTxUpgradeable.setTrustedForwarder" -> "ERC20MetaTxUpgradeable.InvalidZeroAddress"	[color=green,
+			pos="e,1415,2378 1292.8,2378 1328.8,2378 1368.8,2378 1404.9,2378"];
+		"ERC20MetaTxUpgradeable.isTrustedForwarder"	[height=0.5,
+			label=isTrustedForwarder,
+			pos="1182.8,2486",
+			shape="",
+			width=2.8706];
+		"ERC20MetaTxUpgradeable._msgSender"	[color=white,
+			height=0.5,
+			label=_msgSender,
+			pos="782.14,2378",
+			shape="",
+			width=1.8776];
+		"ERC20MetaTxUpgradeable._msgSender" -> "ERC20MetaTxUpgradeable.isTrustedForwarder"	[color=green,
+			pos="e,1084.8,2480.1 846.93,2383.2 887.7,2388.7 940.56,2400 982.32,2423 1002.1,2433.9 998.19,2448.7 1018.3,2459 1035.7,2467.9 1055.4,\
+2474 1074.9,2478.2"];
+		"ERC20MetaTxUpgradeable._msgData"	[color=white,
+			height=0.5,
+			label=_msgData,
+			pos="782.14,2450",
+			shape="",
+			width=1.5707];
+		"ERC20MetaTxUpgradeable._msgData" -> "ERC20MetaTxUpgradeable.isTrustedForwarder"	[color=green,
+			pos="e,1090.8,2477.8 836.9,2454.9 899.13,2460.5 1003,2469.9 1080.5,2476.9"];
+		"ERC20MetaTxUpgradeable._msgData" -> "ERC20MetaTxUpgradeable._msgData"	[color=orange,
+			pos="e,831.1,2459.2 733.18,2459.2 691.21,2471.4 707.53,2486 782.14,2486 850.34,2486 869.83,2473.8 840.63,2462.4"];
+	}
+	subgraph clusterFeesHandlerUpgradeable {
+		graph [bb="1075.3,498,1613.5,951",
+			bgcolor=lightgray,
+			color=lightgray,
+			label=FeesHandlerUpgradeable,
+			lheight=0.21,
+			lp="1344.4,939.5",
+			lwidth=2.56,
+			style=filled
+		];
+		"FeesHandlerUpgradeable.setFeeFaucet"	[color=green,
+			height=0.5,
+			label=setFeeFaucet,
+			pos="1182.8,902",
+			shape="",
+			width=2.022];
+		"FeesHandlerUpgradeable.setTxFeeRate"	[color=green,
+			height=0.5,
+			label=setTxFeeRate,
+			pos="1182.8,848",
+			shape="",
+			width=2.0582];
+		"FeesHandlerUpgradeable.InvalidFeeRate"	[height=0.5,
+			label=InvalidFeeRate,
+			pos="1516.4,848",
+			shape="",
+			width=2.2387];
+		"FeesHandlerUpgradeable.setTxFeeRate" -> "FeesHandlerUpgradeable.InvalidFeeRate"	[color=green,
+			pos="e,1435.7,848 1257,848 1306.7,848 1372.8,848 1425.7,848"];
+		"FeesHandlerUpgradeable.setGaslessBasefee"	[color=green,
+			height=0.5,
+			label=setGaslessBasefee,
+			pos="1182.8,794",
+			shape="",
+			width=2.69];
+		"FeesHandlerUpgradeable.NegativeBasefee"	[height=0.5,
+			label=NegativeBasefee,
+			pos="1516.4,794",
+			shape="",
+			width=2.4734];
+		"FeesHandlerUpgradeable.setGaslessBasefee" -> "FeesHandlerUpgradeable.NegativeBasefee"	[color=green,
+			pos="e,1427.4,794 1279.7,794 1322.9,794 1373.9,794 1417.4,794"];
+		"FeesHandlerUpgradeable.getTxFeeRate"	[color=green,
+			height=0.5,
+			label=getTxFeeRate,
+			pos="1182.8,740",
+			shape="",
+			width=2.0943];
+		"FeesHandlerUpgradeable.getGaslessBasefee"	[color=green,
+			height=0.5,
+			label=getGaslessBasefee,
+			pos="1182.8,686",
+			shape="",
+			width=2.7261];
+		"FeesHandlerUpgradeable.calculateTxFee"	[color=green,
+			height=0.5,
+			label=calculateTxFee,
+			pos="1182.8,632",
+			shape="",
+			width=2.2206];
+		"FeesHandlerUpgradeable._payTxFee"	[color=white,
+			height=0.5,
+			label=_payTxFee,
+			pos="1182.8,578",
+			shape="",
+			width=1.661];
+		"FeesHandlerUpgradeable.payGaslessBasefee"	[color=blue,
+			height=0.5,
+			label=payGaslessBasefee,
+			pos="1182.8,524",
+			shape="",
+			width=2.7623];
+	}
+	subgraph clusterForwarder {
+		graph [bb="281.88,91,1260.9,490",
+			bgcolor=lightgray,
+			color=lightgray,
+			label=Forwarder,
+			lheight=0.21,
+			lp="771.41,478.5",
+			lwidth=1.06,
+			style=filled
+		];
+		"Forwarder.<Receive Ether>"	[color=blue,
+			height=0.5,
+			label="<Receive Ether>",
+			pos="398.42,441",
+			shape="",
+			width=2.5456];
+		"Forwarder.nonce"	[color=green,
+			height=0.5,
+			label=nonce,
+			pos="398.42,387",
+			shape="",
+			width=1.0652];
+		"Forwarder.getEURF"	[color=green,
+			height=0.5,
+			label=getEURF,
+			pos="398.42,333",
+			shape="",
+			width=1.4985];
+		"Forwarder.initialize"	[color=green,
+			height=0.5,
+			label=initialize,
+			pos="398.42,279",
+			shape="",
+			width=1.4082];
+		"Forwarder.registerRequestTypeInternal"	[height=0.5,
+			label=registerRequestTypeInternal,
+			pos="782.14,333",
+			shape="",
+			width=4.0441];
+		"Forwarder.initialize" -> "Forwarder.registerRequestTypeInternal"	[color=green,
+			pos="e,682.33,319.85 445.53,285.98 482.43,291.52 535.49,299.41 581.96,306 611.16,310.14 642.8,314.49 672.08,318.46"];
+		"Forwarder.__Ownable_init"	[height=0.5,
+			label=__Ownable_init,
+			pos="782.14,441",
+			shape="",
+			width=2.2206];
+		"Forwarder.initialize" -> "Forwarder.__Ownable_init"	[color=green,
+			pos="e,709.75,448.84 448.67,276.03 480,276.79 519.5,283 545.96,306 584.14,339.2 542.99,381.72 581.96,414 614.22,440.73 660.02,448.33 \
+699.57,448.86"];
+		"Forwarder._msgSender"	[height=0.5,
+			label=_msgSender,
+			pos="782.14,279",
+			shape="",
+			width=1.8776];
+		"Forwarder.initialize" -> "Forwarder._msgSender"	[color=green,
+			pos="e,714.54,279 449.32,279 514.17,279 628.08,279 704.08,279"];
+		"Forwarder.address"	[height=0.5,
+			label=address,
+			pos="782.14,387",
+			shape="",
+			width=1.3179];
+		"Forwarder.initialize" -> "Forwarder.address"	[color=green,
+			pos="e,735.66,391.04 449.18,278.65 479.37,280.62 517.44,287.22 545.96,306 570.04,321.87 557.5,344.71 581.96,360 624.87,386.83 683.1,391.93 \
+725.51,391.3"];
+		"Forwarder.verify"	[color=blue,
+			height=0.5,
+			label=verify,
+			pos="398.42,117",
+			shape="",
+			width=1.0471];
+		"Forwarder._verifyNonce"	[height=0.5,
+			label=_verifyNonce,
+			pos="782.14,117",
+			shape="",
+			width=1.9859];
+		"Forwarder.verify" -> "Forwarder._verifyNonce"	[color=green,
+			pos="e,710.3,117 436.37,117 496.92,117 618.69,117 700.08,117"];
+		"Forwarder._verifySig"	[height=0.5,
+			label=_verifySig,
+			pos="782.14,171",
+			shape="",
+			width=1.5887];
+		"Forwarder.verify" -> "Forwarder._verifySig"	[color=green,
+			pos="e,729.11,164.12 434.74,122.35 471.49,127.89 530.73,136.74 581.96,144 627.88,150.51 679.82,157.54 719.14,162.79"];
+		"Forwarder.execute"	[color=blue,
+			height=0.5,
+			label=execute,
+			pos="398.42,171",
+			shape="",
+			width=1.2999];
+		"Forwarder.execute" -> "Forwarder._verifyNonce"	[color=green,
+			pos="e,718.32,125.32 442.18,164.53 479.16,158.96 534.06,150.79 581.96,144 623.64,138.09 670.28,131.75 707.94,126.71"];
+		"Forwarder._updateNonce"	[height=0.5,
+			label=_updateNonce,
+			pos="782.14,225",
+			shape="",
+			width=2.1304];
+		"Forwarder.execute" -> "Forwarder._updateNonce"	[color=green,
+			pos="e,714.72,216.2 442.18,177.47 479.16,183.04 534.06,191.21 581.96,198 622.38,203.73 667.46,209.86 704.49,214.83"];
+		"Forwarder.execute" -> "Forwarder._verifySig"	[color=green,
+			pos="e,724.7,171 445.46,171 512.55,171 637.54,171 714.62,171"];
+		"Forwarder.execute" -> "Forwarder._msgSender"	[color=green,
+			pos="e,716.48,283.34 445.45,170.42 476.18,172.1 516.25,178.43 545.96,198 570.04,213.87 557.5,236.71 581.96,252 618.7,274.98 666.67,282.01 \
+706.33,283.17"];
+		"Forwarder.registerRequestType"	[color=blue,
+			height=0.5,
+			label=registerRequestType,
+			pos="398.42,225",
+			shape="",
+			width=3.015];
+		"Forwarder.registerRequestType" -> "Forwarder.registerRequestTypeInternal"	[color=green,
+			pos="e,639.83,329.03 498.58,232.12 515.3,236.36 531.81,242.68 545.96,252 570.04,267.87 557.5,290.71 581.96,306 596.55,315.12 612.91,321.73 \
+629.82,326.46"];
+		"Forwarder._getEncoded"	[height=0.5,
+			label=_getEncoded,
+			pos="1182.8,171",
+			shape="",
+			width=1.9498];
+		"Forwarder._verifySig" -> "Forwarder._getEncoded"	[color=green,
+			pos="e,1112.4,171 839.41,171 908,171 1024.4,171 1102.1,171"];
+	}
+	subgraph clusterEURFToken {
+		graph [bb="8,3029,1281.7,3482",
+			bgcolor=lightgray,
+			color=lightgray,
+			label=EURFToken,
+			lheight=0.21,
+			lp="644.87,3470.5",
+			lwidth=1.18,
+			style=filled
+		];
+		"EURFToken.payGaslessBasefee"	[color=blue,
+			height=0.5,
+			label=payGaslessBasefee,
+			pos="782.14,3109",
+			shape="",
+			width=2.7623];
+		"EURFToken.balanceOf"	[height=0.5,
+			label=balanceOf,
+			pos="1182.8,3109",
+			shape="",
+			width=1.5887];
+		"EURFToken.payGaslessBasefee" -> "EURFToken.balanceOf"	[color=green,
+			pos="e,1127.4,3104.2 876.34,3103.2 950.38,3101.7 1052,3102 1117.3,3103.9"];
+		"EURFToken.payGaslessBasefee" -> "EURFToken.balanceOf"	[color=green,
+			pos="e,1127.4,3113.8 876.34,3114.8 950.38,3116.3 1052,3116 1117.3,3114.1"];
+		"EURFToken.BalanceTooLow"	[height=0.5,
+			label=BalanceTooLow,
+			pos="1182.8,3163",
+			shape="",
+			width=2.2929];
+		"EURFToken.payGaslessBasefee" -> "EURFToken.BalanceTooLow"	[color=green,
+			pos="e,1112.3,3153.6 862.37,3119.7 931.94,3129.2 1032.6,3142.8 1102.3,3152.2"];
+		"EURFToken.InvalidForwarder"	[height=0.5,
+			label=InvalidForwarder,
+			pos="1182.8,3055",
+			shape="",
+			width=2.5276];
+		"EURFToken.payGaslessBasefee" -> "EURFToken.InvalidForwarder"	[color=green,
+			pos="e,1107.1,3065.1 862.37,3098.3 930.21,3089.1 1027.6,3075.9 1097,3066.5"];
+		"EURFToken.<Constructor>"	[color=green,
+			height=0.5,
+			label="<Constructor>",
+			pos="115.44,3433",
+			shape="",
+			width=2.2748];
+		"EURFToken.initialize"	[color=green,
+			height=0.5,
+			label=initialize,
+			pos="115.44,3379",
+			shape="",
+			width=1.4082];
+		"EURFToken.__UUPSUpgradeable_init"	[height=0.5,
+			label=__UUPSUpgradeable_init,
+			pos="398.42,3379",
+			shape="",
+			width=3.5566];
+		"EURFToken.initialize" -> "EURFToken.__UUPSUpgradeable_init"	[color=green,
+			pos="e,270.15,3379 166.35,3379 192.65,3379 226.32,3379 259.79,3379"];
+		"EURFToken.__EIP712_init"	[height=0.5,
+			label=__EIP712_init,
+			pos="398.42,3433",
+			shape="",
+			width=2.0401];
+		"EURFToken.initialize" -> "EURFToken.__EIP712_init"	[color=green,
+			pos="e,337.14,3423 158.8,3388.5 183.31,3393.8 214.79,3400.5 242.88,3406 270.38,3411.3 300.73,3416.7 327.2,3421.3"];
+		"EURFToken.__ERC20_init_unchained"	[height=0.5,
+			label=__ERC20_init_unchained,
+			pos="398.42,3325",
+			shape="",
+			width=3.4483];
+		"EURFToken.initialize" -> "EURFToken.__ERC20_init_unchained"	[color=green,
+			pos="e,316.31,3338.6 158.8,3369.5 183.31,3364.2 214.79,3357.5 242.88,3352 263.33,3348 285.36,3344 306.19,3340.4"];
+		"EURFToken.decimals"	[color=green,
+			height=0.5,
+			label=decimals,
+			pos="115.44,3325",
+			shape="",
+			width=1.4443];
+		"EURFToken.setOwner"	[color=green,
+			height=0.5,
+			label=setOwner,
+			pos="115.44,3271",
+			shape="",
+			width=1.5526];
+		"EURFToken.owner"	[height=0.5,
+			label=owner,
+			pos="398.42,3095",
+			shape="",
+			width=1.1013];
+		"EURFToken.setOwner" -> "EURFToken.owner"	[color=green,
+			pos="e,358.74,3094.8 169.99,3266.7 186.28,3262.9 203,3256.1 214.88,3244 249.7,3208.7 207.92,3171.2 242.88,3136 270.46,3108.3 314.51,3098.6 \
+348.53,3095.6"];
+		"EURFToken.AlreadyOwner"	[height=0.5,
+			label=AlreadyOwner,
+			pos="398.42,3271",
+			shape="",
+			width=2.1484];
+		"EURFToken.setOwner" -> "EURFToken.AlreadyOwner"	[color=green,
+			pos="e,320.84,3271 171.62,3271 211.22,3271 265.37,3271 310.71,3271"];
+		"EURFToken._authorizeUpgrade"	[color=white,
+			height=0.5,
+			label=_authorizeUpgrade,
+			pos="115.44,3217",
+			shape="",
+			width=2.7623];
+		"EURFToken.setFeeFaucet"	[color=green,
+			height=0.5,
+			label=setFeeFaucet,
+			pos="115.44,3055",
+			shape="",
+			width=2.022];
+		"EURFToken._payTxFee"	[color=white,
+			height=0.5,
+			label=_payTxFee,
+			pos="782.14,3163",
+			shape="",
+			width=1.661];
+		"EURFToken.calculateTxFee"	[height=0.5,
+			label=calculateTxFee,
+			pos="1182.8,3217",
+			shape="",
+			width=2.2206];
+		"EURFToken._payTxFee" -> "EURFToken.calculateTxFee"	[color=green,
+			pos="e,1113.9,3207.8 836.9,3170.3 905.54,3179.6 1024.8,3195.7 1103.5,3206.4"];
+		"EURFToken._payTxFee" -> "EURFToken.balanceOf"	[color=green,
+			pos="e,1126.1,3111.7 830.04,3152.1 900.89,3139.8 1035.5,3121.3 1116.1,3112.7"];
+		"EURFToken._payTxFee" -> "EURFToken.balanceOf"	[color=green,
+			pos="e,1136.5,3119.6 841.53,3160 918.05,3152.1 1051.3,3134 1126.3,3121.4"];
+		"EURFToken._payTxFee" -> "EURFToken.BalanceTooLow"	[color=green,
+			pos="e,1099.8,3163 841.96,3163 907.24,3163 1013.5,3163 1089.8,3163"];
+		"EURFToken.transferSanity"	[color=white,
+			height=0.5,
+			label=transferSanity,
+			pos="398.42,3163",
+			shape="",
+			width=2.1665];
+		"EURFToken.transferSanity" -> "EURFToken._payTxFee"	[color=green,
+			pos="e,722.12,3163 476.67,3163 545.53,3163 645.41,3163 711.76,3163"];
+		"EURFToken.transfer"	[color=green,
+			height=0.5,
+			label=transfer,
+			pos="115.44,3109",
+			shape="",
+			width=1.336];
+		"EURFToken.transfer" -> "EURFToken.transferSanity"	[color=green,
+			pos="e,337.88,3151.6 158.51,3117.1 203.24,3125.7 274.71,3139.4 327.85,3149.6"];
+		"EURFToken.transferFrom"	[color=green,
+			height=0.5,
+			label=transferFrom,
+			pos="115.44,3163",
+			shape="",
+			width=2.0401];
+		"EURFToken.transferFrom" -> "EURFToken.transferSanity"	[color=green,
+			pos="e,320.08,3163 189.17,3163 226.03,3163 271.09,3163 309.85,3163"];
+	}
+	subgraph clusterECDSA {
+		graph [bb="1128.6,2269,1236.9,2344",
+			color=lightgray,
+			label=ECDSA,
+			lheight=0.21,
+			lp="1182.8,2332.5",
+			lwidth=0.72
+		];
+		"ECDSA.recover"	[height=0.5,
+			label=recover,
+			pos="1182.8,2295",
+			shape="",
+			width=1.2818];
+	}
+	subgraph clusterEIP712Upgradeable {
+		graph [bb="1103.2,2102,1263.4,2231",
+			color=lightgray,
+			label=EIP712Upgradeable,
+			lheight=0.21,
+			lp="1183.3,2219.5",
+			lwidth=2.01
+		];
+		"EIP712Upgradeable._msgSender"	[height=0.5,
+			label=_msgSender,
+			pos="1182.8,2128",
+			shape="",
+			width=1.8776];
+		"EIP712Upgradeable._msgData"	[height=0.5,
+			label=_msgData,
+			pos="1182.8,2182",
+			shape="",
+			width=1.5707];
+	}
+	subgraph cluster_01 {
+		graph [bb="26.941,3815,433.42,3940",
+			label=Legend,
+			lheight=0.21,
+			lp="230.18,3928.5",
+			lwidth=0.74
+		];
+		key	[height=1.1667,
+			label=<<table border="0" cellpadding="2" cellspacing="0" cellborder="0">
+  <tr><td align="right" port="i1">Internal Call</td></tr>
+  <tr><td align="right" port="i2">External Call</td></tr>
+  <tr><td align="right" port="i3">Defined Contract</td></tr>
+  <tr><td align="right" port="i4">Undefined Contract</td></tr>
+  </table>>,
+			pos="115.44,3866",
+			width=2.2361];
+		key2	[height=1.1806,
+			label=<<table border="0" cellpadding="2" cellspacing="0" cellborder="0">
+  <tr><td port="i1">&nbsp;&nbsp;&nbsp;</td></tr>
+  <tr><td port="i2">&nbsp;&nbsp;&nbsp;</td></tr>
+  <tr><td port="i3" bgcolor="lightgray">&nbsp;&nbsp;&nbsp;</td></tr>
+  <tr><td port="i4">
+    <table border="1" cellborder="0" cellspacing="0" cellpadding="7" color="lightgray">
+      <tr>
+       <td></td>
+      </tr>
+     </table>
+  </td></tr>
+  </table>>,
+			pos="398.42,3866",
+			width=0.75];
+		key:i1:e -> key2:i1:w	[color=green,
+			pos="e,387.42,3895 189.44,3895 273.99,3895 297.61,3895 377.4,3895"];
+		key:i2:e -> key2:i2:w	[color=orange,
+			pos="e,387.42,3876 189.44,3876 273.99,3876 297.61,3876 377.4,3876"];
+	}
+	subgraph clusterdigest {
+		graph [bb="1128.6,8,1236.9,83",
+			color=lightgray,
+			label=digest,
+			lheight=0.21,
+			lp="1182.8,71.5",
+			lwidth=0.62
+		];
+		"digest.recover"	[height=0.5,
+			label=recover,
+			pos="1182.8,34",
+			shape="",
+			width=1.2818];
+	}
+	subgraph clusterUUPSUpgradeable {
+		graph [bb="1375.2,959,1657.7,1358",
+			color=lightgray,
+			label=UUPSUpgradeable,
+			lheight=0.21,
+			lp="1516.4,1346.5",
+			lwidth=1.89
+		];
+		"UUPSUpgradeable.setTrustedForwarder"	[height=0.5,
+			label=setTrustedForwarder,
+			pos="1516.4,1309",
+			shape="",
+			width=3.0511];
+		"UUPSUpgradeable.setFeeFaucet"	[height=0.5,
+			label=setFeeFaucet,
+			pos="1516.4,1093",
+			shape="",
+			width=2.022];
+		"UUPSUpgradeable.setTxFeeRate"	[height=0.5,
+			label=setTxFeeRate,
+			pos="1516.4,1039",
+			shape="",
+			width=2.0582];
+		"UUPSUpgradeable.setGaslessBasefee"	[height=0.5,
+			label=setGaslessBasefee,
+			pos="1516.4,985",
+			shape="",
+			width=2.69];
+		"UUPSUpgradeable.transfer"	[height=0.5,
+			label=transfer,
+			pos="1516.4,1147",
+			shape="",
+			width=1.336];
+		"UUPSUpgradeable.transferFrom"	[height=0.5,
+			label=transferFrom,
+			pos="1516.4,1201",
+			shape="",
+			width=2.0401];
+		"UUPSUpgradeable.transferWithAuthorization"	[height=0.5,
+			label=transferWithAuthorization,
+			pos="1516.4,1255",
+			shape="",
+			width=3.7011];
+	}
+	"ERC20ControlerMinterUpgradeable._msgSender" -> "ERC20MetaTxUpgradeable._msgSender"	[color=orange,
+		pos="e,800.72,2360.7 1120,1660.3 1085.2,1660.1 1043.7,1666.7 1018.3,1694 957.02,1760.1 1013.5,2013.4 982.32,2098 942.97,2204.6 851.91,\
+2307.6 807.87,2353.3"];
+	"ERC20MetaTxUpgradeable.permit" -> "ECDSA.recover"	[color=orange,
+		pos="e,1136.5,2296.7 823.44,2733.4 869.15,2735.9 942.47,2731.9 982.32,2688 1084.4,2575.4 922.61,2466 1018.3,2348 1044.3,2315.9 1090,2303 \
+1126.5,2298"];
+	"ERC20MetaTxUpgradeable.transferWithAuthorization" -> "EURFToken.transferSanity"	[color=green,
+		pos="e,474.9,3159.1 650.12,2663.7 624.25,2670.3 599.67,2682.1 581.96,2702 519.72,2772 605.71,3049.9 545.96,3122 530.7,3140.4 507.89,3150.9 \
+484.8,3156.8"];
+	"ERC20MetaTxUpgradeable.transferWithAuthorization" -> "ECDSA.recover"	[color=orange,
+		pos="e,1136.7,2296.9 898.93,2669.7 929.73,2666.1 960.46,2656.1 982.32,2634 1072.5,2543 936.65,2446.7 1018.3,2348 1044.7,2316.2 1090.3,\
+2303.3 1126.7,2298.1"];
+	"ERC20MetaTxUpgradeable.transferWithAuthorization" -> "UUPSUpgradeable.transferWithAuthorization"	[color=orange,
+		pos="e,1399,1263.5 895.18,2670.5 927.36,2667.3 959.81,2657.4 982.32,2634 1039.5,2574.7 959.82,2323 1018.3,2265 1071.7,2212.1 1303.9,2289.9 \
+1355.2,2235 1391.3,2196.3 1341,1322.5 1375.2,1282 1379.5,1276.8 1384.6,1272.5 1390,1268.8"];
+	"ERC20MetaTxUpgradeable.setTrustedForwarder" -> "UUPSUpgradeable.setTrustedForwarder"	[color=orange,
+		pos="e,1515.4,1327.3 1292.3,2379.3 1315.8,2374.4 1338.5,2365 1355.2,2348 1501,2199.2 1514.2,1489.6 1515.3,1337.7"];
+	"ERC20MetaTxUpgradeable._msgSender" -> "EIP712Upgradeable._msgSender"	[color=orange,
+		pos="e,1115.4,2130.1 795.82,2360.1 827.65,2316.8 915.78,2206 1018.3,2155 1044.9,2141.8 1076.7,2134.8 1105.1,2131.2"];
+	"ERC20MetaTxUpgradeable._msgData" -> "EIP712Upgradeable._msgData"	[color=orange,
+		pos="e,1127.1,2185.9 838.1,2452.7 883.01,2451.8 944.97,2442.9 982.32,2405 1036.6,2350 966.65,2292.4 1018.3,2235 1043.4,2207.2 1083.2,\
+2193.9 1117.3,2187.6"];
+	"FeesHandlerUpgradeable.setTxFeeRate" -> "UUPSUpgradeable.setTxFeeRate"	[color=orange,
+		pos="e,1442.8,1041.2 1251.3,840.93 1286.9,841.1 1328.6,848.11 1355.2,875 1398.5,918.76 1332.7,967.52 1375.2,1012 1390.2,1027.7 1411.4,\
+1035.8 1432.7,1039.7"];
+	"FeesHandlerUpgradeable.setGaslessBasefee" -> "UUPSUpgradeable.setGaslessBasefee"	[color=orange,
+		pos="e,1421.6,981.14 1274.4,788.11 1303.8,790.99 1334.2,799.82 1355.2,821 1397.6,863.75 1334,911.11 1375.2,955 1385.2,965.69 1398.1,973.05 \
+1411.9,978.04"];
+	"Forwarder.execute" -> "EURFToken.payGaslessBasefee"	[color=orange,
+		pos="e,704.68,3097.7 443.16,165.71 476.76,164.34 521.44,168.93 545.96,198 596.59,258.03 538.12,2959.8 581.96,3025 607.36,3062.8 653.4,\
+3083.6 694.82,3095.1"];
+	"Forwarder._verifySig" -> "digest.recover"	[color=orange,
+		pos="e,1138.7,39.68 837.68,175.57 880.3,176.48 939.31,171.64 982.32,144 1007.5,127.8 994.66,105.38 1018.3,87 1050.4,62.098 1094.5,48.695 \
+1128.9,41.601"];
+	"EURFToken.payGaslessBasefee" -> "ERC20AdminUpgradeable._update"	[color=green,
+		pos="e,1137.1,3521.1 862.39,3098.4 903.78,3097.5 951.98,3104.7 982.32,3136 1036.7,3192.2 965.26,3428.6 1018.3,3486 1045.3,3515.2 1090.6,\
+3521.7 1126.7,3521.4"];
+	"EURFToken.payGaslessBasefee" -> "ERC20MetaTxUpgradeable.isTrustedForwarder"	[color=green,
+		pos="e,1082,2481.9 858.27,3097.2 901.84,3086.2 953.61,3065.1 982.32,3025 1048.7,2932.2 941.53,2597.3 1018.3,2513 1032.4,2497.6 1051.6,\
+2488.7 1072,2483.9"];
+	"EURFToken.initialize" -> "ERC20AdminUpgradeable.__ERC20Admin_init_unchained"	[color=green,
+		pos="e,1045.6,3777.8 165.19,3382.8 182.75,3386.5 201.5,3393.3 214.88,3406 243.45,3433.1 211.78,3465.9 242.88,3490 307.97,3540.5 921.4,\
+3486.6 982.32,3542 1054.6,3607.8 949.17,3689.9 1018.3,3759 1023.8,3764.5 1029.9,3769.1 1036.4,3772.9"];
+	"EURFToken.initialize" -> "ERC20AdminUpgradeable.__Pausable_init"	[color=green,
+		pos="e,1102,3626.5 164.19,3384 181.62,3387.8 200.55,3394.4 214.88,3406 235.9,3423 220.25,3445.2 242.88,3460 380.74,3550.1 848.84,3411.6 \
+982.32,3508 1016.9,3533 985.01,3570.3 1018.3,3597 1038.9,3613.5 1065.8,3621.6 1091.7,3625.3"];
+	"EURFToken.initialize" -> "ERC20ControlerMinterUpgradeable.__ERC20ControlerMinter_init_unchained"	[color=green,
+		pos="e,764.22,2063 166.01,3376.8 183.99,3373.4 202.83,3366.3 214.88,3352 296.66,3255 161.24,3165.1 242.88,3068 332.86,2961 458.23,3092.8 \
+545.96,2984 590.38,2928.9 559.76,2415.2 581.96,2348 619.93,2233.1 713.24,2119.8 757.33,2070.6"];
+	"EURFToken.initialize" -> "ERC20ControlerMinterUpgradeable.__AccessControlEnumerable_init"	[color=green,
+		pos="e,620.3,1991.9 165.92,3377 184,3373.6 202.93,3366.5 214.88,3352 267.06,3288.7 194.24,3050 242.88,2984 328.8,2867.4 462,2982.1 545.96,\
+2864 600.48,2787.3 518.56,2087.5 581.96,2018 590.31,2008.8 600.19,2001.7 611,1996.2"];
+	"EURFToken.initialize" -> "ERC20ControlerMinterUpgradeable._grantRole"	[color=green,
+		pos="e,1125,1565.2 166.13,3377.4 184.36,3374.1 203.34,3366.9 214.88,3352 249.98,3306.6 202.04,1327.3 242.88,1287 359.86,1171.6 857.97,\
+1179.6 982.32,1287 1065.6,1358.9 941.19,1453.5 1018.3,1532 1043,1557.1 1081.4,1564.4 1114.8,1565.1"];
+	"EURFToken.initialize" -> "ERC20MetaTxUpgradeable.__ERC20MetaTx_init_unchained"	[color=green,
+		pos="e,1041.9,2423.5 166.13,3377.4 184.36,3374.1 203.33,3366.9 214.88,3352 249.54,3307.2 202.55,1352.8 242.88,1313 272.13,1284.2 952.8,\
+1284.4 982.32,1313 1069.6,1397.4 938.27,2313.7 1018.3,2405 1022.7,2410 1027.7,2414.4 1033.1,2418.1"];
+	"EURFToken.setOwner" -> "ERC20ControlerMinterUpgradeable.address"	[color=green,
+		pos="e,1140.4,1982.8 171.02,3268.4 187.68,3264.8 204.36,3257.6 214.88,3244 281.44,3158 165.45,1363.3 242.88,1287 301.39,1229.3 922.57,\
+1230.6 982.32,1287 1032.7,1334.6 980.08,1852.2 1018.3,1910 1043.7,1948.3 1092.7,1969.2 1130.5,1980.1"];
+	"EURFToken.setOwner" -> "ERC20ControlerMinterUpgradeable.grantRole"	[color=green,
+		pos="e,732.53,1496.2 170.84,3268.3 187.49,3264.6 204.21,3257.5 214.88,3244 267.09,3178.1 217.65,2568.2 242.88,2488 317.49,2250.9 466.98,\
+2253.7 545.96,2018 580.37,1915.3 507.74,1610.9 581.96,1532 617.08,1494.7 677.48,1491.3 722.58,1495.2"];
+	"EURFToken.setOwner" -> "ERC20ControlerMinterUpgradeable.revokeRole"	[color=green,
+		pos="e,728.78,1711.6 170.69,3268.2 187.33,3264.5 204.08,3257.4 214.88,3244 284.82,3157.4 193.21,2843.6 242.88,2744 321.58,2586.2 467.84,\
+2646.1 545.96,2488 582.43,2414.2 526.31,1808.7 581.96,1748 615.66,1711.3 673.78,1707.1 718.57,1710.6"];
+	"EURFToken.setOwner" -> "ERC20ControlerMinterUpgradeable.getRoleMember"	[color=green,
+		pos="e,713.44,1926.2 170.63,3267.8 187.17,3264.1 203.87,3257.1 214.88,3244 256.31,3194.8 210.45,3011.5 242.88,2956 325.79,2814.1 466.68,\
+2888 545.96,2744 587.8,2668 523.39,2028 581.96,1964 611.88,1931.3 661.15,1924.4 703.2,1925.8"];
+	"EURFToken.setOwner" -> "ERC20MetaTxUpgradeable.InvalidZeroAddress"	[color=green,
+		pos="e,1513.3,2359.8 171.02,3268.4 187.68,3264.8 204.36,3257.6 214.88,3244 282.99,3156 168.6,1323.9 242.88,1241 408.21,1056.5 1193.4,\
+1125.4 1355.2,1313 1390.4,1353.8 1492.1,2184.2 1512,2349.5"];
+	"EURFToken.owner" -> "ERC20ControlerMinterUpgradeable.getRoleMember"	[color=green,
+		pos="e,713.83,1926.2 416.46,3078.7 448.85,3046.5 518.54,2970.8 545.96,2891 579.44,2793.5 512.65,2040.3 581.96,1964 611.93,1931 661.6,\
+1924.2 703.83,1925.7"];
+	"EURFToken.setFeeFaucet" -> "UUPSUpgradeable.setFeeFaucet"	[color=orange,
+		pos="e,1451.1,1084.9 116.88,3036.9 121.73,2841.2 166.35,1126.8 242.88,1055 423.09,885.82 1115.8,993.51 1355.2,1055 1365,1057.5 1365.6,\
+1062.6 1375.2,1066 1396,1073.5 1419.4,1079.1 1441,1083.1"];
+	"EURFToken._payTxFee" -> "ERC20AdminUpgradeable._update"	[color=green,
+		pos="e,1136.5,3520.4 815.47,3178 860.42,3200.6 940.93,3247.7 982.32,3313 1024.4,3379.3 962.14,3431.1 1018.3,3486 1046.4,3513.4 1090.8,\
+3520.2 1126.2,3520.5"];
+	"EURFToken._payTxFee" -> "ERC20ControlerMinterUpgradeable.address"	[color=green,
+		pos="e,1138.1,1984.6 833.44,3172.3 879.44,3177.6 945.73,3176.5 982.32,3136 1065.6,3043.7 936.4,2111.5 1018.3,2018 1044.9,1987.7 1091.5,\
+1982.5 1128.1,1984"];
+	"EURFToken.transferSanity" -> "ERC20AdminUpgradeable.adminSanity"	[color=green,
+		pos="e,1113.7,3572.6 448.52,3176.9 557.78,3210.2 823.81,3303.9 982.32,3468 1008,3494.6 988.74,3520.8 1018.3,3543 1042.5,3561.1 1074.4,\
+3568.9 1103.6,3571.8"];
+	"EURFToken.transfer" -> "ERC20ControlerMinterUpgradeable._msgSender"	[color=green,
+		pos="e,1120,1673.7 163.56,3107.8 182.55,3104.8 202.78,3097.6 214.88,3082 277.53,3001.1 170.11,1312.9 242.88,1241 268.04,1216.2 952.62,\
+1212.9 982.32,1240 1048.2,1300.2 957.59,1574.6 1018.3,1640 1041.2,1664.6 1077.2,1672.4 1109.7,1673.6"];
+	"EURFToken.transfer" -> "UUPSUpgradeable.transfer"	[color=orange,
+		pos="e,1468.1,1146.4 163.57,3107.8 182.56,3104.8 202.79,3097.6 214.88,3082 248.7,3038.3 203.54,1131.8 242.88,1093 330.89,1006.2 1244.8,\
+1037.4 1355.2,1093 1368.5,1099.7 1362.6,1112 1375.2,1120 1399.8,1135.5 1431.2,1142.4 1458,1145.4"];
+	"EURFToken.transferFrom" -> "UUPSUpgradeable.transferFrom"	[color=orange,
+		pos="e,1452.5,1192.1 184.3,3156.7 196.18,3152.5 207.18,3146 214.88,3136 248.92,3092 203.63,1173.4 242.88,1134 330.15,1046.4 1235.7,1133.1 \
+1355.2,1165 1364.6,1167.5 1365.9,1171.1 1375.2,1174 1396.7,1180.8 1420.7,1186.2 1442.6,1190.3"];
+}

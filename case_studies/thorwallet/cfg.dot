@@ -1,0 +1,141 @@
+digraph G {
+	graph [bb="0,0,382.27,552",
+		compound=true,
+		page=100,
+		rankdir=LR,
+		ratio=auto
+	];
+	node [label="\N",
+		shape=plaintext
+	];
+	subgraph clusterIERC677Receiver {
+		graph [bb="8,8,203.08,83",
+			bgcolor=lightgray,
+			color=lightgray,
+			label="IERC677Receiver  (iface)",
+			lheight=0.21,
+			lp="105.54,71.5",
+			lwidth=2.50,
+			style=filled
+		];
+		"IERC677Receiver.onTokenTransfer"	[color=blue,
+			height=0.5,
+			label=onTokenTransfer,
+			pos="105.04,34",
+			shape="",
+			width=2.4734];
+	}
+	subgraph clusterIMerge {
+		graph [bgcolor=lightgray,
+			color=lightgray,
+			label="IMerge  (iface)",
+			style=filled
+		];
+	}
+	subgraph clusterITokenReceiver {
+		graph [bb="8,91,202.08,166",
+			bgcolor=lightgray,
+			color=lightgray,
+			label="ITokenReceiver  (iface)",
+			lheight=0.21,
+			lp="105.04,154.5",
+			lwidth=2.26,
+			style=filled
+		];
+		"ITokenReceiver.onTokenTransfer"	[color=blue,
+			height=0.5,
+			label=onTokenTransfer,
+			pos="105.04,117",
+			shape="",
+			width=2.4734];
+	}
+	subgraph clusterTgt {
+		graph [bb="12.55,174,374.27,411",
+			bgcolor=lightgray,
+			color=lightgray,
+			label=Tgt,
+			lheight=0.21,
+			lp="193.41,399.5",
+			lwidth=0.35,
+			style=filled
+		];
+		"Tgt.<Constructor>"	[color=green,
+			height=0.5,
+			label="<Constructor>",
+			pos="105.04,362",
+			shape="",
+			width=2.2748];
+		"Tgt._mint"	[height=0.5,
+			label=_mint,
+			pos="298.68,362",
+			shape="",
+			width=1.011];
+		"Tgt.<Constructor>" -> "Tgt._mint"	[color=green,
+			pos="e,261.97,362 187.04,362 209.2,362 232.45,362 251.89,362"];
+		"Tgt.transferAndCall"	[color=blue,
+			height=0.5,
+			label=transferAndCall,
+			pos="105.04,281",
+			shape="",
+			width=2.347];
+		"Tgt.isContract"	[height=0.5,
+			label=isContract,
+			pos="298.68,200",
+			shape="",
+			width=1.6429];
+		"Tgt.transferAndCall" -> "Tgt.isContract"	[color=green,
+			pos="e,262.02,214.29 142.88,264.83 167.74,253.99 201.31,239.46 231.08,227 237.97,224.12 245.27,221.11 252.42,218.19"];
+		"Tgt._transfer"	[height=0.5,
+			label=_transfer,
+			pos="298.68,254",
+			shape="",
+			width=1.4624];
+		"Tgt.transferAndCall" -> "Tgt._transfer"	[color=green,
+			pos="e,249.71,260.76 176.04,271.14 196.99,268.19 219.71,264.98 239.79,262.16"];
+		"Tgt._msgSender"	[height=0.5,
+			label=_msgSender,
+			pos="298.68,308",
+			shape="",
+			width=1.8776];
+		"Tgt.transferAndCall" -> "Tgt._msgSender"	[color=green,
+			pos="e,250.12,295.38 186.76,285.7 204.63,288.04 223.22,290.8 239.96,293.62"];
+		"Tgt.transferAndCall" -> "Tgt._msgSender"	[color=green,
+			pos="e,231.58,305.14 159.93,294.73 179.06,298.02 200.95,301.27 221.58,303.9"];
+	}
+	subgraph cluster_01 {
+		graph [bb="16.542,419,333.68,544",
+			label=Legend,
+			lheight=0.21,
+			lp="175.11,532.5",
+			lwidth=0.74
+		];
+		key	[height=1.1667,
+			label=<<table border="0" cellpadding="2" cellspacing="0" cellborder="0">
+  <tr><td align="right" port="i1">Internal Call</td></tr>
+  <tr><td align="right" port="i2">External Call</td></tr>
+  <tr><td align="right" port="i3">Defined Contract</td></tr>
+  <tr><td align="right" port="i4">Undefined Contract</td></tr>
+  </table>>,
+			pos="105.04,470",
+			width=2.2361];
+		key2	[height=1.1806,
+			label=<<table border="0" cellpadding="2" cellspacing="0" cellborder="0">
+  <tr><td port="i1">&nbsp;&nbsp;&nbsp;</td></tr>
+  <tr><td port="i2">&nbsp;&nbsp;&nbsp;</td></tr>
+  <tr><td port="i3" bgcolor="lightgray">&nbsp;&nbsp;&nbsp;</td></tr>
+  <tr><td port="i4">
+    <table border="1" cellborder="0" cellspacing="0" cellpadding="7" color="lightgray">
+      <tr>
+       <td></td>
+      </tr>
+     </table>
+  </td></tr>
+  </table>>,
+			pos="298.68,470",
+			width=0.75];
+		key:i1:e -> key2:i1:w	[color=green,
+			pos="e,287.68,499 179.04,499 223.74,499 237.4,499 277.5,499"];
+		key:i2:e -> key2:i2:w	[color=orange,
+			pos="e,287.68,480 179.04,480 223.74,480 237.4,480 277.5,480"];
+	}
+}

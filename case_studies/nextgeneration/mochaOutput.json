@@ -1,0 +1,714 @@
+{
+ "stats": {
+  "suites": 16,
+  "tests": 50,
+  "passes": 50,
+  "pending": 0,
+  "failures": 0
+ },
+ "tests": [
+  {
+   "title": "should have a name",
+   "fullTitle": "EURFToken DEPLOYMENT should have a name",
+   "file": "test/Token.js",
+   "currentRetry": 0,
+   "err": {}
+  },
+  {
+   "title": "should have a symbol",
+   "fullTitle": "EURFToken DEPLOYMENT should have a symbol",
+   "file": "test/Token.js",
+   "currentRetry": 0,
+   "err": {}
+  },
+  {
+   "title": "sets new Owner",
+   "fullTitle": "EURFToken ROLES OWNER sets new Owner",
+   "file": "test/Token.js",
+   "currentRetry": 0,
+   "err": {}
+  },
+  {
+   "title": "sets Administrator",
+   "fullTitle": "EURFToken ROLES OWNER sets Administrator",
+   "file": "test/Token.js",
+   "currentRetry": 0,
+   "err": {}
+  },
+  {
+   "title": "should set master_minter",
+   "fullTitle": "EURFToken ROLES OWNER should set master_minter",
+   "file": "test/Token.js",
+   "currentRetry": 0,
+   "err": {}
+  },
+  {
+   "title": "should add/remove controlers",
+   "fullTitle": "EURFToken ROLES OWNER should add/remove controlers",
+   "file": "test/Token.js",
+   "currentRetry": 0,
+   "err": {}
+  },
+  {
+   "title": "allows upgrade",
+   "fullTitle": "EURFToken ROLES OWNER allows upgrade",
+   "file": "test/Token.js",
+   "currentRetry": 0,
+   "err": {}
+  },
+  {
+   "title": "should revert if the owner is not the caller",
+   "fullTitle": "EURFToken ROLES OWNER should revert if the owner is not the caller",
+   "file": "test/Token.js",
+   "currentRetry": 0,
+   "err": {}
+  },
+  {
+   "title": "should blacklist/unblacklist user",
+   "fullTitle": "EURFToken ROLES ADMINISTRATOR should blacklist/unblacklist user",
+   "file": "test/Token.js",
+   "currentRetry": 0,
+   "err": {}
+  },
+  {
+   "title": "should pause/unpause",
+   "fullTitle": "EURFToken ROLES ADMINISTRATOR should pause/unpause",
+   "file": "test/Token.js",
+   "currentRetry": 0,
+   "err": {}
+  },
+  {
+   "title": "should be able to force a transfer",
+   "fullTitle": "EURFToken ROLES ADMINISTRATOR should be able to force a transfer",
+   "file": "test/Token.js",
+   "currentRetry": 0,
+   "err": {}
+  },
+  {
+   "title": "should revert if the admin is not the caller",
+   "fullTitle": "EURFToken ROLES ADMINISTRATOR should revert if the admin is not the caller",
+   "file": "test/Token.js",
+   "currentRetry": 0,
+   "err": {}
+  },
+  {
+   "title": "should set fee Faucet",
+   "fullTitle": "EURFToken ROLES ADMINISTRATOR FEES should set fee Faucet",
+   "file": "test/Token.js",
+   "currentRetry": 0,
+   "err": {}
+  },
+  {
+   "title": "should update tx fee rate",
+   "fullTitle": "EURFToken ROLES ADMINISTRATOR FEES should update tx fee rate",
+   "file": "test/Token.js",
+   "currentRetry": 0,
+   "err": {}
+  },
+  {
+   "title": "should update gaseless basefee",
+   "fullTitle": "EURFToken ROLES ADMINISTRATOR FORWARDER should update gaseless basefee",
+   "file": "test/Token.js",
+   "currentRetry": 0,
+   "err": {}
+  },
+  {
+   "title": "should set trusted forwarder",
+   "fullTitle": "EURFToken ROLES ADMINISTRATOR FORWARDER should set trusted forwarder",
+   "file": "test/Token.js",
+   "currentRetry": 0,
+   "err": {}
+  },
+  {
+   "title": "should be able to switch _operating on and off",
+   "fullTitle": "EURFToken ROLES CONTROLLER should be able to switch _operating on and off",
+   "file": "test/Token.js",
+   "currentRetry": 0,
+   "err": {}
+  },
+  {
+   "title": "should revert if caller is not a controler",
+   "fullTitle": "EURFToken ROLES CONTROLLER should revert if caller is not a controler",
+   "file": "test/Token.js",
+   "currentRetry": 0,
+   "err": {}
+  },
+  {
+   "title": "should revert if the controler is not the current operator",
+   "fullTitle": "EURFToken ROLES CONTROLLER should revert if the controler is not the current operator",
+   "file": "test/Token.js",
+   "currentRetry": 0,
+   "err": {}
+  },
+  {
+   "title": "owner should be able to switch back on the operations",
+   "fullTitle": "EURFToken ROLES CONTROLLER owner should be able to switch back on the operations",
+   "file": "test/Token.js",
+   "currentRetry": 0,
+   "err": {}
+  },
+  {
+   "title": "should allow minting if _operating is off",
+   "fullTitle": "EURFToken ROLES CONTROLLER should allow minting if _operating is off",
+   "file": "test/Token.js",
+   "currentRetry": 0,
+   "err": {}
+  },
+  {
+   "title": "should allow burning if _operating is off",
+   "fullTitle": "EURFToken ROLES CONTROLLER should allow burning if _operating is off",
+   "file": "test/Token.js",
+   "currentRetry": 0,
+   "err": {}
+  },
+  {
+   "title": "should add/remove minter",
+   "fullTitle": "EURFToken ROLES MASTER MINTER should add/remove minter",
+   "file": "test/Token.js",
+   "currentRetry": 0,
+   "err": {}
+  },
+  {
+   "title": "should update minting allowance",
+   "fullTitle": "EURFToken ROLES MASTER MINTER should update minting allowance",
+   "file": "test/Token.js",
+   "currentRetry": 0,
+   "err": {}
+  },
+  {
+   "title": "should revert if the master_minter is not the caller",
+   "fullTitle": "EURFToken ROLES MASTER MINTER should revert if the master_minter is not the caller",
+   "file": "test/Token.js",
+   "currentRetry": 0,
+   "err": {}
+  },
+  {
+   "title": "should mint within allowance",
+   "fullTitle": "EURFToken ROLES MASTER MINTER MINTER should mint within allowance",
+   "file": "test/Token.js",
+   "currentRetry": 0,
+   "err": {}
+  },
+  {
+   "title": "should not mint above allowance",
+   "fullTitle": "EURFToken ROLES MASTER MINTER MINTER should not mint above allowance",
+   "file": "test/Token.js",
+   "currentRetry": 0,
+   "err": {}
+  },
+  {
+   "title": "should burn within allowance",
+   "fullTitle": "EURFToken ROLES MASTER MINTER MINTER should burn within allowance",
+   "file": "test/Token.js",
+   "currentRetry": 0,
+   "err": {}
+  },
+  {
+   "title": "should not burn above allowance",
+   "fullTitle": "EURFToken ROLES MASTER MINTER MINTER should not burn above allowance",
+   "file": "test/Token.js",
+   "currentRetry": 0,
+   "err": {}
+  },
+  {
+   "title": "should transfer with sufficient balance",
+   "fullTitle": "EURFToken ROLES REGULAR ACCOUNT REGULAR TX should transfer with sufficient balance",
+   "file": "test/Token.js",
+   "currentRetry": 0,
+   "err": {}
+  },
+  {
+   "title": "should not transfer with unsufficient balance",
+   "fullTitle": "EURFToken ROLES REGULAR ACCOUNT REGULAR TX should not transfer with unsufficient balance",
+   "file": "test/Token.js",
+   "currentRetry": 0,
+   "err": {}
+  },
+  {
+   "title": "should approve",
+   "fullTitle": "EURFToken ROLES REGULAR ACCOUNT REGULAR TX should approve",
+   "file": "test/Token.js",
+   "currentRetry": 0,
+   "err": {}
+  },
+  {
+   "title": "should transfer from with sufficient balance",
+   "fullTitle": "EURFToken ROLES REGULAR ACCOUNT REGULAR TX should transfer from with sufficient balance",
+   "file": "test/Token.js",
+   "currentRetry": 0,
+   "err": {}
+  },
+  {
+   "title": "should not transfer from with unsufficient balance",
+   "fullTitle": "EURFToken ROLES REGULAR ACCOUNT REGULAR TX should not transfer from with unsufficient balance",
+   "file": "test/Token.js",
+   "currentRetry": 0,
+   "err": {}
+  },
+  {
+   "title": "should not transfer if blacklisted",
+   "fullTitle": "EURFToken ROLES REGULAR ACCOUNT REGULAR TX should not transfer if blacklisted",
+   "file": "test/Token.js",
+   "currentRetry": 0,
+   "err": {}
+  },
+  {
+   "title": "should approve with valid permit",
+   "fullTitle": "EURFToken ROLES REGULAR ACCOUNT META TX should approve with valid permit",
+   "file": "test/Token.js",
+   "currentRetry": 0,
+   "err": {}
+  },
+  {
+   "title": "should not approve with already used valid permit",
+   "fullTitle": "EURFToken ROLES REGULAR ACCOUNT META TX should not approve with already used valid permit",
+   "file": "test/Token.js",
+   "currentRetry": 0,
+   "err": {}
+  },
+  {
+   "title": "should not approve with unvalid permit",
+   "fullTitle": "EURFToken ROLES REGULAR ACCOUNT META TX should not approve with unvalid permit",
+   "file": "test/Token.js",
+   "currentRetry": 0,
+   "err": {}
+  },
+  {
+   "title": "should transfer with valid transferWithAuthorization",
+   "fullTitle": "EURFToken ROLES REGULAR ACCOUNT META TX should transfer with valid transferWithAuthorization",
+   "file": "test/Token.js",
+   "currentRetry": 0,
+   "err": {}
+  },
+  {
+   "title": "should not transfer with already used valid transferWithAuthorization",
+   "fullTitle": "EURFToken ROLES REGULAR ACCOUNT META TX should not transfer with already used valid transferWithAuthorization",
+   "file": "test/Token.js",
+   "currentRetry": 0,
+   "err": {}
+  },
+  {
+   "title": "should not transfer with unvalid transferWithAuthorization",
+   "fullTitle": "EURFToken ROLES REGULAR ACCOUNT META TX should not transfer with unvalid transferWithAuthorization",
+   "file": "test/Token.js",
+   "currentRetry": 0,
+   "err": {}
+  },
+  {
+   "title": "should not transferWithAuthorization if blacklisted",
+   "fullTitle": "EURFToken ROLES REGULAR ACCOUNT META TX should not transferWithAuthorization if blacklisted",
+   "file": "test/Token.js",
+   "currentRetry": 0,
+   "err": {}
+  },
+  {
+   "title": "should forward transfer",
+   "fullTitle": "EURFToken FORWARDER TRANSFER should forward transfer",
+   "file": "test/Token.js",
+   "currentRetry": 0,
+   "err": {}
+  },
+  {
+   "title": "should forward transfer with gasslessBasefee",
+   "fullTitle": "EURFToken FORWARDER TRANSFER should forward transfer with gasslessBasefee",
+   "file": "test/Token.js",
+   "currentRetry": 0,
+   "err": {}
+  },
+  {
+   "title": "should not transfer with unvalid signature",
+   "fullTitle": "EURFToken FORWARDER TRANSFER should not transfer with unvalid signature",
+   "file": "test/Token.js",
+   "currentRetry": 0,
+   "err": {}
+  },
+  {
+   "title": "should not forward transfer if not enough balance",
+   "fullTitle": "EURFToken FORWARDER TRANSFER should not forward transfer if not enough balance",
+   "file": "test/Token.js",
+   "currentRetry": 0,
+   "err": {}
+  },
+  {
+   "title": "should revert if the forwarder is not trusted",
+   "fullTitle": "EURFToken FORWARDER EDGE CASES should revert if the forwarder is not trusted",
+   "file": "test/Token.js",
+   "currentRetry": 0,
+   "err": {}
+  },
+  {
+   "title": "should revert if payGaslessBasefee is called",
+   "fullTitle": "EURFToken FORWARDER EDGE CASES should revert if payGaslessBasefee is called",
+   "file": "test/Token.js",
+   "currentRetry": 0,
+   "err": {}
+  },
+  {
+   "title": "should revert if any other function (exept transfer) is called",
+   "fullTitle": "EURFToken FORWARDER EDGE CASES should revert if any other function (exept transfer) is called",
+   "file": "test/Token.js",
+   "currentRetry": 0,
+   "err": {}
+  },
+  {
+   "title": "should revert if using already used forward data",
+   "fullTitle": "EURFToken FORWARDER EDGE CASES should revert if using already used forward data",
+   "file": "test/Token.js",
+   "currentRetry": 0,
+   "err": {}
+  }
+ ],
+ "failures": [],
+ "passes": [
+  {
+   "title": "should have a name",
+   "fullTitle": "EURFToken DEPLOYMENT should have a name",
+   "file": "test/Token.js",
+   "currentRetry": 0,
+   "err": {}
+  },
+  {
+   "title": "should have a symbol",
+   "fullTitle": "EURFToken DEPLOYMENT should have a symbol",
+   "file": "test/Token.js",
+   "currentRetry": 0,
+   "err": {}
+  },
+  {
+   "title": "sets new Owner",
+   "fullTitle": "EURFToken ROLES OWNER sets new Owner",
+   "file": "test/Token.js",
+   "currentRetry": 0,
+   "err": {}
+  },
+  {
+   "title": "sets Administrator",
+   "fullTitle": "EURFToken ROLES OWNER sets Administrator",
+   "file": "test/Token.js",
+   "currentRetry": 0,
+   "err": {}
+  },
+  {
+   "title": "should set master_minter",
+   "fullTitle": "EURFToken ROLES OWNER should set master_minter",
+   "file": "test/Token.js",
+   "currentRetry": 0,
+   "err": {}
+  },
+  {
+   "title": "should add/remove controlers",
+   "fullTitle": "EURFToken ROLES OWNER should add/remove controlers",
+   "file": "test/Token.js",
+   "currentRetry": 0,
+   "err": {}
+  },
+  {
+   "title": "allows upgrade",
+   "fullTitle": "EURFToken ROLES OWNER allows upgrade",
+   "file": "test/Token.js",
+   "currentRetry": 0,
+   "err": {}
+  },
+  {
+   "title": "should revert if the owner is not the caller",
+   "fullTitle": "EURFToken ROLES OWNER should revert if the owner is not the caller",
+   "file": "test/Token.js",
+   "currentRetry": 0,
+   "err": {}
+  },
+  {
+   "title": "should blacklist/unblacklist user",
+   "fullTitle": "EURFToken ROLES ADMINISTRATOR should blacklist/unblacklist user",
+   "file": "test/Token.js",
+   "currentRetry": 0,
+   "err": {}
+  },
+  {
+   "title": "should pause/unpause",
+   "fullTitle": "EURFToken ROLES ADMINISTRATOR should pause/unpause",
+   "file": "test/Token.js",
+   "currentRetry": 0,
+   "err": {}
+  },
+  {
+   "title": "should be able to force a transfer",
+   "fullTitle": "EURFToken ROLES ADMINISTRATOR should be able to force a transfer",
+   "file": "test/Token.js",
+   "currentRetry": 0,
+   "err": {}
+  },
+  {
+   "title": "should revert if the admin is not the caller",
+   "fullTitle": "EURFToken ROLES ADMINISTRATOR should revert if the admin is not the caller",
+   "file": "test/Token.js",
+   "currentRetry": 0,
+   "err": {}
+  },
+  {
+   "title": "should set fee Faucet",
+   "fullTitle": "EURFToken ROLES ADMINISTRATOR FEES should set fee Faucet",
+   "file": "test/Token.js",
+   "currentRetry": 0,
+   "err": {}
+  },
+  {
+   "title": "should update tx fee rate",
+   "fullTitle": "EURFToken ROLES ADMINISTRATOR FEES should update tx fee rate",
+   "file": "test/Token.js",
+   "currentRetry": 0,
+   "err": {}
+  },
+  {
+   "title": "should update gaseless basefee",
+   "fullTitle": "EURFToken ROLES ADMINISTRATOR FORWARDER should update gaseless basefee",
+   "file": "test/Token.js",
+   "currentRetry": 0,
+   "err": {}
+  },
+  {
+   "title": "should set trusted forwarder",
+   "fullTitle": "EURFToken ROLES ADMINISTRATOR FORWARDER should set trusted forwarder",
+   "file": "test/Token.js",
+   "currentRetry": 0,
+   "err": {}
+  },
+  {
+   "title": "should be able to switch _operating on and off",
+   "fullTitle": "EURFToken ROLES CONTROLLER should be able to switch _operating on and off",
+   "file": "test/Token.js",
+   "currentRetry": 0,
+   "err": {}
+  },
+  {
+   "title": "should revert if caller is not a controler",
+   "fullTitle": "EURFToken ROLES CONTROLLER should revert if caller is not a controler",
+   "file": "test/Token.js",
+   "currentRetry": 0,
+   "err": {}
+  },
+  {
+   "title": "should revert if the controler is not the current operator",
+   "fullTitle": "EURFToken ROLES CONTROLLER should revert if the controler is not the current operator",
+   "file": "test/Token.js",
+   "currentRetry": 0,
+   "err": {}
+  },
+  {
+   "title": "owner should be able to switch back on the operations",
+   "fullTitle": "EURFToken ROLES CONTROLLER owner should be able to switch back on the operations",
+   "file": "test/Token.js",
+   "currentRetry": 0,
+   "err": {}
+  },
+  {
+   "title": "should allow minting if _operating is off",
+   "fullTitle": "EURFToken ROLES CONTROLLER should allow minting if _operating is off",
+   "file": "test/Token.js",
+   "currentRetry": 0,
+   "err": {}
+  },
+  {
+   "title": "should allow burning if _operating is off",
+   "fullTitle": "EURFToken ROLES CONTROLLER should allow burning if _operating is off",
+   "file": "test/Token.js",
+   "currentRetry": 0,
+   "err": {}
+  },
+  {
+   "title": "should add/remove minter",
+   "fullTitle": "EURFToken ROLES MASTER MINTER should add/remove minter",
+   "file": "test/Token.js",
+   "currentRetry": 0,
+   "err": {}
+  },
+  {
+   "title": "should update minting allowance",
+   "fullTitle": "EURFToken ROLES MASTER MINTER should update minting allowance",
+   "file": "test/Token.js",
+   "currentRetry": 0,
+   "err": {}
+  },
+  {
+   "title": "should revert if the master_minter is not the caller",
+   "fullTitle": "EURFToken ROLES MASTER MINTER should revert if the master_minter is not the caller",
+   "file": "test/Token.js",
+   "currentRetry": 0,
+   "err": {}
+  },
+  {
+   "title": "should mint within allowance",
+   "fullTitle": "EURFToken ROLES MASTER MINTER MINTER should mint within allowance",
+   "file": "test/Token.js",
+   "currentRetry": 0,
+   "err": {}
+  },
+  {
+   "title": "should not mint above allowance",
+   "fullTitle": "EURFToken ROLES MASTER MINTER MINTER should not mint above allowance",
+   "file": "test/Token.js",
+   "currentRetry": 0,
+   "err": {}
+  },
+  {
+   "title": "should burn within allowance",
+   "fullTitle": "EURFToken ROLES MASTER MINTER MINTER should burn within allowance",
+   "file": "test/Token.js",
+   "currentRetry": 0,
+   "err": {}
+  },
+  {
+   "title": "should not burn above allowance",
+   "fullTitle": "EURFToken ROLES MASTER MINTER MINTER should not burn above allowance",
+   "file": "test/Token.js",
+   "currentRetry": 0,
+   "err": {}
+  },
+  {
+   "title": "should transfer with sufficient balance",
+   "fullTitle": "EURFToken ROLES REGULAR ACCOUNT REGULAR TX should transfer with sufficient balance",
+   "file": "test/Token.js",
+   "currentRetry": 0,
+   "err": {}
+  },
+  {
+   "title": "should not transfer with unsufficient balance",
+   "fullTitle": "EURFToken ROLES REGULAR ACCOUNT REGULAR TX should not transfer with unsufficient balance",
+   "file": "test/Token.js",
+   "currentRetry": 0,
+   "err": {}
+  },
+  {
+   "title": "should approve",
+   "fullTitle": "EURFToken ROLES REGULAR ACCOUNT REGULAR TX should approve",
+   "file": "test/Token.js",
+   "currentRetry": 0,
+   "err": {}
+  },
+  {
+   "title": "should transfer from with sufficient balance",
+   "fullTitle": "EURFToken ROLES REGULAR ACCOUNT REGULAR TX should transfer from with sufficient balance",
+   "file": "test/Token.js",
+   "currentRetry": 0,
+   "err": {}
+  },
+  {
+   "title": "should not transfer from with unsufficient balance",
+   "fullTitle": "EURFToken ROLES REGULAR ACCOUNT REGULAR TX should not transfer from with unsufficient balance",
+   "file": "test/Token.js",
+   "currentRetry": 0,
+   "err": {}
+  },
+  {
+   "title": "should not transfer if blacklisted",
+   "fullTitle": "EURFToken ROLES REGULAR ACCOUNT REGULAR TX should not transfer if blacklisted",
+   "file": "test/Token.js",
+   "currentRetry": 0,
+   "err": {}
+  },
+  {
+   "title": "should approve with valid permit",
+   "fullTitle": "EURFToken ROLES REGULAR ACCOUNT META TX should approve with valid permit",
+   "file": "test/Token.js",
+   "currentRetry": 0,
+   "err": {}
+  },
+  {
+   "title": "should not approve with already used valid permit",
+   "fullTitle": "EURFToken ROLES REGULAR ACCOUNT META TX should not approve with already used valid permit",
+   "file": "test/Token.js",
+   "currentRetry": 0,
+   "err": {}
+  },
+  {
+   "title": "should not approve with unvalid permit",
+   "fullTitle": "EURFToken ROLES REGULAR ACCOUNT META TX should not approve with unvalid permit",
+   "file": "test/Token.js",
+   "currentRetry": 0,
+   "err": {}
+  },
+  {
+   "title": "should transfer with valid transferWithAuthorization",
+   "fullTitle": "EURFToken ROLES REGULAR ACCOUNT META TX should transfer with valid transferWithAuthorization",
+   "file": "test/Token.js",
+   "currentRetry": 0,
+   "err": {}
+  },
+  {
+   "title": "should not transfer with already used valid transferWithAuthorization",
+   "fullTitle": "EURFToken ROLES REGULAR ACCOUNT META TX should not transfer with already used valid transferWithAuthorization",
+   "file": "test/Token.js",
+   "currentRetry": 0,
+   "err": {}
+  },
+  {
+   "title": "should not transfer with unvalid transferWithAuthorization",
+   "fullTitle": "EURFToken ROLES REGULAR ACCOUNT META TX should not transfer with unvalid transferWithAuthorization",
+   "file": "test/Token.js",
+   "currentRetry": 0,
+   "err": {}
+  },
+  {
+   "title": "should not transferWithAuthorization if blacklisted",
+   "fullTitle": "EURFToken ROLES REGULAR ACCOUNT META TX should not transferWithAuthorization if blacklisted",
+   "file": "test/Token.js",
+   "currentRetry": 0,
+   "err": {}
+  },
+  {
+   "title": "should forward transfer",
+   "fullTitle": "EURFToken FORWARDER TRANSFER should forward transfer",
+   "file": "test/Token.js",
+   "currentRetry": 0,
+   "err": {}
+  },
+  {
+   "title": "should forward transfer with gasslessBasefee",
+   "fullTitle": "EURFToken FORWARDER TRANSFER should forward transfer with gasslessBasefee",
+   "file": "test/Token.js",
+   "currentRetry": 0,
+   "err": {}
+  },
+  {
+   "title": "should not transfer with unvalid signature",
+   "fullTitle": "EURFToken FORWARDER TRANSFER should not transfer with unvalid signature",
+   "file": "test/Token.js",
+   "currentRetry": 0,
+   "err": {}
+  },
+  {
+   "title": "should not forward transfer if not enough balance",
+   "fullTitle": "EURFToken FORWARDER TRANSFER should not forward transfer if not enough balance",
+   "file": "test/Token.js",
+   "currentRetry": 0,
+   "err": {}
+  },
+  {
+   "title": "should revert if the forwarder is not trusted",
+   "fullTitle": "EURFToken FORWARDER EDGE CASES should revert if the forwarder is not trusted",
+   "file": "test/Token.js",
+   "currentRetry": 0,
+   "err": {}
+  },
+  {
+   "title": "should revert if payGaslessBasefee is called",
+   "fullTitle": "EURFToken FORWARDER EDGE CASES should revert if payGaslessBasefee is called",
+   "file": "test/Token.js",
+   "currentRetry": 0,
+   "err": {}
+  },
+  {
+   "title": "should revert if any other function (exept transfer) is called",
+   "fullTitle": "EURFToken FORWARDER EDGE CASES should revert if any other function (exept transfer) is called",
+   "file": "test/Token.js",
+   "currentRetry": 0,
+   "err": {}
+  },
+  {
+   "title": "should revert if using already used forward data",
+   "fullTitle": "EURFToken FORWARDER EDGE CASES should revert if using already used forward data",
+   "file": "test/Token.js",
+   "currentRetry": 0,
+   "err": {}
+  }
+ ]
+}

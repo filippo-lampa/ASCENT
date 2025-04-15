@@ -1,0 +1,1295 @@
+<!doctype html>
+<html lang="en">
+<head>
+    <title>Code coverage report for contracts/QuadPassport.sol</title>
+    <meta charset="utf-8" />
+    <link rel="stylesheet" href="../prettify.css" />
+    <link rel="stylesheet" href="../base.css" />
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <style type='text/css'>
+        .coverage-summary .sorter {
+            background-image: url(../sort-arrow-sprite.png);
+        }
+    </style>
+</head>
+<body>
+<div class='wrapper'>
+  <div class='pad1'>
+    <h1>
+      <a href="../index.html">all files</a> / <a href="index.html">contracts/</a> QuadPassport.sol
+    </h1>
+    <div class='clearfix'>
+      <div class='fl pad1y space-right2'>
+        <span class="strong">96.94% </span>
+        <span class="quiet">Statements</span>
+        <span class='fraction'>95/98</span>
+      </div>
+      <div class='fl pad1y space-right2'>
+        <span class="strong">87.5% </span>
+        <span class="quiet">Branches</span>
+        <span class='fraction'>77/88</span>
+      </div>
+      <div class='fl pad1y space-right2'>
+        <span class="strong">91.67% </span>
+        <span class="quiet">Functions</span>
+        <span class='fraction'>22/24</span>
+      </div>
+      <div class='fl pad1y space-right2'>
+        <span class="strong">97.48% </span>
+        <span class="quiet">Lines</span>
+        <span class='fraction'>116/119</span>
+      </div>
+    </div>
+  </div>
+  <div class='status-line high'></div>
+<pre><table class="coverage">
+<tr><td class="line-count quiet">1
+2
+3
+4
+5
+6
+7
+8
+9
+10
+11
+12
+13
+14
+15
+16
+17
+18
+19
+20
+21
+22
+23
+24
+25
+26
+27
+28
+29
+30
+31
+32
+33
+34
+35
+36
+37
+38
+39
+40
+41
+42
+43
+44
+45
+46
+47
+48
+49
+50
+51
+52
+53
+54
+55
+56
+57
+58
+59
+60
+61
+62
+63
+64
+65
+66
+67
+68
+69
+70
+71
+72
+73
+74
+75
+76
+77
+78
+79
+80
+81
+82
+83
+84
+85
+86
+87
+88
+89
+90
+91
+92
+93
+94
+95
+96
+97
+98
+99
+100
+101
+102
+103
+104
+105
+106
+107
+108
+109
+110
+111
+112
+113
+114
+115
+116
+117
+118
+119
+120
+121
+122
+123
+124
+125
+126
+127
+128
+129
+130
+131
+132
+133
+134
+135
+136
+137
+138
+139
+140
+141
+142
+143
+144
+145
+146
+147
+148
+149
+150
+151
+152
+153
+154
+155
+156
+157
+158
+159
+160
+161
+162
+163
+164
+165
+166
+167
+168
+169
+170
+171
+172
+173
+174
+175
+176
+177
+178
+179
+180
+181
+182
+183
+184
+185
+186
+187
+188
+189
+190
+191
+192
+193
+194
+195
+196
+197
+198
+199
+200
+201
+202
+203
+204
+205
+206
+207
+208
+209
+210
+211
+212
+213
+214
+215
+216
+217
+218
+219
+220
+221
+222
+223
+224
+225
+226
+227
+228
+229
+230
+231
+232
+233
+234
+235
+236
+237
+238
+239
+240
+241
+242
+243
+244
+245
+246
+247
+248
+249
+250
+251
+252
+253
+254
+255
+256
+257
+258
+259
+260
+261
+262
+263
+264
+265
+266
+267
+268
+269
+270
+271
+272
+273
+274
+275
+276
+277
+278
+279
+280
+281
+282
+283
+284
+285
+286
+287
+288
+289
+290
+291
+292
+293
+294
+295
+296
+297
+298
+299
+300
+301
+302
+303
+304
+305
+306
+307
+308
+309
+310
+311
+312
+313
+314
+315
+316
+317
+318
+319
+320
+321
+322
+323
+324
+325
+326
+327
+328
+329
+330
+331
+332
+333
+334
+335
+336
+337
+338
+339
+340
+341
+342
+343
+344
+345
+346
+347
+348
+349
+350
+351
+352
+353
+354
+355
+356
+357
+358
+359
+360
+361
+362
+363
+364
+365
+366
+367
+368
+369
+370
+371
+372
+373
+374
+375
+376
+377
+378
+379
+380
+381
+382
+383
+384
+385
+386
+387
+388
+389
+390
+391
+392
+393
+394
+395
+396
+397
+398
+399
+400
+401
+402
+403
+404
+405
+406
+407
+408
+409
+410
+411</td><td class="line-coverage quiet"><span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-yes">486×</span>
+<span class="cline-any cline-yes">486×</span>
+<span class="cline-any cline-yes">486×</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-yes">107×</span>
+<span class="cline-any cline-yes">106×</span>
+<span class="cline-any cline-yes">105×</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-yes">103×</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-yes">96×</span>
+<span class="cline-any cline-yes">96×</span>
+<span class="cline-any cline-yes">96×</span>
+<span class="cline-any cline-yes">96×</span>
+<span class="cline-any cline-yes">96×</span>
+<span class="cline-any cline-yes">96×</span>
+<span class="cline-any cline-yes">96×</span>
+<span class="cline-any cline-yes">96×</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-yes">20×</span>
+<span class="cline-any cline-yes">19×</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-yes">12×</span>
+<span class="cline-any cline-yes">12×</span>
+<span class="cline-any cline-yes">12×</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-yes">9×</span>
+<span class="cline-any cline-yes">8×</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-yes">20×</span>
+<span class="cline-any cline-yes">18×</span>
+<span class="cline-any cline-yes">16×</span>
+<span class="cline-any cline-yes">14×</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-yes">12×</span>
+<span class="cline-any cline-yes">6×</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-yes">6×</span>
+<span class="cline-any cline-yes">6×</span>
+<span class="cline-any cline-yes">6×</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-yes">4×</span>
+<span class="cline-any cline-yes">2×</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-yes">2×</span>
+<span class="cline-any cline-yes">4×</span>
+<span class="cline-any cline-yes">4×</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-yes">5×</span>
+<span class="cline-any cline-yes">4×</span>
+<span class="cline-any cline-yes">2×</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-yes">2×</span>
+<span class="cline-any cline-yes">4×</span>
+<span class="cline-any cline-yes">4×</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-yes">11×</span>
+<span class="cline-any cline-yes">5×</span>
+<span class="cline-any cline-yes">2×</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-yes">97×</span>
+<span class="cline-any cline-yes">96×</span>
+<span class="cline-any cline-yes">90×</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-yes">32×</span>
+<span class="cline-any cline-yes">20×</span>
+<span class="cline-any cline-yes">20×</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-yes">139×</span>
+<span class="cline-any cline-yes">136×</span>
+<span class="cline-any cline-yes">133×</span>
+<span class="cline-any cline-yes">121×</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-yes">115×</span>
+<span class="cline-any cline-yes">70×</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-yes">45×</span>
+<span class="cline-any cline-yes">45×</span>
+<span class="cline-any cline-yes">45×</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-yes">103×</span>
+<span class="cline-any cline-yes">103×</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-yes">103×</span>
+<span class="cline-any cline-yes">103×</span>
+<span class="cline-any cline-yes">103×</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-yes">96×</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-yes">19×</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-yes">19×</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-yes">18×</span>
+<span class="cline-any cline-yes">18×</span>
+<span class="cline-any cline-yes">18×</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-yes">12×</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-yes">100×</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-yes">100×</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-yes">5×</span>
+<span class="cline-any cline-yes">5×</span>
+<span class="cline-any cline-yes">5×</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-yes">2×</span>
+<span class="cline-any cline-yes">2×</span>
+<span class="cline-any cline-yes">2×</span>
+<span class="cline-any cline-yes">2×</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-yes">20×</span>
+<span class="cline-any cline-yes">20×</span>
+<span class="cline-any cline-yes">19×</span>
+<span class="cline-any cline-yes">19×</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-yes">19×</span>
+<span class="cline-any cline-yes">19×</span>
+<span class="cline-any cline-yes">19×</span>
+<span class="cline-any cline-yes">19×</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-yes">63×</span>
+<span class="cline-any cline-yes">62×</span>
+<span class="cline-any cline-yes">62×</span>
+<span class="cline-any cline-yes">51×</span>
+<span class="cline-any cline-yes">51×</span>
+<span class="cline-any cline-yes">51×</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-yes">92×</span>
+<span class="cline-any cline-yes">91×</span>
+<span class="cline-any cline-yes">91×</span>
+<span class="cline-any cline-yes">47×</span>
+<span class="cline-any cline-yes">47×</span>
+<span class="cline-any cline-yes">47×</span>
+<span class="cline-any cline-yes">47×</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-yes">46×</span>
+<span class="cline-any cline-yes">46×</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-yes">43×</span>
+<span class="cline-any cline-yes">43×</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-yes">11×</span>
+<span class="cline-any cline-yes">10×</span>
+<span class="cline-any cline-yes">10×</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-yes">7×</span>
+<span class="cline-any cline-yes">5×</span>
+<span class="cline-any cline-yes">4×</span>
+<span class="cline-any cline-yes">4×</span>
+<span class="cline-any cline-yes">4×</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-yes">4×</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-yes">2×</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span></td><td class="text"><pre class="prettyprint lang-js">//SPDX-License-Identifier: MIT
+pragma solidity ^0.8.4;
+&nbsp;
+import "@openzeppelin/contracts-upgradeable/proxy/utils/UUPSUpgradeable.sol";
+import "@openzeppelin/contracts-upgradeable/token/ERC20/extensions/IERC20MetadataUpgradeable.sol";
+import "@openzeppelin/contracts-upgradeable/utils/cryptography/ECDSAUpgradeable.sol";
+import "@openzeppelin/contracts-upgradeable/token/ERC1155/ERC1155Upgradeable.sol";
+import "./QuadPassportStore.sol";
+import "./interfaces/IQuadPassport.sol";
+&nbsp;
+/// @title Quadrata Web3 Identity Passport
+/// @author Fabrice Cheng
+/// @notice This represents wallet accounts Web3 Passport
+/// @dev Passport extended the ERC1155 standard with restrictions on transfers
+contract QuadPassport is IQuadPassport, ERC1155Upgradeable, UUPSUpgradeable, QuadPassportStore {
+    event GovernanceUpdated(address _oldGovernance, address _governance);
+&nbsp;
+    /// @dev initializer (constructor)
+    /// @param _governanceContract address of the QuadGovernance contract
+    /// @param _uri URI of the Quadrata Passport
+    function initialize(
+        address _governanceContract,
+        string memory _uri
+    ) public <span class="missing-if-branch" title="else path not taken" >E</span>initializer {
+        <span class="missing-if-branch" title="else path not taken" >E</span>require(_governanceContract != address(0), "GOVERNANCE_ADDRESS_ZERO");
+        __ERC1155_init(_uri);
+        governance = QuadGovernance(_governanceContract);
+    }
+&nbsp;
+    /// @notice Claim and mint a wallet account Quadrata Passport
+    /// @dev Only when authorized by an eligible issuer
+    /// @param _tokenId tokenId of the Passport (1 for now)
+    /// @param _quadDID Quadrata Decentralized Identity (raw value)
+    /// @param _aml keccak256 of the AML status value
+    /// @param _country keccak256 of the country value
+    /// @param _issuedAt epoch when the passport has been issued by the Issuer
+    /// @param _sig ECDSA signature computed by an eligible issuer to authorize the mint
+    function mintPassport(
+        uint256 _tokenId,
+        bytes32 _quadDID,
+        bytes32 _aml,
+        bytes32 _country,
+        uint256 _issuedAt,
+        bytes calldata _sig
+    ) external payable override {
+        require(msg.value == governance.mintPrice(), "INVALID_MINT_PRICE");
+        require(governance.eligibleTokenId(_tokenId), "PASSPORT_TOKENID_INVALID");
+        require(balanceOf(_msgSender(), _tokenId) == 0, "PASSPORT_ALREADY_EXISTS");
+&nbsp;
+        (bytes32 hash, address issuer) = _verifyIssuerMint(_msgSender(), _tokenId, _quadDID, _aml, _country, _issuedAt, _sig);
+&nbsp;
+        _accountBalancesETH[governance.issuersTreasury(issuer)] += governance.mintPrice();
+        _usedHashes[hash] = true;
+        _validSignatures[_msgSender()][_tokenId] = _sig;
+        _issuedEpoch[_msgSender()][_tokenId] = _issuedAt;
+        _attributes[_msgSender()][keccak256("COUNTRY")] = Attribute({value: _country, epoch: _issuedAt, issuer: issuer});
+        _attributes[_msgSender()][keccak256("DID")] = Attribute({value: _quadDID, epoch: _issuedAt, issuer: issuer});
+        _attributesByDID[_quadDID][keccak256("AML")] = Attribute({value: _aml, epoch: _issuedAt, issuer: issuer});
+        _mint(_msgSender(), _tokenId, 1, "");
+    }
+&nbsp;
+    /// @notice Update or set a new attribute for your existing passport
+    /// @dev Only when authorized by an eligible issuer
+    /// @param _tokenId tokenId of the Passport (1 for now)
+    /// @param _attribute keccak256 of the attribute type (ex: keccak256("COUNTRY"))
+    /// @param _value keccak256 of the value of the attribute (ex: keccak256("FRANCE"))
+    /// @param _issuedAt epoch when the operation has been authorized by the Issuer
+    /// @param _sig ECDSA signature computed by an eligible issuer to authorize the operation
+    function setAttribute(
+        uint256 _tokenId,
+        bytes32 _attribute,
+        bytes32 _value,
+        uint256 _issuedAt,
+        bytes calldata _sig
+    ) external payable override {
+        require(msg.value == governance.mintPricePerAttribute(_attribute), "INVALID_ATTR_MINT_PRICE");
+        (bytes32 hash, address issuer) = _verifyIssuerSetAttr(_msgSender(), _tokenId, _attribute, _value, _issuedAt, _sig);
+&nbsp;
+        _accountBalancesETH[governance.issuersTreasury(issuer)] += governance.mintPricePerAttribute(_attribute);
+        _usedHashes[hash] = true;
+        _setAttributeInternal(_msgSender(), _tokenId, _attribute, _value, _issuedAt, issuer);
+    }
+&nbsp;
+    /// @notice (only Issuer) Update or set a new attribute for an existing passport
+    /// @dev Only issuer role
+    /// @param _account address of the wallet to update
+    /// @param _tokenId tokenId of the Passport (1 for now)
+    /// @param _attribute keccak256 of the attribute type (ex: keccak256("COUNTRY"))
+    /// @param _value keccak256 of the value of the attribute (ex: keccak256("FRANCE"))
+    /// @param _issuedAt epoch when the operation has been authorized by the Issuer
+    function setAttributeIssuer(
+        address _account,
+        uint256 _tokenId,
+        bytes32 _attribute,
+        bytes32 _value,
+        uint256 _issuedAt
+    ) external override {
+        require(governance.hasRole(ISSUER_ROLE, _msgSender()), "INVALID_ISSUER");
+        _setAttributeInternal(_account, _tokenId, _attribute, _value, _issuedAt, _msgSender());
+    }
+&nbsp;
+    function _setAttributeInternal(
+        address _account,
+        uint256 _tokenId,
+        bytes32 _attribute,
+        bytes32 _value,
+        uint256 _issuedAt,
+        address _issuer
+    ) internal {
+        require(governance.eligibleTokenId(_tokenId), "PASSPORT_TOKENID_INVALID");
+        require(balanceOf(_account, _tokenId) == 1, "PASSPORT_DOES_NOT_EXIST");
+        require(_attribute != keccak256("DID"), "MUST_BURN_AND_MINT");
+        require(governance.eligibleAttributes(_attribute)
+            || governance.eligibleAttributesByDID(_attribute),
+            "ATTRIBUTE_NOT_ELIGIBLE"
+        );
+        if (governance.eligibleAttributes(_attribute)) {
+            _attributes[_account][_attribute] = Attribute({
+                value: _value,
+                epoch: _issuedAt,
+                issuer: _issuer
+            });
+        } else {
+            // Attribute grouped by DID
+            bytes32 dID = _attributes[_account][keccak256("DID")].value;
+            <span class="missing-if-branch" title="else path not taken" >E</span>require(dID != bytes32(0), "DID_NOT_FOUND");
+            _attributesByDID[dID][_attribute] = Attribute({
+                value: _value,
+                epoch: _issuedAt,
+                issuer: _issuer
+            });
+        }
+    }
+&nbsp;
+    /// @notice Burn your Quadrata passport
+    /// @dev Only owner of the passport
+    /// @param _tokenId tokenId of the Passport (1 for now)
+    function burnPassport(
+        uint256 _tokenId
+    ) external override {
+        require(balanceOf(_msgSender(), _tokenId) == 1, "CANNOT_BURN_ZERO_BALANCE");
+        _burn(_msgSender(), _tokenId, 1);
+&nbsp;
+        for (uint256 i = 0; i &lt; governance.getSupportedAttributesLength(); i++) {
+            bytes32 attributeType = governance.supportedAttributes(i);
+            delete _attributes[_msgSender()][attributeType];
+        }
+    }
+&nbsp;
+    /// @notice Issuer can burn an account's Quadrata passport when requested
+    /// @dev Only issuer role
+    /// @param _account address of the wallet to burn
+    /// @param _tokenId tokenId of the Passport (1 for now)
+    function burnPassportIssuer(
+        address _account,
+        uint256 _tokenId
+    ) external override {
+        require(governance.hasRole(ISSUER_ROLE, _msgSender()), "INVALID_ISSUER");
+        require(balanceOf(_account, _tokenId) == 1, "CANNOT_BURN_ZERO_BALANCE");
+        _burn(_account, _tokenId, 1);
+&nbsp;
+        for (uint256 i = 0; i &lt; governance.getSupportedAttributesLength(); i++) {
+            bytes32 attributeType = governance.supportedAttributes(i);
+            delete _attributes[_account][attributeType];
+        }
+    }
+&nbsp;
+    /// @notice Query the value of an attribute for a passport holder (pay with ETH)
+    /// @param _account address of the passport holder to query
+    /// @param _tokenId tokenId of the Passport (1 for now)
+    /// @param _attribute keccak256 of the attribute type to query (ex: keccak256("DID"))
+    /// @return the value of the attribute
+    function getAttributeETH(
+        address _account,
+        uint256 _tokenId,
+        bytes32 _attribute
+    ) external payable override returns(bytes32, uint256) {
+        Attribute memory attribute = _getAttributeInternal(_account, _tokenId, _attribute);
+        _doETHPayment(_attribute, attribute.issuer);
+        return (attribute.value, attribute.epoch);
+    }
+&nbsp;
+    /// @notice Query the value of an attribute for a passport holder (free)
+    /// @param _account address of the passport holder to query
+    /// @param _tokenId tokenId of the Passport (1 for now)
+    /// @param _attribute keccak256 of the attribute type to query (ex: keccak256("DID"))
+    /// @return the value of the attribute
+    function getAttributeFree(
+        address _account,
+        uint256 _tokenId,
+        bytes32 _attribute
+    ) external view override returns(bytes32, uint256) {
+        require(governance.pricePerAttribute(_attribute) == 0, "ATTRIBUTE_NOT_FREE");
+        Attribute memory attribute = _getAttributeInternal(_account, _tokenId, _attribute);
+        return (attribute.value, attribute.epoch);
+    }
+&nbsp;
+    /// @notice Query the value of an attribute for a passport holder (payable with ERC20)
+    /// @param _account address of the passport holder to query
+    /// @param _tokenId tokenId of the Passport (1 for now)
+    /// @param _attribute keccak256 of the attribute type to query (ex: keccak256("DID"))
+    /// @param _tokenAddr address of the ERC20 token to use as a payment
+    /// @return the value of the attribute
+    function getAttribute(
+        address _account,
+        uint256 _tokenId,
+        bytes32 _attribute,
+        address _tokenAddr
+    ) external override returns(bytes32, uint256) {
+        Attribute memory attribute = _getAttributeInternal(_account, _tokenId, _attribute);
+        _doTokenPayment(_attribute, _tokenAddr, attribute.issuer);
+        return (attribute.value, attribute.epoch);
+    }
+&nbsp;
+    function _getAttributeInternal(
+        address _account,
+        uint256 _tokenId,
+        bytes32 _attribute
+    ) internal view returns(Attribute memory) {
+        require(_account != address(0), "ACCOUNT_ADDRESS_ZERO");
+        require(governance.eligibleTokenId(_tokenId), "PASSPORT_TOKENID_INVALID");
+        require(balanceOf(_account, _tokenId) == 1, "PASSPORT_DOES_NOT_EXIST");
+        require(governance.eligibleAttributes(_attribute)
+            || governance.eligibleAttributesByDID(_attribute),
+            "ATTRIBUTE_NOT_ELIGIBLE"
+&nbsp;
+        );
+        if (governance.eligibleAttributes(_attribute)) {
+            return _attributes[_account][_attribute];
+        }
+&nbsp;
+        // Attribute grouped by DID
+        bytes32 dID = _attributes[_account][keccak256("DID")].value;
+        <span class="missing-if-branch" title="else path not taken" >E</span>require(dID != bytes32(0), "DID_NOT_FOUND");
+        return _attributesByDID[dID][_attribute];
+    }
+&nbsp;
+    /// @dev Retrieve a signature for an existing passport minted (to be used across chain)
+    /// @param _tokenId tokenId of the Passport (1 for now)
+    /// @return the signaure allowing the mint of the passport
+<span class="fstat-no" title="function not covered" >    function getPassportSignature(</span>
+        uint256 _tokenId
+    ) external view override returns(bytes memory) {
+<span class="cstat-no" title="statement not covered" >        require(governance.eligibleTokenId(_tokenId), "PASSPORT_TOKENID_INVALID")</span>;
+<span class="cstat-no" title="statement not covered" >        return _validSignatures[_msgSender()][_tokenId];</span>
+    }
+&nbsp;
+    function _verifyIssuerMint(
+        address _account,
+        uint256 _tokenId,
+        bytes32 _quadDID,
+        bytes32 _aml,
+        bytes32 _country,
+        uint256 _issuedAt,
+        bytes calldata _sig
+    ) internal view returns(bytes32,address){
+        bytes32 hash = keccak256(abi.encode(_account, _tokenId, _quadDID, _aml, _country,  _issuedAt));
+        <span class="missing-if-branch" title="else path not taken" >E</span>require(!_usedHashes[hash], "SIGNATURE_ALREADY_USED");
+&nbsp;
+        bytes32 signedMsg = ECDSAUpgradeable.toEthSignedMessageHash(hash);
+        address issuer = ECDSAUpgradeable.recover(signedMsg, _sig);
+        require(governance.hasRole(ISSUER_ROLE, issuer), "INVALID_ISSUER");
+&nbsp;
+        return (hash, issuer);
+    }
+&nbsp;
+    function _verifyIssuerSetAttr(
+        address _account,
+        uint256 _tokenId,
+        bytes32 _attribute,
+        bytes32 _value,
+        uint256 _issuedAt,
+        bytes calldata _sig
+    ) internal view returns(bytes32,address) {
+        bytes32 hash = keccak256(abi.encode(_account, _tokenId, _attribute, _value, _issuedAt));
+&nbsp;
+        require(!_usedHashes[hash], "SIGNATURE_ALREADY_USED");
+&nbsp;
+        bytes32 signedMsg = ECDSAUpgradeable.toEthSignedMessageHash(hash);
+        address issuer = ECDSAUpgradeable.recover(signedMsg, _sig);
+        require(governance.hasRole(ISSUER_ROLE, issuer), "INVALID_ISSUER");
+&nbsp;
+        return (hash, issuer);
+    }
+&nbsp;
+    function _beforeTokenTransfer(
+        address operator,
+        address from,
+        address to,
+        uint256[] memory ids,
+        uint256[] memory amounts,
+        bytes memory data
+    ) internal override(ERC1155Upgradeable) {
+    <span class="missing-if-branch" title="else path not taken" >E</span>require(
+        (from == address(0) &amp;&amp; to != address(0))
+        || (from != address(0) &amp;&amp; to == address(0)),
+        "ONLY_MINT_OR_BURN_ALLOWED"
+    );
+        super._beforeTokenTransfer(operator, from, to, ids, amounts, data);
+    }
+&nbsp;
+<span class="fstat-no" title="function not covered" >    function supportsInterface(bytes4 interfaceId) public view virtual override(ERC1155Upgradeable, IERC165Upgradeable) returns (bool) {</span>
+<span class="cstat-no" title="statement not covered" >        return super.supportsInterface(interfaceId);</span>
+    }
+&nbsp;
+    function _doETHPayment(
+        bytes32 _attribute,
+        address _issuer
+    ) internal {
+        uint256 amountETH = calculatePaymentETH(_attribute);
+        <span class="missing-if-branch" title="else path not taken" >E</span>if (amountETH &gt; 0) {
+            require(
+                 msg.value == amountETH,
+                "INSUFFICIENT_PAYMENT_AMOUNT"
+            );
+            uint256 amountIssuer = amountETH * governance.revSplitIssuer() / 1e2;
+            uint256 amountProtocol = amountETH - amountIssuer;
+            _accountBalancesETH[governance.issuersTreasury(_issuer)] += amountIssuer;
+            _accountBalancesETH[governance.treasury()] += amountProtocol;
+        }
+    }
+&nbsp;
+    function _doTokenPayment(
+        bytes32 _attribute,
+        address _tokenPayment,
+        address _issuer
+    ) internal {
+        uint256 amountToken = calculatePaymentToken(_attribute, _tokenPayment);
+        if (amountToken &gt; 0) {
+            IERC20MetadataUpgradeable erc20 = IERC20MetadataUpgradeable(_tokenPayment);
+            <span class="missing-if-branch" title="else path not taken" >E</span>require(
+                erc20.transferFrom(_msgSender(), address(this), amountToken),
+                "INSUFFICIENT_PAYMENT_ALLOWANCE"
+            );
+            uint256 amountIssuer = amountToken * governance.revSplitIssuer() / 10 ** 2;
+            uint256 amountProtocol = amountToken - amountIssuer;
+            _accountBalances[_tokenPayment][governance.issuersTreasury(_issuer)] += amountIssuer;
+            _accountBalances[_tokenPayment][governance.treasury()] += amountProtocol;
+        }
+    }
+&nbsp;
+    /// @dev Allow an issuer's treasury or the Quadrata treasury to withdraw $ETH
+    /// @param _to address of either an issuer's treasury or the Quadrata treasury
+    /// @return the amount of $ETH withdrawn
+    function withdrawETH(address payable _to) external override returns(uint256) {
+       require(_to != address(0), "WITHDRAW_ADDRESS_ZERO");
+       uint256 currentBalance = _accountBalancesETH[_to];
+       require(currentBalance &gt; 0, "NOT_ENOUGH_BALANCE");
+       _accountBalancesETH[_to] = 0;
+       _to.transfer(currentBalance);
+       return currentBalance;
+    }
+&nbsp;
+    /// @dev Allow an issuer's treasury or the Quadrata treasury to withdraw ERC20 tokens
+    /// @param _to address of either an issuer's treasury or the Quadrata treasury
+    /// @param _token address of the ERC20 tokens to withdraw
+    /// @return the amount of ERC20 withdrawn
+    function withdrawToken(address payable _to, address _token) external override returns(uint256) {
+       require(_to != address(0), "WITHDRAW_ADDRESS_ZERO");
+       uint256 currentBalance = _accountBalances[_token][_to];
+       require(currentBalance &gt; 0, "NOT_ENOUGH_BALANCE");
+       _accountBalances[_token][_to] = 0;
+        IERC20MetadataUpgradeable erc20 = IERC20MetadataUpgradeable(_token);
+       erc20.transfer(_to, currentBalance);
+       return currentBalance;
+    }
+&nbsp;
+    /// @dev Calculate the amount of token required to call `getAttribute`
+    /// @param _attribute keccak256 of the attribute type (ex: keccak256("COUNTRY"))
+    /// @param _tokenPayment address of the ERC20 tokens to use as payment
+    /// @return the amount of ERC20 necessary to query the attribute
+    function calculatePaymentToken(
+        bytes32 _attribute,
+        address _tokenPayment
+    ) public view override returns(uint256) {
+        IERC20MetadataUpgradeable erc20 = IERC20MetadataUpgradeable(_tokenPayment);
+        uint256 tokenPrice = governance.getPrice(_tokenPayment);
+        // Convert to Token Decimal
+        uint256 amountToken = (governance.pricePerAttribute(_attribute) * (10 ** (erc20.decimals())) / tokenPrice) ;
+        return amountToken;
+    }
+&nbsp;
+    /// @dev Calculate the amount of $ETH required to call `getAttributeETH`
+    /// @param _attribute keccak256 of the attribute type (ex: keccak256("COUNTRY"))
+    /// @return the amount of $ETH necessary to query the attribute
+    function calculatePaymentETH(
+        bytes32 _attribute
+    ) public view override returns(uint256) {
+        uint256 tokenPrice = governance.getPriceETH();
+        uint256 amountETH = (governance.pricePerAttribute(_attribute) * 1e18 / tokenPrice) ;
+        return amountETH;
+    }
+&nbsp;
+    /// @dev Admin function to set the address of the QuadGovernance contract
+    /// @param _governanceContract contract address of QuadGovernance
+    function setGovernance(address _governanceContract) external override {
+        require(_msgSender() == address(governance), "ONLY_GOVERNANCE_CONTRACT");
+        require(_governanceContract != address(governance), "GOVERNANCE_ALREADY_SET");
+        <span class="missing-if-branch" title="else path not taken" >E</span>require(_governanceContract != address(0), "GOVERNANCE_ADDRESS_ZERO");
+        address oldGov = address(governance);
+        governance = QuadGovernance(_governanceContract);
+&nbsp;
+        emit GovernanceUpdated(oldGov, address(governance));
+    }
+&nbsp;
+    function _authorizeUpgrade(address) internal view override {
+        require(governance.hasRole(GOVERNANCE_ROLE, _msgSender()), "INVALID_ADMIN");
+    }
+}
+&nbsp;
+&nbsp;</pre></td></tr>
+</table></pre>
+<div class='push'></div><!-- for sticky footer -->
+</div><!-- /wrapper -->
+<div class='footer quiet pad2 space-top1 center small'>
+  Code coverage
+  generated by <a href="http://istanbul-js.org/" target="_blank">istanbul</a> at Fri Dec 13 2024 09:03:44 GMT+0100 (Central European Standard Time)
+</div>
+</div>
+<script src="../prettify.js"></script>
+<script>
+window.onload = function () {
+        if (typeof prettyPrint === 'function') {
+            prettyPrint();
+        }
+};
+</script>
+<script src="../sorter.js"></script>
+</body>
+</html>

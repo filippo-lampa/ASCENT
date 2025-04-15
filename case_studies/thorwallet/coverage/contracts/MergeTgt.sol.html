@@ -1,0 +1,620 @@
+<!doctype html>
+<html lang="en">
+<head>
+    <title>Code coverage report for contracts/MergeTgt.sol</title>
+    <meta charset="utf-8" />
+    <link rel="stylesheet" href="../prettify.css" />
+    <link rel="stylesheet" href="../base.css" />
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <style type='text/css'>
+        .coverage-summary .sorter {
+            background-image: url(../sort-arrow-sprite.png);
+        }
+    </style>
+</head>
+<body>
+<div class='wrapper'>
+  <div class='pad1'>
+    <h1>
+      <a href="../index.html">all files</a> / <a href="index.html">contracts/</a> MergeTgt.sol
+    </h1>
+    <div class='clearfix'>
+      <div class='fl pad1y space-right2'>
+        <span class="strong">84.62% </span>
+        <span class="quiet">Statements</span>
+        <span class='fraction'>33/39</span>
+      </div>
+      <div class='fl pad1y space-right2'>
+        <span class="strong">52.08% </span>
+        <span class="quiet">Branches</span>
+        <span class='fraction'>25/48</span>
+      </div>
+      <div class='fl pad1y space-right2'>
+        <span class="strong">61.54% </span>
+        <span class="quiet">Functions</span>
+        <span class='fraction'>8/13</span>
+      </div>
+      <div class='fl pad1y space-right2'>
+        <span class="strong">78.46% </span>
+        <span class="quiet">Lines</span>
+        <span class='fraction'>51/65</span>
+      </div>
+    </div>
+  </div>
+  <div class='status-line high'></div>
+<pre><table class="coverage">
+<tr><td class="line-count quiet">1
+2
+3
+4
+5
+6
+7
+8
+9
+10
+11
+12
+13
+14
+15
+16
+17
+18
+19
+20
+21
+22
+23
+24
+25
+26
+27
+28
+29
+30
+31
+32
+33
+34
+35
+36
+37
+38
+39
+40
+41
+42
+43
+44
+45
+46
+47
+48
+49
+50
+51
+52
+53
+54
+55
+56
+57
+58
+59
+60
+61
+62
+63
+64
+65
+66
+67
+68
+69
+70
+71
+72
+73
+74
+75
+76
+77
+78
+79
+80
+81
+82
+83
+84
+85
+86
+87
+88
+89
+90
+91
+92
+93
+94
+95
+96
+97
+98
+99
+100
+101
+102
+103
+104
+105
+106
+107
+108
+109
+110
+111
+112
+113
+114
+115
+116
+117
+118
+119
+120
+121
+122
+123
+124
+125
+126
+127
+128
+129
+130
+131
+132
+133
+134
+135
+136
+137
+138
+139
+140
+141
+142
+143
+144
+145
+146
+147
+148
+149
+150
+151
+152
+153
+154
+155
+156
+157
+158
+159
+160
+161
+162
+163
+164
+165
+166
+167
+168
+169
+170
+171
+172
+173
+174
+175
+176
+177
+178
+179
+180
+181
+182
+183
+184
+185
+186</td><td class="line-coverage quiet"><span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-yes">18×</span>
+<span class="cline-any cline-yes">18×</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-yes">6×</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-yes">6×</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-yes">6×</span>
+<span class="cline-any cline-yes">6×</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-yes">7×</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-yes">7×</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-yes">7×</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-yes">7×</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-yes">7×</span>
+<span class="cline-any cline-yes">7×</span>
+<span class="cline-any cline-yes">7×</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-yes">7×</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-yes">5×</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-yes">5×</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-yes">5×</span>
+<span class="cline-any cline-yes">5×</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-yes">5×</span>
+<span class="cline-any cline-yes">5×</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-yes">5×</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-yes">5×</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-yes">2×</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-yes">2×</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-yes">2×</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-yes">2×</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-yes">1×</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-yes">1×</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-yes">2×</span>
+<span class="cline-any cline-yes">2×</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-yes">2×</span>
+<span class="cline-any cline-yes">2×</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-yes">2×</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-yes">2×</span>
+<span class="cline-any cline-yes">2×</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-yes">2×</span>
+<span class="cline-any cline-yes">2×</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-yes">2×</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-yes">2×</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-yes">12×</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-yes">12×</span>
+<span class="cline-any cline-yes">12×</span>
+<span class="cline-any cline-yes">9×</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-yes">2×</span>
+<span class="cline-any cline-yes">2×</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-yes">1×</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-yes">6×</span>
+<span class="cline-any cline-yes">6×</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-yes">6×</span>
+<span class="cline-any cline-yes">6×</span>
+<span class="cline-any cline-yes">6×</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span></td><td class="text"><pre class="prettyprint lang-js">// SPDX-License-Identifier: MIT
+pragma solidity ^0.8.9;
+&nbsp;
+import {Ownable} from "@openzeppelin/contracts/access/Ownable.sol";
+import {ReentrancyGuard} from "@openzeppelin/contracts/utils/ReentrancyGuard.sol";
+import {SafeERC20} from "@openzeppelin/contracts/token/ERC20/utils/SafeERC20.sol";
+import {IERC20} from "@openzeppelin/contracts/token/ERC20/IERC20.sol";
+import {IERC677Receiver} from "./interfaces/IERC677Receiver.sol";
+import {IMerge} from "./interfaces/IMerge.sol";
+&nbsp;
+contract MergeTgt is IMerge, Ownable, ReentrancyGuard {
+    using SafeERC20 for IERC20;
+&nbsp;
+    IERC20 public immutable tgt;
+    IERC20 public immutable titn;
+&nbsp;
+    uint256 public constant TGT_TO_EXCHANGE = 579_000_000 * 10 ** 18; // 57.9% of MAX_TGT
+    uint256 public constant TITN_ARB = 173_700_000 * 10 ** 18; // 17.37% of MAX_TITN
+    uint256 public launchTime;
+&nbsp;
+    mapping(address =&gt; uint256) public claimedTitnPerUser;
+    mapping(address =&gt; uint256) public claimableTitnPerUser;
+    uint256 public totalTitnClaimed;
+    uint256 public totalTitnClaimable;
+    uint256 public remainingTitnAfter1Year;
+    uint256 public initialTotalClaimable; // store the initial claimable TITN after 1 year
+&nbsp;
+    LockedStatus public lockedStatus;
+&nbsp;
+    // Events
+    event Deposit(address indexed token, uint256 amount);
+    event Withdraw(address indexed token, uint256 amount, address indexed to);
+    event LaunchTimeSet(uint256 timestamp);
+    event LockedStatusUpdated(LockedStatus newStatus);
+    event ClaimTitn(address indexed user, uint256 amount);
+    event ClaimableTitnUpdated(address indexed user, uint256 titnOut);
+    event WithdrawRemainingTitn(address indexed user, uint256 amount);
+&nbsp;
+    constructor(address _tgt, address _titn, address initialOwner) Ownable(initialOwner) {
+        tgt = IERC20(_tgt);
+        titn = IERC20(_titn);
+    }
+&nbsp;
+    function deposit(IERC20 token, uint256 amount) external <span class="missing-if-branch" title="else path not taken" >E</span>onlyOwner {
+        <span class="missing-if-branch" title="if path not taken" >I</span>if (token != titn) {
+            revert InvalidTokenReceived();
+        }
+&nbsp;
+        // enforce that the deposited amount is 12_500_000 * 10**18
+        <span class="missing-if-branch" title="if path not taken" >I</span>if (amount != TITN_ARB) {
+            revert InvalidAmountReceived();
+        }
+&nbsp;
+        token.safeTransferFrom(msg.sender, address(this), amount);
+        emit Deposit(address(token), amount);
+    }
+&nbsp;
+    /// @notice Withdraw any locked contracts in Merge contract
+<span class="fstat-no" title="function not covered" >    function withdraw(IERC20 token, uint256 amount) external onlyOwner {</span>
+<span class="cstat-no" title="statement not covered" >        token.safeTransfer(owner(), amount)</span>;
+<span class="cstat-no" title="statement not covered" >        emit Withdraw(address(token), amount, owner());</span>
+    }
+&nbsp;
+    /// @notice tgt token transferAndCall ERC677-like
+    function onTokenTransfer(address from, uint256 amount, bytes calldata extraData) external <span class="missing-if-branch" title="else path not taken" >E</span>nonReentrant {
+        <span class="missing-if-branch" title="if path not taken" >I</span>if (msg.sender != address(tgt)) {
+            revert InvalidTokenReceived();
+        }
+        <span class="missing-if-branch" title="if path not taken" >I</span>if (lockedStatus == LockedStatus.Locked || launchTime == 0) {
+            revert MergeLocked();
+        }
+        <span class="missing-if-branch" title="if path not taken" >I</span>if (amount == 0) {
+            revert ZeroAmount();
+        }
+        <span class="missing-if-branch" title="if path not taken" >I</span>if (block.timestamp - launchTime &gt; 360 days) {
+            revert MergeEnded();
+        }
+&nbsp;
+        // tgt in, titn out
+&nbsp;
+        uint256 titnOut = quoteTitn(amount);
+        claimableTitnPerUser[from] += titnOut;
+        totalTitnClaimable += titnOut;
+&nbsp;
+        emit ClaimableTitnUpdated(from, titnOut);
+    }
+&nbsp;
+<span class="fstat-no" title="function not covered" >    function tgtBalance() external view returns (uint256) {</span>
+<span class="cstat-no" title="statement not covered" >        return tgt.balanceOf(address(this));</span>
+    }
+&nbsp;
+<span class="fstat-no" title="function not covered" >    function titnBalance() external view returns (uint256) {</span>
+<span class="cstat-no" title="statement not covered" >        return titn.balanceOf(address(this));</span>
+    }
+&nbsp;
+    function claimTitn(uint256 amount) external <span class="missing-if-branch" title="else path not taken" >E</span>nonReentrant {
+        <span class="missing-if-branch" title="else path not taken" >E</span>require(amount &lt;= claimableTitnPerUser[msg.sender], "Not enough claimable titn");
+&nbsp;
+        <span class="missing-if-branch" title="if path not taken" >I</span>if (block.timestamp - launchTime &gt;= 360 days) {
+            revert TooLateToClaimRemainingTitn();
+        }
+&nbsp;
+        claimedTitnPerUser[msg.sender] += amount;
+        claimableTitnPerUser[msg.sender] -= amount;
+&nbsp;
+        totalTitnClaimed += amount;
+        totalTitnClaimable -= amount;
+&nbsp;
+        titn.safeTransfer(msg.sender, amount);
+&nbsp;
+        emit ClaimTitn(msg.sender, amount);
+    }
+&nbsp;
+    function withdrawRemainingTitn() external <span class="missing-if-branch" title="else path not taken" >E</span>nonReentrant {
+        <span class="missing-if-branch" title="else path not taken" >E</span>require(launchTime &gt; 0, "Launch time not set");
+&nbsp;
+        <span class="missing-if-branch" title="if path not taken" >I</span>if (block.timestamp - launchTime &lt; 360 days) {
+            revert TooEarlyToClaimRemainingTitn();
+        }
+&nbsp;
+        uint256 currentRemainingTitn = titn.balanceOf(address(this));
+&nbsp;
+        if (remainingTitnAfter1Year == 0) {
+            // Initialize remainingTitnAfter1Year to the current balance of TITN
+            remainingTitnAfter1Year = currentRemainingTitn;
+&nbsp;
+            // Capture the total claimable TITN at the time of the first claim
+            initialTotalClaimable = totalTitnClaimable;
+        }
+&nbsp;
+        uint256 claimableTitn = claimableTitnPerUser[msg.sender];
+        <span class="missing-if-branch" title="else path not taken" >E</span>require(claimableTitn &gt; 0, "No claimable TITN");
+&nbsp;
+        // Calculate proportional remaining TITN for the user
+        uint256 unclaimedTitn = remainingTitnAfter1Year - initialTotalClaimable;
+        uint256 userProportionalShare = (claimableTitn * unclaimedTitn) / initialTotalClaimable;
+&nbsp;
+        uint256 titnOut = claimableTitn + userProportionalShare;
+&nbsp;
+        // Update state variables
+        claimableTitnPerUser[msg.sender] = 0; // each user can only claim once
+        totalTitnClaimed += titnOut;
+&nbsp;
+        claimedTitnPerUser[msg.sender] += titnOut;
+        totalTitnClaimable -= claimableTitn;
+&nbsp;
+        // Transfer TITN to the user
+        titn.safeTransfer(msg.sender, titnOut);
+&nbsp;
+        emit WithdrawRemainingTitn(msg.sender, titnOut);
+    }
+&nbsp;
+    function quoteTitn(uint256 tgtAmount) public view returns (uint256 titnAmount) {
+        <span class="missing-if-branch" title="else path not taken" >E</span>require(launchTime &gt; 0, "Launch time not set");
+&nbsp;
+        uint256 timeSinceLaunch = (block.timestamp - launchTime);
+        if (timeSinceLaunch &lt; 90 days) {
+            titnAmount = (tgtAmount * TITN_ARB) / TGT_TO_EXCHANGE;
+        } else if (timeSinceLaunch &lt; 360 days) {
+            uint256 remainingtime = 360 days - timeSinceLaunch;
+            titnAmount = (tgtAmount * TITN_ARB * remainingtime) / (TGT_TO_EXCHANGE * 270 days); //270 days = 9 months
+        } else {
+            titnAmount = 0;
+        }
+    }
+&nbsp;
+    function setLockedStatus(LockedStatus newStatus) external <span class="missing-if-branch" title="else path not taken" >E</span>onlyOwner {
+        lockedStatus = newStatus;
+        emit LockedStatusUpdated(newStatus);
+    }
+&nbsp;
+    function setLaunchTime() external <span class="missing-if-branch" title="else path not taken" >E</span>onlyOwner {
+        <span class="missing-if-branch" title="else path not taken" >E</span>require(launchTime == 0, "Launch time already set");
+        launchTime = block.timestamp;
+        emit LaunchTimeSet(block.timestamp);
+    }
+&nbsp;
+<span class="fstat-no" title="function not covered" >    function gettotalClaimedTitnPerUser(address user) external view returns (uint256) {</span>
+<span class="cstat-no" title="statement not covered" >        return claimedTitnPerUser[user];</span>
+    }
+&nbsp;
+<span class="fstat-no" title="function not covered" >    function getClaimableTitnPerUser(address user) external view returns (uint256) {</span>
+<span class="cstat-no" title="statement not covered" >        return claimableTitnPerUser[user];</span>
+    }
+}
+&nbsp;</pre></td></tr>
+</table></pre>
+<div class='push'></div><!-- for sticky footer -->
+</div><!-- /wrapper -->
+<div class='footer quiet pad2 space-top1 center small'>
+  Code coverage
+  generated by <a href="http://istanbul-js.org/" target="_blank">istanbul</a> at Tue Feb 25 2025 16:40:53 GMT+0100 (Ora standard dell’Europa centrale)
+</div>
+</div>
+<script src="../prettify.js"></script>
+<script>
+window.onload = function () {
+        if (typeof prettyPrint === 'function') {
+            prettyPrint();
+        }
+};
+</script>
+<script src="../sorter.js"></script>
+</body>
+</html>

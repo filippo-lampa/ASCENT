@@ -5,11 +5,7 @@ from torch import nn
 def identify_test_place_in_sequence(test_sequence, total_number_of_tests):
     adapted_sequence = test_sequence.copy()
     for i in range(total_number_of_tests):
-        if i != len(test_sequence) - 1 and i < len(test_sequence):
-            adapted_sequence[i] = adapted_sequence[i] + 1
-        elif i == len(test_sequence) - 1:
-            adapted_sequence[i] = 0
-        else:
+        if i > len(test_sequence) - 1:
             adapted_sequence.append(-1)
     return adapted_sequence
 

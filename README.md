@@ -1,5 +1,5 @@
-# RLBasedTestPrioritizationMT
-RLBasedTestPrioritizationMT is a tool designed to execute tests on mutation testing mutants in a prioritized manner, reducing the number of tests executed while ensuring effective test adequacy.
+# ASCENT
+This is a tool designed to execute tests on mutation testing mutants in a prioritized manner, reducing the number of tests executed while ensuring effective test adequacy.
 
 ## 👾 Mutant Generation
 
@@ -10,7 +10,7 @@ This section provides a setup guide for configuring **Sumo Mutation Testing** in
 Before you begin, make sure you have the following installed:
 
 - **Node.js** (v14.x or higher)
-- **Python** (for interacting with the `solidity-parser` library)
+- **Python** (v3.x or higher)
 
 ### :wrench: Steps for Configuration
 
@@ -103,10 +103,10 @@ npx sumo addMutationsContext
 
 ### 1. Optional (suggested)
 
-Create a Python virtual environment
+Within the ASCENT folder, create a Python virtual environment
 
 ```
-python -m venv .venv
+python3 -m venv .venv
 ```
 
 Activate the freshly created virtual environment
@@ -133,13 +133,13 @@ git lfs pull
 ### 4. Run the prioritization on the chosen project and tests
 
 ```
-python prioritizer.py --mutants path_to_mutations_json_file --tests_folder path_to_test_folder --coverage path_to_test_matrix_json --sut_name project_name
+python3 prioritizer.py --mutants path_to_mutations_json_file --tests_folder path_to_test_folder --coverage path_to_test_matrix_json --sut_name project_name
 ```
 
 Example
 
 ```
-python prioritizer.py --mutants sumo_results/thorwallet/mutations.json --tests_folder case_studies/thorwallet/test/hardhat --coverage case_studies/thorwallet/testMatrix.json --sut_name thorwallet
+python3 prioritizer.py --mutants sumo_results/thorwallet/mutations.json --tests_folder case_studies/thorwallet/test/hardhat --coverage case_studies/thorwallet/testMatrix.json --sut_name thorwallet
 ```
 
 #### 4.1 The following parameters are available for more detailed prioritization control:

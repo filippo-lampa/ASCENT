@@ -1,3 +1,4 @@
+import itertools
 import json
 import os
 import re
@@ -106,7 +107,7 @@ class Prioritizer:
 
         print(f"{bcolors.OKBLUE}Starting prioritization{bcolors.ENDC}")
 
-        current_sut_tests_execution_time = 0
+        sut_tests_execution_time = 0
         total_number_of_tests_executed = 0
         number_of_tests_executed_on_killable_mutants = 0
 
@@ -140,7 +141,7 @@ class Prioritizer:
             (reward, v_loss, p_loss, o_loss, number_of_tests_executed, number_of_tests_executed_on_killable_mutants,
              networks_update_freq, current_sut_tests_execution_time) = mcts.run(mutant, mutant_count, no_test_killing)
 
-            current_sut_tests_execution_time += current_sut_tests_execution_time
+            sut_tests_execution_time += current_sut_tests_execution_time
 
             if not no_test_killing:
                 rewards.append(reward)
@@ -183,24 +184,51 @@ class Prioritizer:
 
         return (total_number_of_tests_executed, number_of_tests_executed_on_killable_mutants, rewards, moving_average,
                 v_losses, p_losses, o_losses, moving_average_v_losses, moving_average_p_losses, moving_average_o_losses,
-                execution_time, current_sut_tests_execution_time)
+                execution_time, sut_tests_execution_time)
 
     def objective(self, trial):
 
-        self.current_sut_tests_execution_time = 0
+        # Choose 2 out of 4 parameters to tune in this trial
+        all_params = ['c_parameter', 'batch_size', 'asymmetric_loss_alpha', 'rollout_after', 'observation_network_buffer_size',
+                      'observation_network_update_delta', 'update_delta', 'buffer_size']
 
-        # Suggest values for hyperparameters
-        buffer_size = trial.suggest_int('buffer_size', 0, len(self.mutants)*2)
-        batch_size = trial.suggest_categorical('batch_size', [16, 32, 40, 64, 128, 256, 512])
-        update_delta = trial.suggest_int('update_delta', 1, 10)
-        observation_network_update_delta = trial.suggest_int('observation_network_update_delta', 1, 10)
-        observation_network_buffer_size = trial.suggest_int('observation_network_buffer_size', 5, 50)
-        rollout_after = trial.suggest_int('rollout_after', 10, 100)
-        asymmetric_loss_alpha = trial.suggest_float('asymmetric_loss_alpha', 1.0, 10.0)
-        c_parameter = trial.suggest_float('c_parameter', 0.1, 5.0)
-        value_lr = trial.suggest_loguniform('value_network_learning_rate', 1e-5, 1e-2)
-        policy_lr = trial.suggest_loguniform('policy_network_learning_rate', 1e-5, 1e-2)
-        obs_lr = trial.suggest_loguniform('observation_network_learning_rate', 1e-5, 1e-2)
+        chosen = trial.suggest_categorical("chosen_params", list(itertools.combinations(all_params, 2)))
+
+        params = {
+            'value_network_learning_rate': 0.001,
+            'policy_network_learning_rate': 0.0001,
+            'observation_network_learning_rate': 0.001
+        }
+
+        defaults = {
+            'c_parameter': 1.0,
+            'batch_size': 40,
+            'asymmetric_loss_alpha': 6.0,
+            'rollout_after': 45,
+            'observation_network_buffer_size': 10,
+            'observation_network_update_delta': 1,
+            'update_delta': 1,
+            'buffer_size': len(self.mutants)
+        }
+
+        for name in all_params:
+            if name in chosen:
+                if name == 'c_parameter':
+                    params[name] = trial.suggest_float(name, 0.1, 5.0)
+                elif name == 'batch_size':
+                    params[name] = trial.suggest_categorical(name, [16, 32, 40, 64, 128, 256, 512])
+                elif name == 'asymmetric_loss_alpha':
+                    params[name] = trial.suggest_float(name, 1.0, 10.0)
+                elif name == 'rollout_after':
+                    params[name] = trial.suggest_int(name, 0, 100)
+                elif name == 'observation_network_buffer_size':
+                    params[name] = trial.suggest_int(name, 5, 50)
+                elif name == 'observation_network_update_delta':
+                    params[name] = trial.suggest_int(name, 1, 10)
+                elif name == 'update_delta':
+                    params[name] = trial.suggest_int(name, 1, 10)
+            else:
+                params[name] = defaults[name]
 
         #kills matrix is a dictionary that stores, for each test, the mutants that it kills. This is shared across all mutants
         kills_matrix = {test['test_id']: [] for test in self.tests}
@@ -214,21 +242,21 @@ class Prioritizer:
         # Execute prioritizer using these hyperparameters
         performance = self.execute(
             execution_id = self.execution_id,
-            buffer_size=buffer_size,
-            batch_size=batch_size,
-            update_delta=update_delta,
-            observation_network_update_delta=observation_network_update_delta,
-            observation_network_buffer_size=observation_network_buffer_size,
-            rollout_after=rollout_after,
-            asymmetric_loss_alpha=asymmetric_loss_alpha,
-            c_parameter=c_parameter,
-            value_lr=value_lr,
-            policy_lr=policy_lr,
-            obs_lr=obs_lr,
-            policy_net=policy_net,
-            value_net=value_net,
-            observation_net=observation_net,
-            kills_matrix=kills_matrix
+            buffer_size = params['buffer_size'],
+            batch_size = params['batch_size'],
+            update_delta = params['update_delta'],
+            observation_network_update_delta = params['observation_network_update_delta'],
+            observation_network_buffer_size = params['observation_network_buffer_size'],
+            rollout_after = params['rollout_after'],
+            asymmetric_loss_alpha = params['asymmetric_loss_alpha'],
+            c_parameter = params['c_parameter'],
+            value_lr = params['value_network_learning_rate'],
+            policy_lr = params['policy_network_learning_rate'],
+            obs_lr = params['observation_network_learning_rate'],
+            policy_net = policy_net,
+            value_net = value_net,
+            observation_net = observation_net,
+            kills_matrix = kills_matrix
         )
 
         # Save results
@@ -236,17 +264,17 @@ class Prioritizer:
             "execution_id": self.execution_id,
             "sut_name": self.sut_name,
             "parameters": {
-                "buffer_size": buffer_size,
-                "batch_size": batch_size,
-                "update_delta": update_delta,
-                "observation_network_update_delta": observation_network_update_delta,
-                "observation_network_buffer_size": observation_network_buffer_size,
-                "rollout_after": rollout_after,
-                "asymmetric_loss_alpha": asymmetric_loss_alpha,
-                "c_parameter": c_parameter,
-                "value_network_learning_rate": value_lr,
-                "policy_network_learning_rate": policy_lr,
-                "observation_network_learning_rate": obs_lr
+                "buffer_size": params["buffer_size"],
+                "batch_size": params["batch_size"],
+                "update_delta": params["update_delta"],
+                "observation_network_update_delta": params["observation_network_update_delta"],
+                "observation_network_buffer_size": params["observation_network_buffer_size"],
+                "rollout_after": params["rollout_after"],
+                "asymmetric_loss_alpha": params["asymmetric_loss_alpha"],
+                "c_parameter": params["c_parameter"],
+                "value_network_learning_rate": params["value_network_learning_rate"],
+                "policy_network_learning_rate": params["policy_network_learning_rate"],
+                "observation_network_learning_rate": params["observation_network_learning_rate"]
             },
             "total_tests_executed": performance[0],
             "baseline_total_tests_executed": baseline_results_per_project[self.sut_name + '_baseline_total_tests_executed'],
@@ -280,7 +308,7 @@ class Prioritizer:
         """
 
         study = optuna.create_study(direction="minimize")
-        study.optimize(self.objective, n_trials=20)
+        study.optimize(self.objective, n_trials=500)
 
         #print best parameters for the SUT in the best_params file in the experiments folder
         print("Best parameters:", study.best_params)

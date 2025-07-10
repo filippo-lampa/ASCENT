@@ -68,6 +68,7 @@ class MCTSAgent:
         self.max_reward = len(tests) # the maximum reward of the current episode to scale the values
         self.kills_ranking = {test: 0 for test in range(len(self.tests))} # kills ranking of the tests, used as heuristic until we start relying on the networks
         self.done = False # Checks if the episode is done (the mutant is killed or we run out of tests)
+        self.current_sut_tests_execution_time = 0
 
         # Mutant-related stuff
         self.mutant_number = None  # number of the current mutant in the prioritization execution
@@ -280,10 +281,21 @@ class MCTSAgent:
                 test_relative_path = test["test_file_path"].split(self.sut_name)[1].replace("\\", "/")
             else:
                 test_relative_path = test["test_file_path"].split(self.sut_name)[1]
+
+            duration_found = False
+
             for killing_test_method in mutant["testResults"][test_relative_path]["failed"]:
                 if killing_test_method["title"] == test["test_method_name"]:
+                    self.current_sut_tests_execution_time += killing_test_method["duration"]
+                    duration_found = True
                     outcome = 1
                     break
+
+            if not duration_found:
+                for non_killing_test_method in mutant["testResults"][test_relative_path]["passed"]:
+                    if non_killing_test_method["title"] == test["test_method_name"]:
+                        self.current_sut_tests_execution_time += non_killing_test_method["duration"]
+                        break
 
         # Update the kills ranking
         if outcome == 1:
@@ -450,4 +462,5 @@ class MCTSAgent:
 
             loss_p = training_model(self.policy_net, inputs, targets, self.policy_opt, self.policy_loss_function)
 
-        return reward_e, loss_v, loss_p, self.loss_o, self.number_of_tests_executed, self.number_of_tests_executed_on_killable_mutants, self.UPDATE_DELTA
+        return (reward_e, loss_v, loss_p, self.loss_o, self.number_of_tests_executed, self.number_of_tests_executed_on_killable_mutants,
+                self.UPDATE_DELTA, self.current_sut_tests_execution_time)

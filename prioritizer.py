@@ -1,8 +1,9 @@
-import argparse
 import json
 import os
 import re
 import time
+
+import optuna
 
 import numpy as np
 
@@ -10,6 +11,7 @@ from mcts_agent import MCTSAgent
 
 from utils.logger import bcolors
 from utils.plotting import plot_mutant_prioritization_results
+from utils.consts import baseline_results_per_project, suts_names
 from networks.policy_nn import PolicyNN
 from networks.value_nn import ValueNN
 from networks.observation_nn import ObservationNN
@@ -20,29 +22,15 @@ class Prioritizer:
     For each mutant in a set of mutants, the prioritizer will learn to execute the tests in a
     way that maximizes the chance to kill the mutant as soon as possible.
     '''
-    def __init__(self, tests_folder_path, mutants_path, sut_name, plot_delta, average_delta, buffer_size, batch_size, update_delta,
-                 observation_network_update_delta, observation_network_buffer_size, rollout_after, asymmetric_loss_alpha,
-                 c_parameter, value_network_learning_rate, policy_network_learning_rate, observation_network_learning_rate):
+    def __init__(self, tests_folder_path, mutants_path, sut_name, plot_delta, average_delta):
         self.tests_folder_path = tests_folder_path
         self.mutants_path = mutants_path
         self.sut_name = sut_name
-        self.value_net = None
-        self.policy_net = None
-        self.observation_net = None
-        self.mcts = None
         self.plot_delta = plot_delta
         self.average_delta = average_delta
-        self.buffer_size = buffer_size
-        self.batch_size = batch_size
-        self.update_delta = update_delta
-        self.observation_network_update_delta = observation_network_update_delta
-        self.observation_network_buffer_size = observation_network_buffer_size
-        self.rollout_after = rollout_after
-        self.asymmetric_loss_alpha = asymmetric_loss_alpha
-        self.c_parameter = c_parameter
-        self.value_network_learning_rate = value_network_learning_rate
-        self.policy_network_learning_rate = policy_network_learning_rate
-        self.observation_network_learning_rate = observation_network_learning_rate
+        self.mutants = None
+        self.tests = None
+        self.execution_id = 0
 
     def load_mutants(self):
         '''
@@ -108,39 +96,34 @@ class Prioritizer:
 
         return tests
 
-    def execute(self):
+    def execute(self, execution_id=0, buffer_size=None, batch_size=None,
+                update_delta=None, observation_network_update_delta=None, observation_network_buffer_size=None,
+                rollout_after=None, asymmetric_loss_alpha=None, c_parameter=None, value_lr=None,
+                policy_lr=None, obs_lr=None, policy_net=None, value_net=None, observation_net=None, kills_matrix=None):
         '''
         Execute the prioritizer.
         '''
-        tests = self.load_tests()
-        mutants = self.load_mutants()
-
-        #kills matrix is a dictionary that stores, for each test, the mutants that it kills. This is shared across all mutants
-        kills_matrix = {test['test_id']: [] for test in tests}
-
-        #init neural networks
-        nn_input_size = 1 + 1 + len(tests)
-        self.value_net = ValueNN(nn_input_size)
-        self.policy_net = PolicyNN(nn_input_size, len(tests))
-        self.observation_net = ObservationNN(nn_input_size + 7)
 
         print(f"{bcolors.OKBLUE}Starting prioritization{bcolors.ENDC}")
+
+        current_sut_tests_execution_time = 0
+        total_number_of_tests_executed = 0
+        number_of_tests_executed_on_killable_mutants = 0
+
+        #get start time in milliseconds
+        start_time = round(time.time() * 1000)
 
         (rewards, moving_average, v_losses, p_losses, o_losses, moving_average_v_losses, moving_average_p_losses,
          moving_average_o_losses) = [[] for _ in range(8)]
 
-        self.mcts = MCTSAgent(self.policy_net, self.value_net, self.observation_net, tests, kills_matrix,
-                              self.sut_name, len(mutants), self.buffer_size, self.batch_size, self.update_delta,
-                              self.observation_network_update_delta, self.observation_network_buffer_size, self.rollout_after,
-                              self.asymmetric_loss_alpha, self.c_parameter, self.value_network_learning_rate,
-                              self.policy_network_learning_rate, self.observation_network_learning_rate)
-
-        #shuffle mutants
-        mutants = np.random.permutation(mutants)
+        mcts = MCTSAgent(policy_net, value_net, observation_net, self.tests, kills_matrix,
+                              self.sut_name, len(self.mutants), buffer_size, batch_size, update_delta,
+                                observation_network_update_delta, observation_network_buffer_size, rollout_after,
+                                asymmetric_loss_alpha, c_parameter, value_lr, policy_lr, obs_lr)
 
         mutant_count = 0
 
-        for index,mutant in enumerate(mutants):
+        for index,mutant in enumerate(self.mutants):
 
             mutant_count += 1
 
@@ -152,10 +135,12 @@ class Prioritizer:
                         no_test_killing = False
                         break
 
-            print(f"{bcolors.HEADER}Processing mutant {index} ({mutant['id']}) out of {len(mutants)}{bcolors.ENDC}")
+            print(f"{bcolors.HEADER}Processing mutant {index} ({mutant['id']}) out of {len(self.mutants)}{bcolors.ENDC}")
 
             (reward, v_loss, p_loss, o_loss, number_of_tests_executed, number_of_tests_executed_on_killable_mutants,
-             networks_update_freq) = self.mcts.run(mutant, mutant_count, no_test_killing)
+             networks_update_freq, current_sut_tests_execution_time) = mcts.run(mutant, mutant_count, no_test_killing)
+
+            current_sut_tests_execution_time += current_sut_tests_execution_time
 
             if not no_test_killing:
                 rewards.append(reward)
@@ -175,45 +160,172 @@ class Prioritizer:
             print(f"{bcolors.OKGREEN}Total number of tests executed on killable mutants so far: "
                   f"{number_of_tests_executed_on_killable_mutants}{bcolors.ENDC}")
 
+            """
+            Uncomment the following lines to plot the results every 'plot_delta' mutants.
             if (index + 1) % self.plot_delta == 0:
                 plot_mutant_prioritization_results(rewards, moving_average, moving_average_v_losses, moving_average_p_losses,
                                                    moving_average_o_losses, networks_update_freq, self.average_delta,
                                                    self.sut_name)
+            """
 
+            if index == len(self.mutants) - 1:
+                if not os.path.exists('experiments/plots'):
+                    os.makedirs('experiments/plots')
+
+                plot_mutant_prioritization_results(rewards, moving_average, moving_average_v_losses, moving_average_p_losses,
+                                                   moving_average_o_losses, networks_update_freq, self.average_delta,
+                                                   self.sut_name, should_save=True, save_path='experiments/plots',
+                                                   execution_id=execution_id)
+        end_time = round(time.time() * 1000)
+
+        execution_time = end_time - start_time
+        print(f"{bcolors.OKGREEN}Execution time: {round(execution_time, 2)} seconds{bcolors.ENDC}")
+
+        return (total_number_of_tests_executed, number_of_tests_executed_on_killable_mutants, rewards, moving_average,
+                v_losses, p_losses, o_losses, moving_average_v_losses, moving_average_p_losses, moving_average_o_losses,
+                execution_time, current_sut_tests_execution_time)
+
+    def objective(self, trial):
+
+        self.current_sut_tests_execution_time = 0
+
+        # Suggest values for hyperparameters
+        buffer_size = trial.suggest_int('buffer_size', 0, len(self.mutants)*2)
+        batch_size = trial.suggest_categorical('batch_size', [16, 32, 40, 64, 128, 256, 512])
+        update_delta = trial.suggest_int('update_delta', 1, 10)
+        observation_network_update_delta = trial.suggest_int('observation_network_update_delta', 1, 10)
+        observation_network_buffer_size = trial.suggest_int('observation_network_buffer_size', 5, 50)
+        rollout_after = trial.suggest_int('rollout_after', 10, 100)
+        asymmetric_loss_alpha = trial.suggest_float('asymmetric_loss_alpha', 1.0, 10.0)
+        c_parameter = trial.suggest_float('c_parameter', 0.1, 5.0)
+        value_lr = trial.suggest_loguniform('value_network_learning_rate', 1e-5, 1e-2)
+        policy_lr = trial.suggest_loguniform('policy_network_learning_rate', 1e-5, 1e-2)
+        obs_lr = trial.suggest_loguniform('observation_network_learning_rate', 1e-5, 1e-2)
+
+        #kills matrix is a dictionary that stores, for each test, the mutants that it kills. This is shared across all mutants
+        kills_matrix = {test['test_id']: [] for test in self.tests}
+
+        #init neural networks
+        nn_input_size = 1 + 1 + len(self.tests)
+        value_net = ValueNN(nn_input_size)
+        policy_net = PolicyNN(nn_input_size, len(self.tests))
+        observation_net = ObservationNN(nn_input_size + 7)
+
+        # Execute prioritizer using these hyperparameters
+        performance = self.execute(
+            execution_id = self.execution_id,
+            buffer_size=buffer_size,
+            batch_size=batch_size,
+            update_delta=update_delta,
+            observation_network_update_delta=observation_network_update_delta,
+            observation_network_buffer_size=observation_network_buffer_size,
+            rollout_after=rollout_after,
+            asymmetric_loss_alpha=asymmetric_loss_alpha,
+            c_parameter=c_parameter,
+            value_lr=value_lr,
+            policy_lr=policy_lr,
+            obs_lr=obs_lr,
+            policy_net=policy_net,
+            value_net=value_net,
+            observation_net=observation_net,
+            kills_matrix=kills_matrix
+        )
+
+        # Save results
+        result = {
+            "execution_id": self.execution_id,
+            "sut_name": self.sut_name,
+            "parameters": {
+                "buffer_size": buffer_size,
+                "batch_size": batch_size,
+                "update_delta": update_delta,
+                "observation_network_update_delta": observation_network_update_delta,
+                "observation_network_buffer_size": observation_network_buffer_size,
+                "rollout_after": rollout_after,
+                "asymmetric_loss_alpha": asymmetric_loss_alpha,
+                "c_parameter": c_parameter,
+                "value_network_learning_rate": value_lr,
+                "policy_network_learning_rate": policy_lr,
+                "observation_network_learning_rate": obs_lr
+            },
+            "total_tests_executed": performance[0],
+            "baseline_total_tests_executed": baseline_results_per_project[self.sut_name + '_baseline_total_tests_executed'],
+            "total_tests_executed_on_killable_mutants": performance[1],
+            "baseline_total_tests_executed_on_killable_mutants": baseline_results_per_project[self.sut_name + '_baseline_total_tests_executed_on_killable_mutants'],
+            "percentual_improvement_on_killable_mutants": (
+                (baseline_results_per_project[self.sut_name + '_baseline_total_tests_executed_on_killable_mutants'] - performance[1]) /
+                baseline_results_per_project[self.sut_name + '_baseline_total_tests_executed_on_killable_mutants']) * 100
+                if baseline_results_per_project[self.sut_name + '_baseline_total_tests_executed_on_killable_mutants'] > 0 else 0,
+            "average_number_of_tests_needed_to_kill_a_mutant": np.mean([len(test['test_id']) for test in self.tests]),
+            "execution_time": performance[10],
+            "tests_execution_time": performance[11],
+            "total_execution_time": performance[10] + performance[11]
+        }
+
+        #update results json file
+        with open('experiments/results.json', 'r+') as f:
+            results = json.load(f)
+            results['executions'].append(result)
+            f.seek(0)
+            json.dump(results, f, indent=4)
+
+
+        self.execution_id += 1
+
+        return performance[0]  # Return the total number of tests executed as the objective value for minimization
+
+    def launch_experiments(self):
+        """
+        Execute the prioritizer multiple times on the same mutants and tests, with different parameters selected through grid search.
+        """
+
+        study = optuna.create_study(direction="minimize")
+        study.optimize(self.objective, n_trials=20)
+
+        #print best parameters for the SUT in the best_params file in the experiments folder
+        print("Best parameters:", study.best_params)
+        with open('experiments/best_params.json', 'w') as f:
+            json.dump(study.best_params, f, indent=4)
+
+        # retrieve the relative execution from the json (check the entry with the same parameters and return its execution id)
+        with open('experiments/results.json', 'r') as f:
+            results = json.load(f)
+            executions = results.get("executions", [])
+            for execution in executions:
+                if execution["parameters"] == study.best_params:
+                    print(f"Best execution ID: {execution['execution_id']}")
+                    break
+            else:
+                print("No matching execution found for the best parameters.")
 
 if __name__ == '__main__':
-    parser = argparse.ArgumentParser(description='Network-Guided MCTS test prioritizer for mutation testing')
-    parser.add_argument('--tests_folder', type=str, help='Path to the folder containing the tests.')
-    parser.add_argument('--mutants', type=str, help='Path to the file containing the mutants.')
-    parser.add_argument('--cfg', type=str, nargs='?', help='Path to the dot file containing the control flow graph.')
-    parser.add_argument('--ast', type=str, nargs='?', help='Path to the file containing the abstract syntax tree.')
-    parser.add_argument('--coverage', type=str, help='Path to the coverage file (test matrix).')
-    parser.add_argument("--sut_name", type=str, help="Name of the SUT.")
-    parser.add_argument('--plot_delta', type=int, default=30, help='Plot every n steps.')
-    parser.add_argument('--average_delta', type=int, default=10, help='Average every n steps.')
-    parser.add_argument('--buffer_size', type=int, help='Buffer size for the MCTS agent.')
-    parser.add_argument('--batch_size', type=int, default=40, help='Batch size for the MCTS agent.')
-    parser.add_argument('--update_delta', type=int, default=1, help='Update value and policy networks every n steps.')
-    parser.add_argument('--observation_network_update_delta', type=int, default=1, help='Update observation network every n steps.')
-    parser.add_argument('--observation_network_buffer_size', type=int, default=10, help='Buffer size for the observation network.')
-    parser.add_argument('--rollout_delay', type=int, default=45, help='Start relying on networks after n steps. (should be higher than the batch size and the update_delta parameters')
-    parser.add_argument('--asymmetric_loss_alpha', type=float, default=6.0, help='Alpha parameter for the asymmetric loss function. A higher value will penalize underestimations of the value network more heavily.')
-    parser.add_argument('--c_parameter', type=float, default=1.0, help='C parameter for the UCT algorithm. A higher value will make the algorithm explore more.')
-    parser.add_argument('--value_network_learning_rate', type=float, default=0.001, help='Learning rate for the value network.')
-    parser.add_argument('--policy_network_learning_rate', type=float, default=0.0001, help='Learning rate for the policy network.')
-    parser.add_argument('--observation_network_learning_rate', type=float, default=0.001, help='Learning rate for the observation network.')
 
+    print(f"{bcolors.HEADER}Launching experiments...{bcolors.ENDC}")
 
-    args = parser.parse_args()
+    if not os.path.exists('experiments'):
+        os.makedirs('experiments')
 
-    prioritizer = Prioritizer(args.tests_folder, args.mutants, args.sut_name, args.plot_delta, args.average_delta, args.buffer_size,
-                              args.batch_size, args.update_delta, args.observation_network_update_delta,
-                              args.observation_network_buffer_size, args.rollout_delay, args.asymmetric_loss_alpha, args.c_parameter,
-                              args.value_network_learning_rate, args.policy_network_learning_rate, args.observation_network_learning_rate)
+    with open('experiments/results.json', 'w') as f:
+        json.dump({"executions": []}, f, indent=4)
 
-    start_time = time.time()
-    prioritizer.execute()
-    end_time = time.time()
+    #empty the experiments/plots folder
+    if not os.path.exists('experiments/plots'):
+        os.makedirs('experiments/plots')
+    else:
+        for file in os.listdir('experiments/plots'):
+            file_path = os.path.join('experiments/plots', file)
+            if os.path.isfile(file_path):
+                os.remove(file_path)
 
-    print(f"{bcolors.OKGREEN}Execution time: {round(end_time - start_time, 2)} seconds{bcolors.ENDC}")
+    #execute the prioritizer on each project
+    for sut_name in suts_names:
+        test_folder_path = os.path.join('case_studies', sut_name, 'test')
+        mutants_path = os.path.join('sumo_results', sut_name, 'mutations.json')
+        prioritizer = Prioritizer(test_folder_path, mutants_path, sut_name, 30, 10)
+        print(f"{bcolors.OKBLUE}Executing prioritizer for {sut_name}{bcolors.ENDC}")
+        prioritizer.mutants = prioritizer.load_mutants()
+        prioritizer.tests = prioritizer.load_tests()
+        print(f"{bcolors.OKBLUE}Loaded {len(prioritizer.mutants)} mutants and {len(prioritizer.tests)} tests for {sut_name}{bcolors.ENDC}")
+        prioritizer.launch_experiments()
+
 

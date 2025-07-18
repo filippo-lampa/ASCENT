@@ -1,4 +1,4 @@
---find-links https://download.pytorch.org/whl/cu118
+--find-links https://download.pytorch.org/whl/cu128
 torch
 numpy >= 2.2.0
 matplotlib >= 3.10.0

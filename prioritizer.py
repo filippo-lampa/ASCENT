@@ -188,11 +188,10 @@ class Prioritizer:
 
     def objective(self, trial):
 
-        # Choose 2 out of 4 parameters to tune in this trial
         all_params = ['c_parameter', 'batch_size', 'asymmetric_loss_alpha', 'rollout_after', 'observation_network_buffer_size',
                       'observation_network_update_delta', 'update_delta', 'buffer_size']
 
-        chosen = trial.suggest_categorical("chosen_params", list(itertools.combinations(all_params, 2)))
+        chosen = trial.suggest_categorical("chosen_params", list(itertools.combinations(all_params, 8)))
 
         params = {
             'value_network_learning_rate': 0.001,
@@ -227,6 +226,8 @@ class Prioritizer:
                     params[name] = trial.suggest_int(name, 1, 10)
                 elif name == 'update_delta':
                     params[name] = trial.suggest_int(name, 1, 10)
+                elif name == 'buffer_size':
+                    params[name] = trial.suggest_int(name, 1, len(self.mutants))
             else:
                 params[name] = defaults[name]
 
@@ -307,8 +308,8 @@ class Prioritizer:
         Execute the prioritizer multiple times on the same mutants and tests, with different parameters selected through grid search.
         """
 
-        study = optuna.create_study(direction="minimize")
-        study.optimize(self.objective, n_trials=500)
+        study = optuna.create_study(direction="minimize", sampler=optuna.samplers.RandomSampler())
+        study.optimize(self.objective, n_trials=1000)
 
         #print best parameters for the SUT in the best_params file in the experiments folder
         print("Best parameters:", study.best_params)
@@ -327,8 +328,6 @@ class Prioritizer:
                 print("No matching execution found for the best parameters.")
 
 if __name__ == '__main__':
-
-    print(f"{bcolors.HEADER}Launching experiments...{bcolors.ENDC}")
 
     if not os.path.exists('experiments'):
         os.makedirs('experiments')

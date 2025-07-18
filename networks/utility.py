@@ -26,7 +26,7 @@ def inference(state_tensor, model):
     tensor_in = state_tensor
     tensor_in = tensor_in[None]  # Wrap one outer dimension (as for a batch)
     with torch.no_grad():
-        output = model(tensor_in)
+        output = model(tensor_in.to('cuda' if torch.cuda.is_available() else 'cpu'))
     output = output.squeeze()  # Remove the outermost batch-size dimension
     return output.item() if model.__class__.__name__ == 'ValueNN' or model.__class__.__name__ == 'ObservationNN' \
         else torch.softmax(output, dim=-1)
@@ -45,9 +45,9 @@ def training_model(model, inputs, targets, opt, loss_function, scheduler=None):
     losses = []
     for batch, (X, y) in enumerate(zip(inputs, targets)):
         opt.zero_grad()  # resetting the gradients
-        pred = model(X)
+        pred = model(X.to('cuda' if torch.cuda.is_available() else 'cpu'))  # forward pass
 
-        loss = loss_function(pred, y)
+        loss = loss_function(pred, y.to('cuda' if torch.cuda.is_available() else 'cpu'))
         losses.append(loss.item())
         loss.backward()  # computing the gradient
         opt.step()  # changing the weights of the network

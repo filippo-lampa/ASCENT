@@ -37,9 +37,9 @@ class MCTSAgent:
 
         # Set the device for PyTorch
         device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
-        if torch.cuda.is_available():
-            print("Using device: ", device)
-            print(torch.cuda.get_device_name(0))
+        #if torch.cuda.is_available():
+        #    print("Using device: ", device)
+        #    print(torch.cuda.get_device_name(0))
 
         # Init Neural-MCTS parameters
         self.ROLLOUT_AFTER = rollout_after
@@ -154,7 +154,7 @@ class MCTSAgent:
             possible_actions = self.get_available_actions()
 
             if len(possible_actions) == 0:
-                print("no possible actions")
+            #    print("no possible actions")
                 return
 
             action = random.choice(possible_actions)
@@ -413,7 +413,7 @@ class MCTSAgent:
 
             current_reward = len(self.tests) - step
 
-            print("Step: ", step, "Sequence: ", ob.test_sequence, "Reward: ", current_reward)
+            #print("Step: ", step, "Sequence: ", ob.test_sequence, "Reward: ", current_reward)
 
             if self.done:
                 mytree.T += current_reward / len(self.tests) # update the value of the node with the actual reward

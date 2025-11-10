@@ -35,12 +35,12 @@ def inference(state_tensor, model):
 
 def training_model(model, inputs, targets, opt, loss_function, scheduler=None):
 
-    if model.__class__.__name__ == 'ValueNN':
-        print("Training ValueNN model...")
-    elif model.__class__.__name__ == 'PolicyNN':
-        print("Training PolicyNN model...")
-    else:
-        print("Training ObservationNN model...")
+    #if model.__class__.__name__ == 'ValueNN':
+        #print("Training ValueNN model...")
+    #elif model.__class__.__name__ == 'PolicyNN':
+        #print("Training PolicyNN model...")
+    #else:
+        #print("Training ObservationNN model...")
 
     model.train()
     losses = []

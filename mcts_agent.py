@@ -37,8 +37,9 @@ class MCTSAgent:
 
         # Set the device for PyTorch
         device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
-        print("Using device: ", device)
-        print(torch.cuda.get_device_name(0))
+        if torch.cuda.is_available():
+            print("Using device: ", device)
+            print(torch.cuda.get_device_name(0))
 
         # Init Neural-MCTS parameters
         self.ROLLOUT_AFTER = rollout_after

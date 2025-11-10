@@ -1,3 +1,4 @@
+import argparse
 import itertools
 import json
 import os
@@ -32,6 +33,7 @@ class Prioritizer:
         self.mutants = None
         self.tests = None
         self.execution_id = 0
+        self.parameters_set_id = 0
 
     def load_mutants(self):
         '''
@@ -97,7 +99,7 @@ class Prioritizer:
 
         return tests
 
-    def execute(self, execution_id=0, buffer_size=None, batch_size=None,
+    def execute(self, execution_id=0, parameters_set_id=0, buffer_size=None, batch_size=None,
                 update_delta=None, observation_network_update_delta=None, observation_network_buffer_size=None,
                 rollout_after=None, asymmetric_loss_alpha=None, c_parameter=None, value_lr=None,
                 policy_lr=None, obs_lr=None, policy_net=None, value_net=None, observation_net=None, kills_matrix=None):
@@ -176,7 +178,7 @@ class Prioritizer:
                 plot_mutant_prioritization_results(rewards, moving_average, moving_average_v_losses, moving_average_p_losses,
                                                    moving_average_o_losses, networks_update_freq, self.average_delta,
                                                    self.sut_name, should_save=True, save_path='experiments/plots',
-                                                   execution_id=execution_id)
+                                                   execution_id=execution_id, parameters_set_id=parameters_set_id)
         end_time = round(time.time() * 1000)
 
         execution_time = end_time - start_time
@@ -188,15 +190,15 @@ class Prioritizer:
 
     def objective(self, trial):
 
-        all_params = ['c_parameter', 'batch_size', 'asymmetric_loss_alpha', 'rollout_after', 'observation_network_buffer_size',
-                      'observation_network_update_delta', 'update_delta', 'buffer_size']
+        all_params = ['c_parameter', 'asymmetric_loss_alpha', 'rollout_after', 'observation_network_buffer_size',
+                      'observation_network_update_delta', 'update_delta', 'buffer_size', 'batch_size']
 
-        chosen = trial.suggest_categorical("chosen_params", list(itertools.combinations(all_params, 8)))
+        chosen = trial.suggest_categorical("chosen_params", list(itertools.combinations(all_params, 7)))
 
         params = {
             'value_network_learning_rate': 0.001,
             'policy_network_learning_rate': 0.0001,
-            'observation_network_learning_rate': 0.001
+            'observation_network_learning_rate': 0.001,
         }
 
         defaults = {
@@ -213,25 +215,26 @@ class Prioritizer:
         for name in all_params:
             if name in chosen:
                 if name == 'c_parameter':
-                    params[name] = trial.suggest_float(name, 0.1, 5.0)
+                    params[name] = trial.suggest_categorical(name, [0.1, 1.0, 2.0, 3.0, 5.0])
                 elif name == 'batch_size':
-                    params[name] = trial.suggest_categorical(name, [16, 32, 40, 64, 128, 256, 512])
+                    params[name] = trial.suggest_categorical(name, [16, 32, 40, 64, 128])
                 elif name == 'asymmetric_loss_alpha':
-                    params[name] = trial.suggest_float(name, 1.0, 10.0)
+                    params[name] = trial.suggest_categorical(name, [1.0, 3.25, 5.5, 7.75, 10.0])
                 elif name == 'rollout_after':
-                    params[name] = trial.suggest_int(name, 0, 100)
+                    params[name] = trial.suggest_categorical(name, [0, 25, 50, 75, 100])
                 elif name == 'observation_network_buffer_size':
-                    params[name] = trial.suggest_int(name, 5, 50)
+                    params[name] = trial.suggest_categorical(name, [5, 15, 25, 35, 50])
                 elif name == 'observation_network_update_delta':
-                    params[name] = trial.suggest_int(name, 1, 10)
+                    params[name] = trial.suggest_categorical(name, [1, 3, 5, 7, 10])
                 elif name == 'update_delta':
-                    params[name] = trial.suggest_int(name, 1, 10)
+                    params[name] = trial.suggest_categorical(name, [1, 3, 5, 7, 10])
                 elif name == 'buffer_size':
-                    params[name] = trial.suggest_int(name, 1, len(self.mutants))
+                    params[name] = trial.suggest_categorical(name, [int(len(self.mutants) * factor) for factor in [0.2, 0.4, 0.6, 0.8, 1.0]])
             else:
                 params[name] = defaults[name]
 
-        #kills matrix is a dictionary that stores, for each test, the mutants that it kills. This is shared across all mutants
+        #kills matrix is a dictionary that stores, for each mutant operator, a dictionary containing as keys all the tests, and
+        # as entries the number of mutants of that operator that it kills. This is shared across all mutants
         kills_matrix = {test['test_id']: [] for test in self.tests}
 
         #init neural networks
@@ -303,13 +306,13 @@ class Prioritizer:
 
         return performance[0]  # Return the total number of tests executed as the objective value for minimization
 
-    def launch_experiments(self):
+    def launch_experiments_optuna(self):
         """
         Execute the prioritizer multiple times on the same mutants and tests, with different parameters selected through grid search.
         """
 
         study = optuna.create_study(direction="minimize", sampler=optuna.samplers.RandomSampler())
-        study.optimize(self.objective, n_trials=1000)
+        study.optimize(self.objective, n_trials=500)
 
         #print best parameters for the SUT in the best_params file in the experiments folder
         print("Best parameters:", study.best_params)
@@ -326,6 +329,7 @@ class Prioritizer:
                     break
             else:
                 print("No matching execution found for the best parameters.")
+
 
 if __name__ == '__main__':
 
@@ -345,14 +349,19 @@ if __name__ == '__main__':
                 os.remove(file_path)
 
     #execute the prioritizer on each project
-    for sut_name in suts_names:
-        test_folder_path = os.path.join('case_studies', sut_name, 'test')
-        mutants_path = os.path.join('sumo_results', sut_name, 'mutations.json')
-        prioritizer = Prioritizer(test_folder_path, mutants_path, sut_name, 30, 10)
-        print(f"{bcolors.OKBLUE}Executing prioritizer for {sut_name}{bcolors.ENDC}")
-        prioritizer.mutants = prioritizer.load_mutants()
-        prioritizer.tests = prioritizer.load_tests()
-        print(f"{bcolors.OKBLUE}Loaded {len(prioritizer.mutants)} mutants and {len(prioritizer.tests)} tests for {sut_name}{bcolors.ENDC}")
-        prioritizer.launch_experiments()
+    parser = argparse.ArgumentParser(description='Network-Guided MCTS test prioritizer for mutation testing')
+    parser.add_argument('--sut_name', type=str, help='Path to the folder containing the tests.')
+
+    args = parser.parse_args()
+    sut_name = args.sut_name
+
+    test_folder_path = os.path.join('case_studies', sut_name, 'test')
+    mutants_path = os.path.join('sumo_results', sut_name, 'mutations.json')
+    prioritizer = Prioritizer(test_folder_path, mutants_path, sut_name, 30, 10)
+    print(f"{bcolors.OKBLUE}Executing prioritizer for {sut_name}{bcolors.ENDC}")
+    prioritizer.mutants = prioritizer.load_mutants()
+    prioritizer.tests = prioritizer.load_tests()
+    print(f"{bcolors.OKBLUE}Loaded {len(prioritizer.mutants)} mutants and {len(prioritizer.tests)} tests for {sut_name}{bcolors.ENDC}")
+    prioritizer.launch_experiments_optuna()
 
 

@@ -13,6 +13,8 @@
 /case_studies/*/artifacts
 /case_studies/*/cache
 
+ascent-runner.tar
+
 # User-specific stuff
 .idea/**/workspace.xml
 .idea/**/tasks.xml

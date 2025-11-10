@@ -1,14 +1,17 @@
 import matplotlib.pyplot as plt
 
 def plot_mutant_prioritization_results(rewards, moving_average, v_losses, p_losses, o_losses, networks_update_freq, moving_average_window, sut_name,
-                                       should_save=False, save_path=None, execution_id=None):
+                                       should_save=False, save_path=None, execution_id=None, parameters_set_id=None):
 
     plt.figure(figsize=(10, 6))
     plt.plot(rewards, color='blue', label='Individual Rewards', alpha=0.7)
     plt.plot(moving_average, color='orange', label='Average Reward', linewidth=2)
 
     # Labeling
-    plt.title('Individual Rewards and Average Reward Over Time for SUT: ' + sut_name + ' (Execution ID: ' + str(execution_id) + ')')
+    if parameters_set_id is not None:
+        plt.title('Individual Rewards and Average Reward Over Time for SUT: ' + sut_name + ' (Execution ID: ' + str(execution_id) + ', Parameters Set ID: ' + str(parameters_set_id) + ')')
+    else:
+        plt.title('Individual Rewards and Average Reward Over Time for SUT: ' + sut_name + ' (Execution ID: ' + str(execution_id) + ')')
     plt.xlabel('Time Steps')
     plt.ylabel('Reward')
     plt.legend()
@@ -17,7 +20,10 @@ def plot_mutant_prioritization_results(rewards, moving_average, v_losses, p_loss
     plt.show()
 
     plt.plot(o_losses)
-    plt.title('Observation Losses for SUT: ' + sut_name + ' (Execution ID: ' + str(execution_id) + ')')
+    if parameters_set_id is not None:
+        plt.title('Observation Losses for SUT: ' + sut_name + ' (Execution ID: ' + str(execution_id) + ', Parameters Set ID: ' + str(parameters_set_id) + ')')
+    else:
+        plt.title('Observation Losses for SUT: ' + sut_name + ' (Execution ID: ' + str(execution_id) + ')')
     plt.xlabel('Update (every ' + str(networks_update_freq) + ' episodes)')
     plt.ylabel('Loss')
     if should_save and save_path:
@@ -25,7 +31,10 @@ def plot_mutant_prioritization_results(rewards, moving_average, v_losses, p_loss
     plt.show()
 
     plt.plot(v_losses)
-    plt.title('Value Losses for SUT: ' + sut_name + ' (Execution ID: ' + str(execution_id) + ')')
+    if parameters_set_id is not None:
+        plt.title('Value Losses for SUT: ' + sut_name + ' (Execution ID: ' + str(execution_id) + ', Parameters Set ID: ' + str(parameters_set_id) + ')')
+    else:
+        plt.title('Value Losses for SUT: ' + sut_name + ' (Execution ID: ' + str(execution_id) + ')')
     plt.xlabel('Update (every ' + str(networks_update_freq) + ' episodes)')
     plt.ylabel('Loss')
     if should_save and save_path:
@@ -33,7 +42,10 @@ def plot_mutant_prioritization_results(rewards, moving_average, v_losses, p_loss
     plt.show()
 
     plt.plot(p_losses)
-    plt.title('Policy Losses for SUT: ' + sut_name + ' (Execution ID: ' + str(execution_id) + ')')
+    if parameters_set_id is not None:
+        plt.title('Policy Losses for SUT: ' + sut_name + ' (Execution ID: ' + str(execution_id) + ', Parameters Set ID: ' + str(parameters_set_id) + ')')
+    else:
+        plt.title('Policy Losses for SUT: ' + sut_name + ' (Execution ID: ' + str(execution_id) + ')')
     plt.xlabel('Update (every ' + str(networks_update_freq) + ' episodes)')
     plt.ylabel('Loss')
     if should_save and save_path:

@@ -12,9 +12,6 @@ from replay_buffer import ReplayBuffer
 from networks.utility import inference, training_model, observation_to_tensor
 from utils.consts import mutant_operators_list
 
-device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
-print("Using device: ", device)
-
 class AsymmetricLoss(nn.Module):
     def __init__(self, alpha):  # alpha > 1 penalizes underestimation more
         super(AsymmetricLoss, self).__init__()
@@ -38,6 +35,12 @@ class MCTSAgent:
                  asymmetric_loss_alpha=None, c_parameter=None, value_network_learning_rate=None,
                  policy_network_learning_rate=None, observation_network_learning_rate=None):
 
+        # Set the device for PyTorch
+        device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
+        if torch.cuda.is_available():
+            print("Using device: ", device)
+            print(torch.cuda.get_device_name(0))
+
         # Init Neural-MCTS parameters
         self.ROLLOUT_AFTER = rollout_after
         self.BUFFER_SIZE = number_of_mutants if buffer_size is None else buffer_size
@@ -49,9 +52,9 @@ class MCTSAgent:
         self.replay_buffer = ReplayBuffer(self.BUFFER_SIZE, self.BATCH_SIZE)
 
         # Init networks
-        self.policy_net = policy_nn
-        self.observation_nn = observation_nn
-        self.value_net = value_nn
+        self.policy_net = policy_nn.to(device)
+        self.observation_nn = observation_nn.to(device)
+        self.value_net = value_nn.to(device)
         self.asymmetric_loss_alpha = asymmetric_loss_alpha
         self.observation_nn_opt = torch.optim.Adam(self.observation_nn.parameters(), lr=observation_network_learning_rate)
         self.value_opt = torch.optim.Adam(self.value_net.parameters(), lr=value_network_learning_rate)

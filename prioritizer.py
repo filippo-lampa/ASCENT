@@ -1,3 +1,4 @@
+import argparse
 import itertools
 import json
 import os
@@ -32,6 +33,7 @@ class Prioritizer:
         self.mutants = None
         self.tests = None
         self.execution_id = 0
+        self.parameters_set_id = 0
 
     def load_mutants(self):
         '''
@@ -97,7 +99,7 @@ class Prioritizer:
 
         return tests
 
-    def execute(self, execution_id=0, buffer_size=None, batch_size=None,
+    def execute(self, execution_id=0, parameters_set_id=0, buffer_size=None, batch_size=None,
                 update_delta=None, observation_network_update_delta=None, observation_network_buffer_size=None,
                 rollout_after=None, asymmetric_loss_alpha=None, c_parameter=None, value_lr=None,
                 policy_lr=None, obs_lr=None, policy_net=None, value_net=None, observation_net=None, kills_matrix=None):
@@ -176,7 +178,7 @@ class Prioritizer:
                 plot_mutant_prioritization_results(rewards, moving_average, moving_average_v_losses, moving_average_p_losses,
                                                    moving_average_o_losses, networks_update_freq, self.average_delta,
                                                    self.sut_name, should_save=True, save_path='experiments/plots',
-                                                   execution_id=execution_id)
+                                                   execution_id=execution_id, parameters_set_id=parameters_set_id)
         end_time = round(time.time() * 1000)
 
         execution_time = end_time - start_time
@@ -188,21 +190,21 @@ class Prioritizer:
 
     def objective(self, trial):
 
-        # Choose 2 out of 4 parameters to tune in this trial
-        all_params = ['c_parameter', 'batch_size', 'asymmetric_loss_alpha', 'rollout_after', 'observation_network_buffer_size',
+        all_params = ['c_parameter', 'asymmetric_loss_alpha', 'rollout_after', 'observation_network_buffer_size',
                       'observation_network_update_delta', 'update_delta', 'buffer_size']
 
-        chosen = trial.suggest_categorical("chosen_params", list(itertools.combinations(all_params, 2)))
+        chosen = trial.suggest_categorical("chosen_params", list(itertools.combinations(all_params, 7)))
 
         params = {
             'value_network_learning_rate': 0.001,
             'policy_network_learning_rate': 0.0001,
-            'observation_network_learning_rate': 0.001
+            'observation_network_learning_rate': 0.001,
+            'batch_size': 40
         }
 
         defaults = {
             'c_parameter': 1.0,
-            'batch_size': 40,
+            #'batch_size': 40,
             'asymmetric_loss_alpha': 6.0,
             'rollout_after': 45,
             'observation_network_buffer_size': 10,
@@ -215,8 +217,8 @@ class Prioritizer:
             if name in chosen:
                 if name == 'c_parameter':
                     params[name] = trial.suggest_float(name, 0.1, 5.0)
-                elif name == 'batch_size':
-                    params[name] = trial.suggest_categorical(name, [16, 32, 40, 64, 128, 256, 512])
+                #elif name == 'batch_size':
+                    #params[name] = trial.suggest_categorical(name, [16, 32, 40, 64, 128, 256, 512])
                 elif name == 'asymmetric_loss_alpha':
                     params[name] = trial.suggest_float(name, 1.0, 10.0)
                 elif name == 'rollout_after':
@@ -227,6 +229,8 @@ class Prioritizer:
                     params[name] = trial.suggest_int(name, 1, 10)
                 elif name == 'update_delta':
                     params[name] = trial.suggest_int(name, 1, 10)
+                elif name == 'buffer_size':
+                    params[name] = trial.suggest_int(name, 1, len(self.mutants))
             else:
                 params[name] = defaults[name]
 
@@ -302,12 +306,12 @@ class Prioritizer:
 
         return performance[0]  # Return the total number of tests executed as the objective value for minimization
 
-    def launch_experiments(self):
+    def launch_experiments_optuna(self):
         """
         Execute the prioritizer multiple times on the same mutants and tests, with different parameters selected through grid search.
         """
 
-        study = optuna.create_study(direction="minimize")
+        study = optuna.create_study(direction="minimize", sampler=optuna.samplers.RandomSampler())
         study.optimize(self.objective, n_trials=500)
 
         #print best parameters for the SUT in the best_params file in the experiments folder
@@ -326,9 +330,149 @@ class Prioritizer:
             else:
                 print("No matching execution found for the best parameters.")
 
-if __name__ == '__main__':
+    def launch_experiments(self):
+        """
+        Execute the prioritizer multiple times on the same mutants and tests, changing one parameter at a time.
+        We test 5 values for each parameter, and we execute the experiment 5 times for each value. The total
+        number of experiments is then 5 * 5 * number_of_parameters.
+        """
 
-    print(f"{bcolors.HEADER}Launching experiments...{bcolors.ENDC}")
+        parameters_to_test = {
+            'buffer_size': [int(len(self.mutants) * factor) for factor in [0.2, 0.4, 0.6, 0.8, 1.0]],
+            'batch_size': [16, 32, 40, 64, 128],
+            'update_delta': [1, 3, 5, 7, 10],
+            'observation_network_update_delta': [1, 3, 5, 7, 10],
+            'observation_network_buffer_size': [5, 15, 25, 35, 50],
+            'rollout_after': [0, 25, 50, 75, 100],
+            'asymmetric_loss_alpha': [1.0, 3.25, 5.5, 7.75, 10.0],
+            'c_parameter': [0.1, 1.325, 2.55, 3.775, 5.0]
+        }
+
+        default_parameters = {
+            'buffer_size': len(self.mutants),
+            'batch_size': 40,
+            'update_delta': 1,
+            'observation_network_update_delta': 1,
+            'observation_network_buffer_size': 10,
+            'rollout_after': 45,
+            'asymmetric_loss_alpha': 6.0,
+            'c_parameter': 1.0
+        }
+
+        for parameter_name, parameter_values in parameters_to_test.items():
+            for parameter_value in parameter_values:
+                for repeat in range(5):  # repeat each experiment 5 times
+                    print(f"{bcolors.OKBLUE}Executing experiment with {parameter_name}={parameter_value}, repeat {repeat + 1}{bcolors.ENDC}")
+
+                    #init neural networks
+                    nn_input_size = 1 + 1 + len(self.tests)
+                    value_net = ValueNN(nn_input_size)
+                    policy_net = PolicyNN(nn_input_size, len(self.tests))
+                    observation_net = ObservationNN(nn_input_size + 7)
+
+                    #kills matrix is a dictionary that stores, for each test, the mutants that it kills. This is shared across all mutants
+                    kills_matrix = {test['test_id']: [] for test in self.tests}
+
+                    # Execute prioritizer using these hyperparameters
+                    performance = self.execute(
+                        execution_id = self.execution_id,
+                        parameters_set_id = self.parameters_set_id,
+                        buffer_size = parameter_value if parameter_name == 'buffer_size' else default_parameters['buffer_size'],
+                        batch_size = parameter_value if parameter_name == 'batch_size' else default_parameters['batch_size'],
+                        update_delta = parameter_value if parameter_name == 'update_delta' else default_parameters['update_delta'],
+                        observation_network_update_delta = parameter_value if parameter_name == 'observation_network_update_delta'
+                        else default_parameters['observation_network_update_delta'],
+                        observation_network_buffer_size = parameter_value if parameter_name == 'observation_network_buffer_size'
+                        else default_parameters['observation_network_buffer_size'],
+                        rollout_after = parameter_value if parameter_name == 'rollout_after' else default_parameters['rollout_after'],
+                        asymmetric_loss_alpha = parameter_value if parameter_name == 'asymmetric_loss_alpha'
+                        else default_parameters['asymmetric_loss_alpha'],
+                        c_parameter = parameter_value if parameter_name == 'c_parameter' else default_parameters['c_parameter'],
+                        value_lr = 0.001,
+                        policy_lr = 0.0001,
+                        obs_lr = 0.001,
+                        policy_net = policy_net,
+                        value_net = value_net,
+                        observation_net = observation_net,
+                        kills_matrix = kills_matrix
+                    )
+
+                    '''
+                    report information about the experiment in the results json file in the following form:
+                    "executions": [
+                            {
+                                "execution_id": 0,
+                                "parameters_set_id": 0,
+                                "sut_name": "thorwallet",
+                                "parameters": {
+                                    "buffer_size": 173,
+                                    "batch_size": 40,
+                                    "update_delta": 3,
+                                    "observation_network_update_delta": 4,
+                                    "observation_network_buffer_size": 46,
+                                    "rollout_after": 49,
+                                    "asymmetric_loss_alpha": 9.65935096442645,
+                                    "c_parameter": 2.8013082955387016,
+                                    "value_network_learning_rate": 0.001,
+                                    "policy_network_learning_rate": 0.0001,
+                                    "observation_network_learning_rate": 0.001
+                                },
+                                "total_tests_executed": 1455,
+                                "baseline_total_tests_executed": 1613,
+                                "total_tests_executed_on_killable_mutants": 328,
+                                "baseline_total_tests_executed_on_killable_mutants": 484,
+                                "percentual_improvement_on_killable_mutants": 32.231404958677686,
+                                "average_number_of_tests_needed_to_kill_a_mutant": 66.42857142857143,
+                                "execution_time": 59083,
+                                "tests_execution_time": 25863393,
+                                "total_execution_time": 25922476
+                            },
+                            ...
+                    '''
+
+                    with open('experiments/results.json', 'r+') as f:
+                        results = json.load(f)
+                        results['executions'].append({
+                            "execution_id": self.execution_id,
+                            "parameters_set_id": self.parameters_set_id,
+                            "sut_name": self.sut_name,
+                            "parameters": {
+                                "buffer_size": parameter_value if parameter_name == 'buffer_size' else default_parameters['buffer_size'],
+                                "batch_size": parameter_value if parameter_name == 'batch_size' else default_parameters['batch_size'],
+                                "update_delta": parameter_value if parameter_name == 'update_delta' else default_parameters['update_delta'],
+                                "observation_network_update_delta": parameter_value if parameter_name == 'observation_network_update_delta'
+                                else default_parameters['observation_network_update_delta'],
+                                "observation_network_buffer_size": parameter_value if parameter_name == 'observation_network_buffer_size'
+                                else default_parameters['observation_network_buffer_size'],
+                                "rollout_after": parameter_value if parameter_name == 'rollout_after' else default_parameters['rollout_after'],
+                                "asymmetric_loss_alpha": parameter_value if parameter_name == 'asymmetric_loss_alpha'
+                                else default_parameters['asymmetric_loss_alpha'],
+                                "c_parameter": parameter_value if parameter_name == 'c_parameter' else default_parameters['c_parameter'],
+                                "value_network_learning_rate": 0.001,
+                                "policy_network_learning_rate": 0.0001,
+                                "observation_network_learning_rate": 0.001
+                            },
+                            "total_tests_executed": performance[0],
+                            "baseline_total_tests_executed": baseline_results_per_project[self.sut_name + '_baseline_total_tests_executed'],
+                            "total_tests_executed_on_killable_mutants": performance[1],
+                            "baseline_total_tests_executed_on_killable_mutants": baseline_results_per_project[self.sut_name + '_baseline_total_tests_executed_on_killable_mutants'],
+                            "percentual_improvement_on_killable_mutants": (
+                                (baseline_results_per_project[self.sut_name + '_baseline_total_tests_executed_on_killable_mutants'] - performance[1]) /
+                                baseline_results_per_project[self.sut_name + '_baseline_total_tests_executed_on_killable_mutants']) * 100
+                                if baseline_results_per_project[self.sut_name + '_baseline_total_tests_executed_on_killable_mutants'] > 0 else 0,
+                            "average_number_of_tests_needed_to_kill_a_mutant": np.mean([len(test['test_id']) for test in self.tests]),
+                            "execution_time": performance[10],
+                            "tests_execution_time": performance[11],
+                            "total_execution_time": performance[10] + performance[11]
+                        })
+                        f.seek(0)
+                        json.dump(results, f, indent=4)
+
+                    self.execution_id += 1
+                self.parameters_set_id += 1
+
+
+if __name__ == '__main__':
 
     if not os.path.exists('experiments'):
         os.makedirs('experiments')
@@ -346,14 +490,19 @@ if __name__ == '__main__':
                 os.remove(file_path)
 
     #execute the prioritizer on each project
-    for sut_name in suts_names:
-        test_folder_path = os.path.join('case_studies', sut_name, 'test')
-        mutants_path = os.path.join('sumo_results', sut_name, 'mutations.json')
-        prioritizer = Prioritizer(test_folder_path, mutants_path, sut_name, 30, 10)
-        print(f"{bcolors.OKBLUE}Executing prioritizer for {sut_name}{bcolors.ENDC}")
-        prioritizer.mutants = prioritizer.load_mutants()
-        prioritizer.tests = prioritizer.load_tests()
-        print(f"{bcolors.OKBLUE}Loaded {len(prioritizer.mutants)} mutants and {len(prioritizer.tests)} tests for {sut_name}{bcolors.ENDC}")
-        prioritizer.launch_experiments()
+    parser = argparse.ArgumentParser(description='Network-Guided MCTS test prioritizer for mutation testing')
+    parser.add_argument('--sut_name', type=str, help='Path to the folder containing the tests.')
+
+    args = parser.parse_args()
+    sut_name = args.sut_name
+
+    test_folder_path = os.path.join('case_studies', sut_name, 'test')
+    mutants_path = os.path.join('sumo_results', sut_name, 'mutations.json')
+    prioritizer = Prioritizer(test_folder_path, mutants_path, sut_name, 30, 10)
+    print(f"{bcolors.OKBLUE}Executing prioritizer for {sut_name}{bcolors.ENDC}")
+    prioritizer.mutants = prioritizer.load_mutants()
+    prioritizer.tests = prioritizer.load_tests()
+    print(f"{bcolors.OKBLUE}Loaded {len(prioritizer.mutants)} mutants and {len(prioritizer.tests)} tests for {sut_name}{bcolors.ENDC}")
+    prioritizer.launch_experiments()
 
 

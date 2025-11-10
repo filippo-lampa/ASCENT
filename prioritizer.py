@@ -3,6 +3,7 @@ import itertools
 import json
 import os
 import re
+import sys
 import time
 
 import optuna
@@ -34,6 +35,7 @@ class Prioritizer:
         self.tests = None
         self.execution_id = 0
         self.parameters_set_id = 0
+        self.coverage_matrix = None
 
     def load_mutants(self):
         '''
@@ -45,12 +47,15 @@ class Prioritizer:
         with open(self.mutants_path, 'r', encoding='utf-8') as f:
             mutants = json.load(f)
         mutants_list = []
+        index_counter = 0
         for contract, contract_mutants in mutants.items():
             for mutant in contract_mutants:
                 if 'operator' not in mutant:
                     print(f"{bcolors.WARNING}Mutant {mutant['id']} has no operator. Skipping...{bcolors.ENDC}")
                     continue
                 mutant['contract'] = contract
+                mutant['index'] = index_counter
+                index_counter += 1
                 mutants_list.append(mutant)
 
         return mutants_list
@@ -99,10 +104,36 @@ class Prioritizer:
 
         return tests
 
+    def parse_coverage_matrix(self, coverage_path):
+        if self.mutants is None or self.tests is None:
+            raise Exception("Mutants and tests must be loaded before parsing the coverage matrix.")
+        coverage_matrix = np.zeros((len(self.mutants), len(self.tests)), dtype=int)
+        with open(coverage_path, 'r', encoding='utf-8') as f:
+            try:
+                coverage = json.load(f)
+            except UnicodeDecodeError as e:
+                print(f"{bcolors.FAIL}Invalid characters in the mutants file.{bcolors.ENDC}")
+                sys.exit(1)
+            for mutant in self.mutants:
+                mutant_start_line = mutant["startLine"]
+                mutant_relative_path = mutant["file"].split(self.sut_name)[1][1:]
+                try:
+                    hitting_tests = coverage[mutant_relative_path][str(mutant_start_line)]
+                except KeyError:
+                    print("{bcolors.WARNING}Mutant line not found in coverage file.{bcolors.ENDC}")
+                    hitting_tests = []
+                for test in hitting_tests:
+                    test_file_name = test["file"].split('/')[-1]
+                    for test_index, test_obj in enumerate(self.tests):
+                        if test_obj["test_id"] == test_file_name + "_" + test["title"]:
+                            coverage_matrix[self.mutants.index(mutant)][test_index] = 1
+                            break
+        return coverage_matrix
+
     def execute(self, execution_id=0, parameters_set_id=0, buffer_size=None, batch_size=None,
                 update_delta=None, observation_network_update_delta=None, observation_network_buffer_size=None,
                 rollout_after=None, asymmetric_loss_alpha=None, c_parameter=None, value_lr=None,
-                policy_lr=None, obs_lr=None, policy_net=None, value_net=None, observation_net=None, kills_matrix=None):
+                policy_lr=None, obs_lr=None, policy_net=None, value_net=None, observation_net=None, kills_matrix=None, coverage_matrix=None):
         '''
         Execute the prioritizer.
         '''
@@ -122,7 +153,7 @@ class Prioritizer:
         mcts = MCTSAgent(policy_net, value_net, observation_net, self.tests, kills_matrix,
                               self.sut_name, len(self.mutants), buffer_size, batch_size, update_delta,
                                 observation_network_update_delta, observation_network_buffer_size, rollout_after,
-                                asymmetric_loss_alpha, c_parameter, value_lr, policy_lr, obs_lr)
+                                asymmetric_loss_alpha, c_parameter, value_lr, policy_lr, obs_lr, coverage_matrix)
 
         mutant_count = 0
 
@@ -238,10 +269,10 @@ class Prioritizer:
         kills_matrix = {test['test_id']: [] for test in self.tests}
 
         #init neural networks
-        nn_input_size = 1 + 1 + len(self.tests)
+        nn_input_size = 1 + 1 + 1 +len(self.tests)
         value_net = ValueNN(nn_input_size)
         policy_net = PolicyNN(nn_input_size, len(self.tests))
-        observation_net = ObservationNN(nn_input_size + 7)
+        observation_net = ObservationNN(nn_input_size - 1 + 7)
 
         # Execute prioritizer using these hyperparameters
         performance = self.execute(
@@ -260,7 +291,8 @@ class Prioritizer:
             policy_net = policy_net,
             value_net = value_net,
             observation_net = observation_net,
-            kills_matrix = kills_matrix
+            kills_matrix = kills_matrix,
+            coverage_matrix = self.coverage_matrix
         )
 
         # Save results
@@ -306,11 +338,12 @@ class Prioritizer:
 
         return performance[0]  # Return the total number of tests executed as the objective value for minimization
 
-    def launch_experiments_optuna(self):
+    def launch_experiments_optuna(self, coverage_path=None):
         """
         Execute the prioritizer multiple times on the same mutants and tests, with different parameters selected through grid search.
         """
 
+        self.coverage_matrix = self.parse_coverage_matrix(coverage_path)
         study = optuna.create_study(direction="minimize", sampler=optuna.samplers.RandomSampler())
         study.optimize(self.objective, n_trials=500)
 
@@ -355,13 +388,14 @@ if __name__ == '__main__':
     args = parser.parse_args()
     sut_name = args.sut_name
 
+    coverage_path = os.path.join('case_studies', sut_name, 'testMatrix.json')
     test_folder_path = os.path.join('case_studies', sut_name, 'test')
     mutants_path = os.path.join('sumo_results', sut_name, 'mutations.json')
-    prioritizer = Prioritizer(test_folder_path, mutants_path, sut_name, 30, 10)
+    prioritizer = Prioritizer(test_folder_path, mutants_path, sut_name,30, 10)
     print(f"{bcolors.OKBLUE}Executing prioritizer for {sut_name}{bcolors.ENDC}")
     prioritizer.mutants = prioritizer.load_mutants()
     prioritizer.tests = prioritizer.load_tests()
     print(f"{bcolors.OKBLUE}Loaded {len(prioritizer.mutants)} mutants and {len(prioritizer.tests)} tests for {sut_name}{bcolors.ENDC}")
-    prioritizer.launch_experiments_optuna()
+    prioritizer.launch_experiments_optuna(coverage_path)
 
 

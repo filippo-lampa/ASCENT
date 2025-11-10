@@ -65,6 +65,7 @@ class MCTSAgent:
         self.loss_o = None # current loss of the observation network. used to track the training of the network
 
         # Others
+        self.kills_matrix = kills_matrix
         self.tests = tests
         self.sut_name = sut_name
         self.num_actions = len(self.tests)
@@ -88,15 +89,16 @@ class MCTSAgent:
 
     def init_tree(self):
         for i in range(len(self.tests)):
-            initial_state = self.State([i], mutant_operators_list.index(self.mutant["operator"]), i)
+            initial_state = self.State([i], mutant_operators_list.index(self.mutant["operator"]), i, self.kills_matrix[self.mutant["operator"]][self.tests[i]["test_id"]])
             self.tree = self.Node(False, False, None, initial_state, i, self)
             self.root_nodes.append(self.tree)
 
     class State:
-        def __init__(self, test_sequence: list[int], mutant_operator: str, test_index: int = 0):
+        def __init__(self, test_sequence: list[int], mutant_operator: str, test_index: int = 0, num_of_mutants_same_operator_killed: int = 0):
             self.test_sequence = test_sequence
             self.mutant_operator = mutant_operator
             self.test_index = test_index
+            self.num_of_mutants_same_operator_killed = num_of_mutants_same_operator_killed
 
     class Node:
         def __init__(self, done, killed, parent, observation, action_index, mcts_agent):
@@ -173,7 +175,7 @@ class MCTSAgent:
             env_copy.test_sequence.append(action)
 
             mutant_killed_prediction = inference(observation_to_tensor(env_copy, action, self.mcts_agent.num_actions), self.mcts_agent.observation_nn)
-            placeholder_observation = self.mcts_agent.State(env_copy.test_sequence, env_copy.mutant_operator, action)
+            placeholder_observation = self.mcts_agent.State(env_copy.test_sequence, env_copy.mutant_operator, action, env_copy.num_of_mutants_same_operator_killed)
             killed = 1 if mutant_killed_prediction > 1 else 0
             done = True if len(env_copy.test_sequence) == len(self.mcts_agent.tests) else False
 
@@ -233,7 +235,7 @@ class MCTSAgent:
             #fit the chosen node to the current mutant
             next_child.observation = self.mcts_agent.State(next_child.observation.test_sequence,
                                         mutant_operators_list.index(self.mcts_agent.mutant["operator"]),
-                                        next_child.action_index)
+                                        next_child.action_index, self.mcts_agent.kills_matrix[self.mcts_agent.mutant["operator"]][self.mcts_agent.tests[next_child.action_index]["test_id"]])
 
             current.nn_p = masked_probs
 
@@ -315,6 +317,7 @@ class MCTSAgent:
 
         # Execute the test against the mutant
         killed = self.execute_test_on_mutant(self.tests[action], self.mutant)
+        self.kills_matrix[self.mutant["operator"]][self.tests[action]["test_id"]] += killed
 
         # train the observation network
         if (killed == 0 and random.random() < 0.1) or killed == 1:
@@ -323,7 +326,7 @@ class MCTSAgent:
         if len(self.OBSERVATION_KILL_BUFFER) == self.OBSERVATION_BUFFER_SIZE and self.mutant_number % self.OBSERVATION_UPDATE_DELTA == 0:
             self.loss_o = training_model(self.observation_nn, [observation_to_tensor(x[0][0], x[0][1], self.num_actions) for x in self.OBSERVATION_KILL_BUFFER], [torch.FloatTensor([x[1]]) for x in self.OBSERVATION_KILL_BUFFER], self.observation_nn_opt, self.observation_loss_function)
 
-        state = self.State(env.test_sequence, mutant_operators_list.index(self.mutant["operator"]), action)
+        state = self.State(env.test_sequence, mutant_operators_list.index(self.mutant["operator"]), action, env.num_of_mutants_same_operator_killed)
 
         terminal_state = False
         if len(env.test_sequence) == len(self.tests) or killed:
@@ -349,7 +352,7 @@ class MCTSAgent:
             self.tree = self.root_nodes[random.choice(possible_trees_indexes)]
             self.tree.done = False
             initial_state = self.State([self.tree.action_index], mutant_operators_list.index(self.mutant["operator"]),
-                                         self.tree.action_index)
+                                         self.tree.action_index, self.kills_matrix[self.mutant["operator"]][self.tests[self.tree.action_index]["test_id"]])
             # since we are at the root node, we immediately execute the action and get the observation
             _, killed, terminal_state = self.take_step(self.tree.action_index, initial_state)
             self.tree.observation = initial_state

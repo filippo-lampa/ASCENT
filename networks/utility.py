@@ -17,8 +17,9 @@ def observation_to_tensor(obs, action_for_observation=None, total_number_of_test
     test_index_tensor = torch.tensor([obs.test_index], dtype=torch.float32)
     test_sequence_precise_tensor = torch.tensor(identify_test_place_in_sequence(obs.test_sequence, total_number_of_tests), dtype=torch.float32)
     mutant_operator_tensor = torch.tensor([obs.mutant_operator], dtype=torch.float32)
+    num_of_mutants_same_operator_killed_tensor = torch.tensor([obs.num_of_mutants_same_operator_killed], dtype=torch.float32)
     if action_for_observation is None:
-        return torch.cat((test_index_tensor, test_sequence_precise_tensor, mutant_operator_tensor))
+        return torch.cat((test_index_tensor, test_sequence_precise_tensor, mutant_operator_tensor, num_of_mutants_same_operator_killed_tensor))
     return torch.cat((action_tensor, test_sequence_precise_tensor, mutant_operator_tensor)) #used in the observation network to predict if the mutant is killed or not
 
 

@@ -235,13 +235,17 @@ class Prioritizer:
 
         #kills matrix is a dictionary that stores, for each mutant operator, a dictionary containing as keys all the tests, and
         # as entries the number of mutants of that operator that it kills. This is shared across all mutants
-        kills_matrix = {test['test_id']: [] for test in self.tests}
+        kills_matrix = {}
+        for mutant in self.mutants:
+            operator = mutant['operator']
+            if operator not in kills_matrix:
+                kills_matrix[operator] = {test['test_id']: 0 for test in self.tests}
 
         #init neural networks
-        nn_input_size = 1 + 1 + len(self.tests)
+        nn_input_size = 1 + 1 + 1 + len(self.tests)
         value_net = ValueNN(nn_input_size)
         policy_net = PolicyNN(nn_input_size, len(self.tests))
-        observation_net = ObservationNN(nn_input_size + 7)
+        observation_net = ObservationNN(nn_input_size + 6)
 
         # Execute prioritizer using these hyperparameters
         performance = self.execute(

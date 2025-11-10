@@ -102,7 +102,7 @@ class Prioritizer:
     def execute(self, execution_id=0, parameters_set_id=0, buffer_size=None, batch_size=None,
                 update_delta=None, observation_network_update_delta=None, observation_network_buffer_size=None,
                 rollout_after=None, asymmetric_loss_alpha=None, c_parameter=None, value_lr=None,
-                policy_lr=None, obs_lr=None, policy_net=None, value_net=None, observation_net=None, kills_matrix=None):
+                policy_lr=None, obs_lr=None, policy_net=None, value_net=None, observation_net=None, variance_matrix=None):
         '''
         Execute the prioritizer.
         '''
@@ -119,7 +119,7 @@ class Prioritizer:
         (rewards, moving_average, v_losses, p_losses, o_losses, moving_average_v_losses, moving_average_p_losses,
          moving_average_o_losses) = [[] for _ in range(8)]
 
-        mcts = MCTSAgent(policy_net, value_net, observation_net, self.tests, kills_matrix,
+        mcts = MCTSAgent(policy_net, value_net, observation_net, self.tests, variance_matrix,
                               self.sut_name, len(self.mutants), buffer_size, batch_size, update_delta,
                                 observation_network_update_delta, observation_network_buffer_size, rollout_after,
                                 asymmetric_loss_alpha, c_parameter, value_lr, policy_lr, obs_lr)
@@ -233,15 +233,18 @@ class Prioritizer:
             else:
                 params[name] = defaults[name]
 
-        #kills matrix is a dictionary that stores, for each mutant operator, a dictionary containing as keys all the tests, and
-        # as entries the number of mutants of that operator that it kills. This is shared across all mutants
-        kills_matrix = {test['test_id']: [] for test in self.tests}
+        '''
+        Initialize variance matrix. Since the formula to compute the variance is defined as:
+        variance = (sum((x - mean)^2)) / N
+        We need to store all the rewards obtained for each (mutant, test) pair to compute the variance.
+        '''
+        variance_matrix = {mutant['operator']: {test['test_id']: [] for test in self.tests} for mutant in self.mutants}
 
         #init neural networks
-        nn_input_size = 1 + 1 + len(self.tests)
+        nn_input_size = 1 + 1 + 1 + len(self.tests)
         value_net = ValueNN(nn_input_size)
         policy_net = PolicyNN(nn_input_size, len(self.tests))
-        observation_net = ObservationNN(nn_input_size + 7)
+        observation_net = ObservationNN(nn_input_size - 1 + 7)
 
         # Execute prioritizer using these hyperparameters
         performance = self.execute(
@@ -260,7 +263,7 @@ class Prioritizer:
             policy_net = policy_net,
             value_net = value_net,
             observation_net = observation_net,
-            kills_matrix = kills_matrix
+            variance_matrix = variance_matrix,
         )
 
         # Save results

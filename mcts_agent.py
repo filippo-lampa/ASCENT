@@ -29,7 +29,7 @@ class AsymmetricLoss(nn.Module):
 
 class MCTSAgent:
 
-    def __init__(self, policy_nn=None, value_nn=None, observation_nn=None, tests=None, kills_matrix=None,
+    def __init__(self, policy_nn=None, value_nn=None, observation_nn=None, tests=None, variance_matrix=None,
                  sut_name=None, number_of_mutants=None, buffer_size=None, batch_size=None, update_delta=None,
                  observation_update_delta=None, observation_buffer_size=None, rollout_after=None,
                  asymmetric_loss_alpha=None, c_parameter=None, value_network_learning_rate=None,
@@ -72,6 +72,7 @@ class MCTSAgent:
         self.kills_ranking = {test: 0 for test in range(len(self.tests))} # kills ranking of the tests, used as heuristic until we start relying on the networks
         self.done = False # Checks if the episode is done (the mutant is killed or we run out of tests)
         self.current_sut_tests_execution_time = 0
+        self.variance_matrix = variance_matrix
 
         # Mutant-related stuff
         self.mutant_number = None  # number of the current mutant in the prioritization execution
@@ -88,15 +89,24 @@ class MCTSAgent:
 
     def init_tree(self):
         for i in range(len(self.tests)):
-            initial_state = self.State([i], mutant_operators_list.index(self.mutant["operator"]), i)
+            initial_state = self.State([i], mutant_operators_list.index(self.mutant["operator"]), i, self.calculate_bernoulli_variance(i))
             self.tree = self.Node(False, False, None, initial_state, i, self)
             self.root_nodes.append(self.tree)
 
+    def calculate_bernoulli_variance(self, test_index):
+        average_outcome = 0.0
+        if len(self.variance_matrix[self.mutant["operator"]][self.tests[test_index]['test_id']]) > 0:
+            average_outcome = np.mean(
+                self.variance_matrix[self.mutant["operator"]][self.tests[test_index]['test_id']])
+        bernoulli_variance = average_outcome * (1 - average_outcome)
+        return bernoulli_variance
+
     class State:
-        def __init__(self, test_sequence: list[int], mutant_operator: str, test_index: int = 0):
+        def __init__(self, test_sequence: list[int], mutant_operator: str, test_index: int = 0, variance: float = 0.0):
             self.test_sequence = test_sequence
             self.mutant_operator = mutant_operator
             self.test_index = test_index
+            self.variance = variance
 
     class Node:
         def __init__(self, done, killed, parent, observation, action_index, mcts_agent):
@@ -173,7 +183,7 @@ class MCTSAgent:
             env_copy.test_sequence.append(action)
 
             mutant_killed_prediction = inference(observation_to_tensor(env_copy, action, self.mcts_agent.num_actions), self.mcts_agent.observation_nn)
-            placeholder_observation = self.mcts_agent.State(env_copy.test_sequence, env_copy.mutant_operator, action)
+            placeholder_observation = self.mcts_agent.State(env_copy.test_sequence, env_copy.mutant_operator, action, self.mcts_agent.calculate_bernoulli_variance(action))
             killed = 1 if mutant_killed_prediction > 1 else 0
             done = True if len(env_copy.test_sequence) == len(self.mcts_agent.tests) else False
 
@@ -233,7 +243,7 @@ class MCTSAgent:
             #fit the chosen node to the current mutant
             next_child.observation = self.mcts_agent.State(next_child.observation.test_sequence,
                                         mutant_operators_list.index(self.mcts_agent.mutant["operator"]),
-                                        next_child.action_index)
+                                        next_child.action_index, next_child.observation.variance)
 
             current.nn_p = masked_probs
 
@@ -316,6 +326,8 @@ class MCTSAgent:
         # Execute the test against the mutant
         killed = self.execute_test_on_mutant(self.tests[action], self.mutant)
 
+        self.variance_matrix[self.mutant["operator"]][self.tests[action]["test_id"]].append(killed)
+
         # train the observation network
         if (killed == 0 and random.random() < 0.1) or killed == 1:
             self.OBSERVATION_KILL_BUFFER.append([(env, action), killed])
@@ -323,7 +335,7 @@ class MCTSAgent:
         if len(self.OBSERVATION_KILL_BUFFER) == self.OBSERVATION_BUFFER_SIZE and self.mutant_number % self.OBSERVATION_UPDATE_DELTA == 0:
             self.loss_o = training_model(self.observation_nn, [observation_to_tensor(x[0][0], x[0][1], self.num_actions) for x in self.OBSERVATION_KILL_BUFFER], [torch.FloatTensor([x[1]]) for x in self.OBSERVATION_KILL_BUFFER], self.observation_nn_opt, self.observation_loss_function)
 
-        state = self.State(env.test_sequence, mutant_operators_list.index(self.mutant["operator"]), action)
+        state = self.State(env.test_sequence, mutant_operators_list.index(self.mutant["operator"]), action, self.calculate_bernoulli_variance(action))
 
         terminal_state = False
         if len(env.test_sequence) == len(self.tests) or killed:
@@ -348,8 +360,10 @@ class MCTSAgent:
             possible_trees_indexes = [i for i, x in enumerate(scores) if x == max(scores)]
             self.tree = self.root_nodes[random.choice(possible_trees_indexes)]
             self.tree.done = False
+
             initial_state = self.State([self.tree.action_index], mutant_operators_list.index(self.mutant["operator"]),
-                                         self.tree.action_index)
+                                         self.tree.action_index, self.calculate_bernoulli_variance(self.tree.action_index))
+
             # since we are at the root node, we immediately execute the action and get the observation
             _, killed, terminal_state = self.take_step(self.tree.action_index, initial_state)
             self.tree.observation = initial_state

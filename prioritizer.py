@@ -31,7 +31,7 @@ class Prioritizer:
         self.average_delta = average_delta
         self.mutants = None
         self.tests = None
-        self.execution_id = 0,
+        self.execution_id = 0
         self.results_file_name = results_file_name
         self.best_params_file_name = best_params_file_name
 
@@ -311,7 +311,7 @@ class Prioritizer:
         """
 
         study = optuna.create_study(direction="minimize", sampler=optuna.samplers.RandomSampler())
-        study.optimize(self.objective, n_trials=500)
+        study.optimize(self.objective, n_trials=200)
 
         #print best parameters for the SUT in the best_params file in the experiments folder
         print("Best parameters:", study.best_params)

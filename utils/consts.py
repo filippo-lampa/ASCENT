@@ -18,8 +18,8 @@ baseline_results_per_project = {
     "thorwallet_baseline_total_tests_executed_on_killable_mutants": 484
 }
 suts_names = [
-    "thorwallet",
-    #"nextgeneration",
+    #"thorwallet",
+    "nextgeneration",
     #"quadrata",
     #"secondswap",
     #"bakerfi"

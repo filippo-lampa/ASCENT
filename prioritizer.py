@@ -190,16 +190,15 @@ class Prioritizer:
 
     def objective(self, trial):
 
-        # Choose 2 out of 4 parameters to tune in this trial
-        all_params = ['c_parameter', 'batch_size', 'asymmetric_loss_alpha', 'rollout_after', 'observation_network_buffer_size',
-                      'observation_network_update_delta', 'update_delta', 'buffer_size']
+        all_params = ['c_parameter', 'asymmetric_loss_alpha', 'rollout_after', 'observation_network_buffer_size',
+                      'observation_network_update_delta', 'update_delta', 'buffer_size', 'batch_size']
 
-        chosen = trial.suggest_categorical("chosen_params", list(itertools.combinations(all_params, 2)))
+        chosen = trial.suggest_categorical("chosen_params", list(itertools.combinations(all_params, 7)))
 
         params = {
             'value_network_learning_rate': 0.001,
             'policy_network_learning_rate': 0.0001,
-            'observation_network_learning_rate': 0.001
+            'observation_network_learning_rate': 0.001,
         }
 
         defaults = {
@@ -216,19 +215,21 @@ class Prioritizer:
         for name in all_params:
             if name in chosen:
                 if name == 'c_parameter':
-                    params[name] = trial.suggest_float(name, 0.1, 5.0)
+                    params[name] = trial.suggest_categorical(name, [0.1, 1.0, 2.0, 3.0, 5.0])
                 elif name == 'batch_size':
-                    params[name] = trial.suggest_categorical(name, [16, 32, 40, 64, 128, 256, 512])
+                    params[name] = trial.suggest_categorical(name, [16, 32, 40, 64, 128])
                 elif name == 'asymmetric_loss_alpha':
-                    params[name] = trial.suggest_float(name, 1.0, 10.0)
+                    params[name] = trial.suggest_categorical(name, [1.0, 3.25, 5.5, 7.75, 10.0])
                 elif name == 'rollout_after':
-                    params[name] = trial.suggest_int(name, 0, 100)
+                    params[name] = trial.suggest_categorical(name, [0, 25, 50, 75, 100])
                 elif name == 'observation_network_buffer_size':
-                    params[name] = trial.suggest_int(name, 5, 50)
+                    params[name] = trial.suggest_categorical(name, [5, 15, 25, 35, 50])
                 elif name == 'observation_network_update_delta':
-                    params[name] = trial.suggest_int(name, 1, 10)
+                    params[name] = trial.suggest_categorical(name, [1, 3, 5, 7, 10])
                 elif name == 'update_delta':
-                    params[name] = trial.suggest_int(name, 1, 10)
+                    params[name] = trial.suggest_categorical(name, [1, 3, 5, 7, 10])
+                elif name == 'buffer_size':
+                    params[name] = trial.suggest_categorical(name, [int(len(self.mutants) * factor) for factor in [0.2, 0.4, 0.6, 0.8, 1.0]])
             else:
                 params[name] = defaults[name]
 

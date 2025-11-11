@@ -24,7 +24,7 @@ class Prioritizer:
     For each mutant in a set of mutants, the prioritizer will learn to execute the tests in a
     way that maximizes the chance to kill the mutant as soon as possible.
     '''
-    def __init__(self, tests_folder_path, mutants_path, sut_name, plot_delta, average_delta):
+    def __init__(self, tests_folder_path, mutants_path, sut_name, plot_delta, average_delta, results_file_name, best_params_file_name):
         self.tests_folder_path = tests_folder_path
         self.mutants_path = mutants_path
         self.sut_name = sut_name
@@ -34,6 +34,8 @@ class Prioritizer:
         self.tests = None
         self.execution_id = 0
         self.parameters_set_id = 0
+        self.results_file_name = results_file_name
+        self.best_params_file_name = best_params_file_name
 
     def load_mutants(self):
         '''
@@ -295,7 +297,7 @@ class Prioritizer:
         }
 
         #update results json file
-        with open('experiments/results.json', 'r+') as f:
+        with open('experiments/' + self.results_file_name, 'r+') as f:
             results = json.load(f)
             results['executions'].append(result)
             f.seek(0)
@@ -316,11 +318,11 @@ class Prioritizer:
 
         #print best parameters for the SUT in the best_params file in the experiments folder
         print("Best parameters:", study.best_params)
-        with open('experiments/best_params.json', 'w') as f:
+        with open('experiments/' + self.best_params_file_name, 'w') as f:
             json.dump(study.best_params, f, indent=4)
 
         # retrieve the relative execution from the json (check the entry with the same parameters and return its execution id)
-        with open('experiments/results.json', 'r') as f:
+        with open('experiments/' + self.results_file_name, 'r') as f:
             results = json.load(f)
             executions = results.get("executions", [])
             for execution in executions:
@@ -336,7 +338,26 @@ if __name__ == '__main__':
     if not os.path.exists('experiments'):
         os.makedirs('experiments')
 
-    with open('experiments/results.json', 'w') as f:
+
+    next_experiment_id = 0
+    if os.path.exists('experiments/results.json'):
+        existing_files = [f for f in os.listdir('experiments') if f.startswith('results')]
+    experiment_ids = [int(re.search(r'results_(\d+)\.json', f).group(1)) for f in existing_files if
+                      re.search(r'results_(\d+)\.json', f)]
+    next_experiment_id = max(experiment_ids) + 1 if experiment_ids else 1
+
+    results_file_name = 'results.json' if next_experiment_id == 0 else f'results_{next_experiment_id}.json'
+
+    next_best_params_id = 0
+    if os.path.exists('experiments/best_params.json'):
+        existing_files = [f for f in os.listdir('experiments') if f.startswith('best_params')]
+    best_params_ids = [int(re.search(r'best_params_(\d+)\.json', f).group(1)) for f in existing_files if
+                       re.search(r'best_params_(\d+)\.json', f)]
+    next_best_params_id = max(best_params_ids) + 1 if best_params_ids else 1
+
+    best_params_file_name = 'best_params.json' if next_best_params_id == 0 else f'best_params_{next_best_params_id}.json'
+
+    with open('experiments/' + results_file_name, 'w') as f:
         json.dump({"executions": []}, f, indent=4)
 
     #empty the experiments/plots folder
@@ -357,7 +378,7 @@ if __name__ == '__main__':
 
     test_folder_path = os.path.join('case_studies', sut_name, 'test')
     mutants_path = os.path.join('sumo_results', sut_name, 'mutations.json')
-    prioritizer = Prioritizer(test_folder_path, mutants_path, sut_name, 30, 10)
+    prioritizer = Prioritizer(test_folder_path, mutants_path, sut_name, 30, 10, results_file_name, best_params_file_name)
     print(f"{bcolors.OKBLUE}Executing prioritizer for {sut_name}{bcolors.ENDC}")
     prioritizer.mutants = prioritizer.load_mutants()
     prioritizer.tests = prioritizer.load_tests()

@@ -309,7 +309,7 @@ class Prioritizer:
         Execute the prioritizer multiple times on the same mutants and tests, with different parameters selected through grid search.
         """
 
-        study = optuna.create_study(direction="minimize")
+        study = optuna.create_study(direction="minimize", sampler=optuna.samplers.RandomSampler())
         study.optimize(self.objective, n_trials=500)
 
         #print best parameters for the SUT in the best_params file in the experiments folder

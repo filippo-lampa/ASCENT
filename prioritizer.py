@@ -374,18 +374,18 @@ if __name__ == '__main__':
     next_experiment_id = 0
     if os.path.exists('experiments/results.json'):
         existing_files = [f for f in os.listdir('experiments') if f.startswith('results')]
-    experiment_ids = [int(re.search(r'results_(\d+)\.json', f).group(1)) for f in existing_files if
+        experiment_ids = [int(re.search(r'results_(\d+)\.json', f).group(1)) for f in existing_files if
                       re.search(r'results_(\d+)\.json', f)]
-    next_experiment_id = max(experiment_ids) + 1 if experiment_ids else 1
+        next_experiment_id = max(experiment_ids) + 1 if experiment_ids else 1
 
     results_file_name = 'results.json' if next_experiment_id == 0 else f'results_{next_experiment_id}.json'
 
     next_best_params_id = 0
     if os.path.exists('experiments/best_params.json'):
         existing_files = [f for f in os.listdir('experiments') if f.startswith('best_params')]
-    best_params_ids = [int(re.search(r'best_params_(\d+)\.json', f).group(1)) for f in existing_files if
+        best_params_ids = [int(re.search(r'best_params_(\d+)\.json', f).group(1)) for f in existing_files if
                        re.search(r'best_params_(\d+)\.json', f)]
-    next_best_params_id = max(best_params_ids) + 1 if best_params_ids else 1
+        next_best_params_id = max(best_params_ids) + 1 if best_params_ids else 1
 
     best_params_file_name = 'best_params.json' if next_best_params_id == 0 else f'best_params_{next_best_params_id}.json'
 

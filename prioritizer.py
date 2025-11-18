@@ -329,6 +329,79 @@ class Prioritizer:
             else:
                 print("No matching execution found for the best parameters.")
 
+    def launch_single_prioritization(self):
+        """
+        Execute the prioritizer once on the same mutants and tests, with the default parameters. Then print the results.
+        The default parameters are the followings:
+                params = {
+            'value_network_learning_rate': 0.001,
+            'policy_network_learning_rate': 0.0001,
+            'observation_network_learning_rate': 0.001,
+        }
+
+        defaults = {
+            'c_parameter': 1.0,
+            'batch_size': 40,
+            'asymmetric_loss_alpha': 6.0,
+            'rollout_after': 45,
+            'observation_network_buffer_size': 10,
+            'observation_network_update_delta': 1,
+            'update_delta': 1,
+            'buffer_size': len(self.mutants)
+        }
+        """
+        params = {
+            'value_network_learning_rate': 0.001,
+            'policy_network_learning_rate': 0.0001,
+            'observation_network_learning_rate': 0.001,
+            'c_parameter': 1.0,
+            'batch_size': 40,
+            'asymmetric_loss_alpha': 6.0,
+            'rollout_after': 45,
+            'observation_network_buffer_size': 10,
+            'observation_network_update_delta': 1,
+            'update_delta': 1,
+            'buffer_size': len(self.mutants)
+        }
+
+        #kills matrix is a dictionary that stores, for each test, the mutants that it kills. This is shared across all mutants
+        kills_matrix = {test['test_id']: [] for test in self.tests}
+
+        #init neural networks
+        nn_input_size = 1 + 1 + len(self.tests)
+        value_net = ValueNN(nn_input_size)
+        policy_net = PolicyNN(nn_input_size, len(self.tests))
+        observation_net = ObservationNN(nn_input_size + 7)
+
+        # Execute prioritizer using these hyperparameters
+        performance = self.execute(
+            execution_id = self.execution_id,
+            buffer_size = params['buffer_size'],
+            batch_size = params['batch_size'],
+            update_delta = params['update_delta'],
+            observation_network_update_delta = params['observation_network_update_delta'],
+            observation_network_buffer_size = params['observation_network_buffer_size'],
+            rollout_after = params['rollout_after'],
+            asymmetric_loss_alpha = params['asymmetric_loss_alpha'],
+            c_parameter = params['c_parameter'],
+            value_lr = params['value_network_learning_rate'],
+            policy_lr = params['policy_network_learning_rate'],
+            obs_lr = params['observation_network_learning_rate'],
+            policy_net = policy_net,
+            value_net = value_net,
+            observation_net = observation_net,
+            kills_matrix = kills_matrix
+        )
+
+        print(f"{bcolors.OKGREEN}Single prioritization execution completed for SUT {self.sut_name}.{bcolors.ENDC}")
+        print(f"Total tests executed: {performance[0]}")
+        print(f"Total tests executed on killable mutants: {performance[1]}")
+        print(f"Execution time (ms): {performance[10]}")
+        print(f"Tests execution time (ms): {performance[11]}")
+        print(f"Total execution time (ms): {performance[10] + performance[11]}")
+
+
+
 if __name__ == '__main__':
 
     print(f"{bcolors.HEADER}Launching experiments...{bcolors.ENDC}")
@@ -377,4 +450,15 @@ if __name__ == '__main__':
         print(f"{bcolors.OKBLUE}Loaded {len(prioritizer.mutants)} mutants and {len(prioritizer.tests)} tests for {sut_name}{bcolors.ENDC}")
         prioritizer.launch_experiments()
 
+    '''
+    sut_name = "thorwallet"
+    test_folder_path = os.path.join('case_studies', sut_name, 'test')
+    mutants_path = os.path.join('sumo_results', sut_name, 'mutations.json')
+    prioritizer = Prioritizer(test_folder_path, mutants_path, sut_name, 30, 10, results_file_name, best_params_file_name)
+    print(f"{bcolors.OKBLUE}Executing single prioritization for {sut_name}{bcolors.ENDC}")
+    prioritizer.mutants = prioritizer.load_mutants()
+    prioritizer.tests = prioritizer.load_tests()
+    print(f"{bcolors.OKBLUE}Loaded {len(prioritizer.mutants)} mutants and {len(prioritizer.tests)} tests for {sut_name}{bcolors.ENDC}")
+    prioritizer.launch_single_prioritization()
+    '''
 

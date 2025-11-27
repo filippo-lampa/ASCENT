@@ -104,89 +104,61 @@ class Prioritizer:
     def execute(self, execution_id=0, parameters_set_id=0, buffer_size=None, batch_size=None,
                 update_delta=None, observation_network_update_delta=None, observation_network_buffer_size=None,
                 rollout_after=None, asymmetric_loss_alpha=None, c_parameter=None, value_lr=None,
-                policy_lr=None, obs_lr=None, policy_net=None, value_net=None, observation_net=None, kills_matrix=None):
+                policy_lr=None, obs_lr=None, policy_net=None, value_net=None, observation_net=None,
+                kills_matrix=None, inference_batch_size=128, window_size=32):
         '''
-        Execute the prioritizer.
+        Execute the prioritizer on all mutants.
+
+        Parameters:
+        - window_size: Number of mutants to process concurrently before batching inferences
+        - inference_batch_size: Maximum number of inference requests to process at once (GPU memory limit)
         '''
 
-        print(f"{bcolors.OKBLUE}Starting prioritization{bcolors.ENDC}")
+        print(f"{bcolors.OKBLUE}Starting prioritization for {len(self.mutants)} mutants{bcolors.ENDC}")
+        print(f"{bcolors.OKBLUE}Window size: {window_size} mutants{bcolors.ENDC}")
+        print(f"{bcolors.OKBLUE}Inference batch size: {inference_batch_size} requests{bcolors.ENDC}")
 
-        sut_tests_execution_time = 0
-        total_number_of_tests_executed = 0
-        number_of_tests_executed_on_killable_mutants = 0
-
-        #get start time in milliseconds
         start_time = round(time.time() * 1000)
 
-        (rewards, moving_average, v_losses, p_losses, o_losses, moving_average_v_losses, moving_average_p_losses,
-         moving_average_o_losses) = [[] for _ in range(8)]
-
+        # Initialize MCTS agent
         mcts = MCTSAgent(policy_net, value_net, observation_net, self.tests, kills_matrix,
-                              self.sut_name, len(self.mutants), buffer_size, batch_size, update_delta,
-                                observation_network_update_delta, observation_network_buffer_size, rollout_after,
-                                asymmetric_loss_alpha, c_parameter, value_lr, policy_lr, obs_lr)
+                        self.sut_name, len(self.mutants), buffer_size, batch_size, update_delta,
+                        observation_network_update_delta, observation_network_buffer_size, rollout_after,
+                        asymmetric_loss_alpha, c_parameter, value_lr, policy_lr, obs_lr,
+                        inference_batch_size, window_size)
 
-        mutant_count = 0
+        # Run on all mutants - MCTS handles parallelization internally
+        (avg_reward, v_loss, p_loss, o_loss, num_tests_executed, num_tests_on_killable,
+         networks_update_freq, sut_tests_execution_time) = mcts.run(self.mutants)
 
-        for index,mutant in enumerate(self.mutants):
+        # Prepare results
+        rewards = [avg_reward]
+        moving_average = [avg_reward]
+        v_losses = [v_loss] if v_loss is not None else []
+        p_losses = [p_loss] if p_loss is not None else []
+        o_losses = [o_loss] if o_loss is not None else []
+        moving_average_v_losses = [v_loss] if v_loss is not None else []
+        moving_average_p_losses = [p_loss] if p_loss is not None else []
+        moving_average_o_losses = [o_loss] if o_loss is not None else []
 
-            mutant_count += 1
+        print(f"{bcolors.OKGREEN}Total tests executed: {num_tests_executed}{bcolors.ENDC}")
+        print(f"{bcolors.OKGREEN}Tests executed on killable mutants: {num_tests_on_killable}{bcolors.ENDC}")
 
-            no_test_killing = True
-            if len(mutant[
-                       "testResults"]) > 0:  # for test purposes, we remove the rewards of the mutants that are not killed by any test
-                for test_file in mutant["testResults"]:
-                    if len(mutant["testResults"][test_file]["failed"]) > 0:
-                        no_test_killing = False
-                        break
+        # Plot results
+        if not os.path.exists('experiments/plots'):
+            os.makedirs('experiments/plots')
 
-            print(f"{bcolors.HEADER}Processing mutant {index} ({mutant['id']}) out of {len(self.mutants)}{bcolors.ENDC}")
+        plot_mutant_prioritization_results(rewards, moving_average, moving_average_v_losses, moving_average_p_losses,
+                                           moving_average_o_losses, networks_update_freq, self.average_delta,
+                                           self.sut_name, should_save=True, save_path='experiments/plots',
+                                           execution_id=execution_id, parameters_set_id=parameters_set_id)
 
-            (reward, v_loss, p_loss, o_loss, number_of_tests_executed, number_of_tests_executed_on_killable_mutants,
-             networks_update_freq, current_sut_tests_execution_time) = mcts.run(mutant, mutant_count, no_test_killing)
-
-            sut_tests_execution_time += current_sut_tests_execution_time
-
-            if not no_test_killing:
-                rewards.append(reward)
-                moving_average.append(np.mean(rewards))
-            if o_loss is not None:
-                o_losses.append(o_loss)
-                moving_average_o_losses.append(np.mean(o_losses))
-            if v_loss is not None:
-                v_losses.append(v_loss)
-                moving_average_v_losses.append(np.mean(v_losses))
-            if p_loss is not None:
-                p_losses.append(p_loss)
-                moving_average_p_losses.append(np.mean(p_losses))
-            total_number_of_tests_executed = number_of_tests_executed
-
-            print(f"{bcolors.OKGREEN}Total number of tests executed so far: {total_number_of_tests_executed}{bcolors.ENDC}")
-            print(f"{bcolors.OKGREEN}Total number of tests executed on killable mutants so far: "
-                  f"{number_of_tests_executed_on_killable_mutants}{bcolors.ENDC}")
-
-            """
-            Uncomment the following lines to plot the results every 'plot_delta' mutants.
-            if (index + 1) % self.plot_delta == 0:
-                plot_mutant_prioritization_results(rewards, moving_average, moving_average_v_losses, moving_average_p_losses,
-                                                   moving_average_o_losses, networks_update_freq, self.average_delta,
-                                                   self.sut_name)
-            """
-
-            if index == len(self.mutants) - 1:
-                if not os.path.exists('experiments/plots'):
-                    os.makedirs('experiments/plots')
-
-                plot_mutant_prioritization_results(rewards, moving_average, moving_average_v_losses, moving_average_p_losses,
-                                                   moving_average_o_losses, networks_update_freq, self.average_delta,
-                                                   self.sut_name, should_save=True, save_path='experiments/plots',
-                                                   execution_id=execution_id, parameters_set_id=parameters_set_id)
         end_time = round(time.time() * 1000)
-
         execution_time = end_time - start_time
-        print(f"{bcolors.OKGREEN}Execution time: {round(execution_time, 2)} seconds{bcolors.ENDC}")
 
-        return (total_number_of_tests_executed, number_of_tests_executed_on_killable_mutants, rewards, moving_average,
+        print(f"{bcolors.OKGREEN}Execution time: {execution_time} milliseconds{bcolors.ENDC}")
+
+        return (num_tests_executed, num_tests_on_killable, rewards, moving_average,
                 v_losses, p_losses, o_losses, moving_average_v_losses, moving_average_p_losses, moving_average_o_losses,
                 execution_time, sut_tests_execution_time)
 
@@ -245,24 +217,27 @@ class Prioritizer:
         policy_net = PolicyNN(nn_input_size, len(self.tests))
         observation_net = ObservationNN(nn_input_size + 7)
 
-        # Execute prioritizer using these hyperparameters
+        # Execute prioritizer
         performance = self.execute(
-            execution_id = self.execution_id,
-            buffer_size = params['buffer_size'],
-            batch_size = params['batch_size'],
-            update_delta = params['update_delta'],
-            observation_network_update_delta = params['observation_network_update_delta'],
-            observation_network_buffer_size = params['observation_network_buffer_size'],
-            rollout_after = params['rollout_after'],
-            asymmetric_loss_alpha = params['asymmetric_loss_alpha'],
-            c_parameter = params['c_parameter'],
-            value_lr = params['value_network_learning_rate'],
-            policy_lr = params['policy_network_learning_rate'],
-            obs_lr = params['observation_network_learning_rate'],
-            policy_net = policy_net,
-            value_net = value_net,
-            observation_net = observation_net,
-            kills_matrix = kills_matrix
+            execution_id=self.execution_id,
+            parameters_set_id=self.parameters_set_id,
+            buffer_size=params['buffer_size'],
+            batch_size=params['batch_size'],
+            update_delta=params['update_delta'],
+            observation_network_update_delta=params['observation_network_update_delta'],
+            observation_network_buffer_size=params['observation_network_buffer_size'],
+            rollout_after=params['rollout_after'],
+            asymmetric_loss_alpha=params['asymmetric_loss_alpha'],
+            c_parameter=params['c_parameter'],
+            value_lr=params['value_network_learning_rate'],
+            policy_lr=params['policy_network_learning_rate'],
+            obs_lr=params['observation_network_learning_rate'],
+            policy_net=policy_net,
+            value_net=value_net,
+            observation_net=observation_net,
+            kills_matrix=kills_matrix,
+            inference_batch_size=128,  # GPU memory limit
+            window_size=32  # Process 32 mutants before batching
         )
 
         # Save results
@@ -332,6 +307,45 @@ class Prioritizer:
             else:
                 print("No matching execution found for the best parameters.")
 
+    def launch_single_experiment_default_params(self):
+        """
+        Execute the prioritizer once on the same mutants and tests, with default parameters.
+        """
+
+        #kills matrix is a dictionary that stores, for each mutant operator, a dictionary containing as keys all the tests, and
+        # as entries the number of mutants of that operator that it kills. This is shared across all mutants
+        kills_matrix = {test['test_id']: [] for test in self.tests}
+
+        #init neural networks
+        nn_input_size = 1 + 1 + len(self.tests)
+        value_net = ValueNN(nn_input_size)
+        policy_net = PolicyNN(nn_input_size, len(self.tests))
+        observation_net = ObservationNN(nn_input_size + 7)
+
+        # Execute prioritizer with windowing
+        self.execute(
+            execution_id=self.execution_id,
+            parameters_set_id=self.parameters_set_id,
+            buffer_size=len(self.mutants),
+            batch_size=40,
+            update_delta=1,
+            observation_network_update_delta=1,
+            observation_network_buffer_size=10,
+            rollout_after=45,
+            asymmetric_loss_alpha=6.0,
+            c_parameter=1.0,
+            value_lr=0.001,
+            policy_lr=0.0001,
+            obs_lr=0.001,
+            policy_net=policy_net,
+            value_net=value_net,
+            observation_net=observation_net,
+            kills_matrix=kills_matrix,
+            inference_batch_size=128,  # GPU memory limit - process up to 128 inference requests at once
+            window_size=32  # Process 32 mutants concurrently before running inference batch
+        )
+
+
 
 if __name__ == '__main__':
 
@@ -383,6 +397,4 @@ if __name__ == '__main__':
     prioritizer.mutants = prioritizer.load_mutants()
     prioritizer.tests = prioritizer.load_tests()
     print(f"{bcolors.OKBLUE}Loaded {len(prioritizer.mutants)} mutants and {len(prioritizer.tests)} tests for {sut_name}{bcolors.ENDC}")
-    prioritizer.launch_experiments_optuna()
-
-
+    prioritizer.launch_single_experiment_default_params()

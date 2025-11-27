@@ -1,3 +1,10 @@
+import threading
+import queue
+from enum import Enum
+from dataclasses import dataclass
+from typing import Optional, List, Tuple, Dict, Any
+import time
+
 import numpy as np
 
 from copy import deepcopy
@@ -12,19 +19,259 @@ from replay_buffer import ReplayBuffer
 from networks.utility import inference, training_model, observation_to_tensor
 from utils.consts import mutant_operators_list
 
+
+class InferenceType(Enum):
+    VALUE = "value"
+    POLICY = "policy"
+    OBSERVATION = "observation"
+
+
+@dataclass
+class InferenceRequest:
+    mutant_id: int
+    inference_type: InferenceType
+    observation: Any
+    action: Optional[int] = None
+    node_id: Optional[int] = None
+
+
+@dataclass
+class SearchContext:
+    mutant_id: int
+    mutant: Dict
+    mutant_not_killable: bool
+    current_node: Any
+    step: int
+    obs_history: List
+    ps_history: List
+    p_obs_history: List
+    reward_e: float
+    done: bool
+    waiting_for_inference: bool
+    pending_inference_type: Optional[InferenceType] = None
+    pending_action: Optional[int] = None
+
+
+class InferenceManager:
+
+    def __init__(self, mcts_agent, inference_batch_size, window_size):
+        self.mcts_agent = mcts_agent
+        self.inference_batch_size = inference_batch_size
+        self.window_size = window_size
+
+        # Buffer for pending requests (max size = total mutants)
+        self.pending_requests = []
+        self.requests_lock = threading.Lock()
+
+        # Results storage
+        self.result_dict = {}
+        self.result_lock = threading.Lock()
+
+        # Thread control
+        self.running = True
+        self.trigger_event = threading.Event()
+        self.mutants_processed_count = 0
+        self.count_lock = threading.Lock()
+
+        # Start inference thread
+        self.worker_thread = threading.Thread(target=self._worker, daemon=True)
+        self.worker_thread.start()
+        print("[InferenceManager] Thread started")
+
+    def request_inference(self, request: InferenceRequest):
+        with self.requests_lock:
+            self.pending_requests.append(request)
+
+    def increment_mutant_count(self):
+        with self.count_lock:
+            self.mutants_processed_count += 1
+            if self.mutants_processed_count >= self.window_size:
+                self.mutants_processed_count = 0
+                self.trigger_event.set()
+
+    def get_result(self, mutant_id: int, inference_type: InferenceType):
+        with self.result_lock:
+            if mutant_id in self.result_dict and inference_type in self.result_dict[mutant_id]:
+                result = self.result_dict[mutant_id].pop(inference_type)
+                if not self.result_dict[mutant_id]:
+                    del self.result_dict[mutant_id]
+                return result
+        return None
+
+    def has_result(self, mutant_id: int, inference_type: InferenceType) -> bool:
+        with self.result_lock:
+            return mutant_id in self.result_dict and inference_type in self.result_dict[mutant_id]
+
+    def _worker(self):
+        while self.running:
+            # Wait for trigger or timeout
+            triggered = self.trigger_event.wait(timeout=0.5)
+
+            if not triggered and self.running:
+                # Check if there are pending requests anyway
+                with self.requests_lock:
+                    has_pending = len(self.pending_requests) > 0
+
+                if not has_pending:
+                    continue
+
+            self.trigger_event.clear()
+
+            # Get all pending requests
+            with self.requests_lock:
+                if not self.pending_requests:
+                    continue
+
+                batch = self.pending_requests.copy()
+                self.pending_requests.clear()
+
+            print(f"[InferenceManager] Processing {len(batch)} requests")
+            self._process_batch(batch)
+
+    def _process_batch(self, batch: List[InferenceRequest]):
+        """Process batch of requests."""
+        # Group by type
+        by_type = {InferenceType.VALUE: [], InferenceType.POLICY: [], InferenceType.OBSERVATION: []}
+        for req in batch:
+            by_type[req.inference_type].append(req)
+
+        # Process each type
+        for inf_type, requests in by_type.items():
+            if not requests:
+                continue
+
+            # Process in chunks
+            for i in range(0, len(requests), self.inference_batch_size):
+                chunk = requests[i:i + self.inference_batch_size]
+
+                # Prepare inputs
+                if inf_type == InferenceType.VALUE:
+                    model = self.mcts_agent.value_net
+                    inputs = [observation_to_tensor(req.observation, total_number_of_tests=self.mcts_agent.num_actions)
+                             for req in chunk]
+                elif inf_type == InferenceType.POLICY:
+                    model = self.mcts_agent.policy_net
+                    inputs = [observation_to_tensor(req.observation, total_number_of_tests=self.mcts_agent.num_actions)
+                             for req in chunk]
+                else:
+                    model = self.mcts_agent.observation_nn
+                    inputs = [observation_to_tensor(req.observation, req.action, self.mcts_agent.num_actions)
+                             for req in chunk]
+
+                # Batch inference
+                inputs_tensor = torch.stack(inputs).to('cuda' if torch.cuda.is_available() else 'cpu')
+                with torch.no_grad():
+                    outputs = model(inputs_tensor)
+
+                # Store results
+                with self.result_lock:
+                    for j, req in enumerate(chunk):
+                        if req.mutant_id not in self.result_dict:
+                            self.result_dict[req.mutant_id] = {}
+
+                        if inf_type == InferenceType.VALUE or inf_type == InferenceType.OBSERVATION:
+                            result = outputs[j].item()
+                        else:
+                            result = torch.softmax(outputs[j], dim=-1).cpu().numpy()
+
+                        self.result_dict[req.mutant_id][inf_type] = result
+
+    def shutdown(self):
+        self.running = False
+        self.trigger_event.set()
+        self.worker_thread.join(timeout=2.0)
+
+
+class TrainingManager:
+
+    def __init__(self, mcts_agent):
+        self.mcts_agent = mcts_agent
+        self.training_queue = queue.Queue()
+        self.latest_losses = {'value': None, 'policy': None}
+        self.losses_lock = threading.Lock()
+        self.running = True
+
+        # Start training thread
+        self.worker_thread = threading.Thread(target=self._worker, daemon=True)
+        self.worker_thread.start()
+        print("[TrainingManager] Thread started")
+
+    def request_training(self):
+        try:
+            self.training_queue.put_nowait(True)
+        except queue.Full:
+            pass  # Skip if queue is full
+
+    def _worker(self):
+        while self.running:
+            try:
+                self.training_queue.get(timeout=0.5)
+
+                if len(self.mcts_agent.replay_buffer) >= self.mcts_agent.BATCH_SIZE:
+                    experiences = self.mcts_agent.replay_buffer.sample()
+
+                    # Train value network
+                    inputs = [observation_to_tensor(exp.obs, total_number_of_tests=self.mcts_agent.num_actions)
+                             for exp in experiences]
+                    targets = [torch.FloatTensor([exp.v / self.mcts_agent.max_reward]) for exp in experiences]
+
+                    balanced_inputs = []
+                    balanced_targets = []
+                    k = 1.0
+
+                    for i in range(len(targets)):
+                        if experiences[i].v != 0 or random.random() < k:
+                            balanced_inputs.append(inputs[i])
+                            balanced_targets.append(targets[i])
+
+                    loss_v = None
+                    if balanced_inputs:
+                        loss_v = training_model(self.mcts_agent.value_net, balanced_inputs, balanced_targets,
+                                               self.mcts_agent.value_opt, self.mcts_agent.value_loss_function)
+
+                    # Train policy network
+                    inputs = [observation_to_tensor(exp.p_obs, total_number_of_tests=self.mcts_agent.num_actions)
+                             for exp in experiences if exp.p is not None]
+                    targets = [torch.FloatTensor(exp.p) for exp in experiences if exp.p is not None]
+
+                    balanced_inputs = []
+                    balanced_targets = []
+
+                    for i in range(min(len(inputs), len(targets))):
+                        if i < len(experiences) and (experiences[i].v != 0 or random.random() < k):
+                            balanced_inputs.append(inputs[i])
+                            balanced_targets.append(targets[i])
+
+                    loss_p = None
+                    if balanced_inputs:
+                        loss_p = training_model(self.mcts_agent.policy_net, balanced_inputs, balanced_targets,
+                                               self.mcts_agent.policy_opt, self.mcts_agent.policy_loss_function)
+
+                    with self.losses_lock:
+                        self.latest_losses['value'] = loss_v
+                        self.latest_losses['policy'] = loss_p
+
+            except queue.Empty:
+                continue
+
+    def get_latest_losses(self):
+        with self.losses_lock:
+            return self.latest_losses['value'], self.latest_losses['policy']
+
+    def shutdown(self):
+        self.running = False
+        self.worker_thread.join(timeout=2.0)
+
+
 class AsymmetricLoss(nn.Module):
-    def __init__(self, alpha):  # alpha > 1 penalizes underestimation more
+    def __init__(self, alpha):
         super(AsymmetricLoss, self).__init__()
         self.alpha = alpha
 
     def forward(self, predictions, targets):
         errors = targets - predictions
-
-        loss = torch.where(errors < 0,  # underestimation case
-                           self.alpha * errors ** 2,
-                           errors ** 2)  # normal penalty for overestimation
-
-        return loss.mean()  # return average loss
+        loss = torch.where(errors < 0, self.alpha * errors ** 2, errors ** 2)
+        return loss.mean()
 
 
 class MCTSAgent:
@@ -33,9 +280,9 @@ class MCTSAgent:
                  sut_name=None, number_of_mutants=None, buffer_size=None, batch_size=None, update_delta=None,
                  observation_update_delta=None, observation_buffer_size=None, rollout_after=None,
                  asymmetric_loss_alpha=None, c_parameter=None, value_network_learning_rate=None,
-                 policy_network_learning_rate=None, observation_network_learning_rate=None):
+                 policy_network_learning_rate=None, observation_network_learning_rate=None,
+                 inference_batch_size=128, window_size=32):
 
-        # Set the device for PyTorch
         device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
         if torch.cuda.is_available():
             print("Using device: ", device)
@@ -62,146 +309,93 @@ class MCTSAgent:
         self.observation_loss_function = torch.nn.BCEWithLogitsLoss()
         self.value_loss_function = AsymmetricLoss(self.asymmetric_loss_alpha)
         self.policy_loss_function = torch.nn.CrossEntropyLoss(label_smoothing=0.5)
-        self.loss_o = None # current loss of the observation network. used to track the training of the network
+        self.loss_o = None
 
         # Others
         self.tests = tests
         self.sut_name = sut_name
         self.num_actions = len(self.tests)
-        self.max_reward = len(tests) # the maximum reward of the current episode to scale the values
-        self.kills_ranking = {test: 0 for test in range(len(self.tests))} # kills ranking of the tests, used as heuristic until we start relying on the networks
-        self.done = False # Checks if the episode is done (the mutant is killed or we run out of tests)
+        self.max_reward = len(tests)
+        self.kills_ranking = {test: 0 for test in range(len(self.tests))}
         self.current_sut_tests_execution_time = 0
 
-        # Mutant-related stuff
-        self.mutant_number = None  # number of the current mutant in the prioritization execution
-        self.mutant = None
+        # Mutant-related
+        self.mutant_count = 0
         self.number_of_tests_executed = 0
         self.number_of_tests_executed_on_killable_mutants = 0
-        self.mutant_not_killable = None
 
         # MCTS stuff
         self.c = c_parameter
         self.tree = None
         self.root_nodes = []
+        self.node_counter = 0
 
+        # Parallelization parameters
+        self.window_size = window_size
+        self.inference_batch_size = inference_batch_size
+
+        # Inference and training management (SEPARATE THREADS)
+        self.inference_manager = InferenceManager(self, inference_batch_size, window_size)
+        self.training_manager = TrainingManager(self)
+
+    def _get_node_id(self):
+        """Generate unique node ID."""
+        self.node_counter += 1
+        return self.node_counter
 
     def init_tree(self):
         for i in range(len(self.tests)):
             initial_state = self.State([i], mutant_operators_list.index(self.mutant["operator"]), i)
-            self.tree = self.Node(False, False, None, initial_state, i, self)
-            self.root_nodes.append(self.tree)
+            node = self.Node(False, False, None, initial_state, i, self, self._get_node_id())
+            self.root_nodes.append(node)
 
     class State:
-        def __init__(self, test_sequence: list[int], mutant_operator: str, test_index: int = 0):
+        def __init__(self, test_sequence: list, mutant_operator: int, test_index: int = 0):
             self.test_sequence = test_sequence
             self.mutant_operator = mutant_operator
             self.test_index = test_index
 
     class Node:
-        def __init__(self, done, killed, parent, observation, action_index, mcts_agent):
+        def __init__(self, done, killed, parent, observation, action_index, mcts_agent, node_id):
             self.mcts_agent = mcts_agent
             self.children = {}
-            self.T = 0 # sum of rewards
-            self.N = 0 # number of visits
-            self.observation = observation # state of the prioritization
-            self.done = done # if the node is terminal. could be because we ran out of tests or because the mutant is killed
-            self.killed = killed # if the mutant is killed
+            self.T = 0
+            self.N = 0
+            self.observation = observation
+            self.done = done
+            self.killed = killed
             self.parent = parent
             self.backup_parent = parent
-            self.action_index = action_index # action index that leads to this node
-            self.nn_v = 0 # value from the value network
-            self.nn_p = [0] * self.mcts_agent.num_actions # priors from the policy network
-
+            self.action_index = action_index
+            self.nn_v = 0
+            self.nn_p = [0] * self.mcts_agent.num_actions
+            self.node_id = node_id
 
         def getUCBscore(self):
             if self.N == 0:
                 return float('inf')
 
-            # We need the parent node of the current node
             top_node = self
             if top_node.parent:
                 top_node = top_node.parent
 
             value_score = (self.T / self.N)
-
             prior_score = 0
-            if self.mcts_agent.mutant_number >= self.mcts_agent.ROLLOUT_AFTER:
+            if self.mcts_agent.mutant_count >= self.mcts_agent.ROLLOUT_AFTER:
                 prior_score = self.mcts_agent.c * self.parent.nn_p[self.action_index] * sqrt(log(top_node.N) / self.N)
 
             return value_score + prior_score
-
 
         def detach_parent(self):
             del self.parent
             self.parent = None
 
-
         def get_available_actions(self):
             return [i for i in range(len(self.mcts_agent.tests)) if i not in self.observation.test_sequence]
 
-
-        def create_child(self):
-            '''
-            We create a copy of the current node enviroment and apply it to the new child, i.e. the most promising action
-            '''
-
-            if self.done:
-                return
-
-            possible_actions = self.get_available_actions()
-
-            if len(possible_actions) == 0:
-                print("no possible actions")
-                return
-
-            action = random.choice(possible_actions)
-
-            # selective widening
-
-            if self.mcts_agent.mutant_number < self.mcts_agent.ROLLOUT_AFTER:
-                # get the most promising action according to the kills ranking
-                for i in range(len(self.mcts_agent.kills_ranking)):
-                    if list(self.mcts_agent.kills_ranking.keys())[i] in possible_actions:
-                        action = list(self.mcts_agent.kills_ranking.keys())[i]
-                        break
-            else:
-                # choose the action index that is in the possible actions and has the highest policy score
-                action = max(possible_actions, key=lambda x: self.nn_p[x])
-
-            env_copy = deepcopy(self.observation)
-            env_copy.test_sequence.append(action)
-
-            mutant_killed_prediction = inference(observation_to_tensor(env_copy, action, self.mcts_agent.num_actions), self.mcts_agent.observation_nn)
-            placeholder_observation = self.mcts_agent.State(env_copy.test_sequence, env_copy.mutant_operator, action)
-            killed = 1 if mutant_killed_prediction > 1 else 0
-            done = True if len(env_copy.test_sequence) == len(self.mcts_agent.tests) else False
-
-            self.children[action] = type(self)(done, killed, self, placeholder_observation, action, self.mcts_agent)
-            self.children[action].nn_v, self.children[action].nn_p = self.children[action].rollout()
-
-            if self.mcts_agent.mutant_number >= self.mcts_agent.ROLLOUT_AFTER:
-                self.children[action].T += self.children[action].nn_v
-
-
-        def rollout(self):
-            if self.done:
-                return 0, None
-            else:
-
-                obs = observation_to_tensor(self.observation, total_number_of_tests=self.mcts_agent.num_actions)
-
-                v = inference(obs, self.mcts_agent.value_net)
-                p = inference(obs, self.mcts_agent.policy_net)
-
-                return v if v > 0 else 0, p
-
-
         def next(self):
-
             if self.done:
                 raise ValueError("episode has ended")
-
             if not self.children:
                 raise ValueError('no children found and episode hasn\'t ended')
 
@@ -222,60 +416,186 @@ class MCTSAgent:
             probs = np.array(probs)
             probs = probs / probs.sum()
 
-            #the next children is the one with the highest UCB score (the one with the highest probability)
             next_child = list(self.children.items())[np.argmax(probs)][1]
 
-            #mask probabilities of all other actions to 0
             masked_probs = [0] * self.mcts_agent.num_actions
             for index, child in enumerate(self.children.values()):
                 masked_probs[child.action_index] = probs[index]
 
-            #fit the chosen node to the current mutant
-            next_child.observation = self.mcts_agent.State(next_child.observation.test_sequence,
-                                        mutant_operators_list.index(self.mcts_agent.mutant["operator"]),
-                                        next_child.action_index)
-
-            current.nn_p = masked_probs
+            next_child.observation = self.mcts_agent.State(
+                next_child.observation.test_sequence,
+                mutant_operators_list.index(self.mcts_agent.mutant["operator"]),
+                next_child.action_index
+            )
 
             return next_child, next_child.action_index, next_child.observation, masked_probs, self.observation
 
+    def select_action(self, node, mutant_id: int) -> Tuple[Optional[int], bool]:
+        """
+        Select action for expansion. Returns (action, needs_rollout).
+        If needs_rollout is True, rollout was requested and we should wait.
+        """
+        possible_actions = node.get_available_actions()
 
-    def policy_player_mcts(self, mytree):
+        if len(possible_actions) == 0:
+            return None, False
 
-        mytree.N += 1 # We increment the number of visits of the current node
+        # Check if we need rollout for this node
+        if self.mutant_count >= self.ROLLOUT_AFTER:
+            if node.nn_v == 0 and all(p == 0 for p in node.nn_p):
+                # Request rollout
+                self.inference_manager.request_inference(
+                    InferenceRequest(mutant_id, InferenceType.VALUE, node.observation, node_id=node.node_id)
+                )
+                self.inference_manager.request_inference(
+                    InferenceRequest(mutant_id, InferenceType.POLICY, node.observation, node_id=node.node_id)
+                )
+                return None, True
 
-        if self.mutant_number >= self.ROLLOUT_AFTER:
+        # Select action based on strategy
+        if self.mutant_count < self.ROLLOUT_AFTER:
+            action = None
+            for i in range(len(self.kills_ranking)):
+                if list(self.kills_ranking.keys())[i] in possible_actions:
+                    action = list(self.kills_ranking.keys())[i]
+                    break
+            if action is None:
+                action = random.choice(possible_actions)
+        else:
+            action = max(possible_actions, key=lambda x: node.nn_p[x])
 
-            # perform a rollout to fit the current node to the current mutant, so that the next ucb score will be calculated
-            # with the current mutant in mind
-            nn_v, nn_p = mytree.rollout()
-            mytree.nn_v = nn_v
-            mytree.nn_p = nn_p
-            mytree.T += nn_v
+        return action, False
 
-        mytree.create_child()
+    def create_child(self, node, action: int, mutant_id: int) -> 'MCTSAgent.Node':
+        env_copy = deepcopy(node.observation)
+        env_copy.test_sequence.append(action)
 
-        next_tree, next_action, obs, p, p_obs = mytree.next()
+        placeholder_obs = self.State(env_copy.test_sequence, env_copy.mutant_operator, action)
+        done = len(env_copy.test_sequence) == len(self.tests)
 
-        # we detach the current node and returning the sub-tree that starts from the node rooted at the choosen action
-        next_tree.detach_parent()
+        child_id = self._get_node_id()
+        child = self.Node(done, False, node, placeholder_obs, action, self, child_id)
+        node.children[action] = child
 
-        return next_tree, next_action, obs, p, p_obs
+        # Request observation inference
+        self.inference_manager.request_inference(
+            InferenceRequest(mutant_id, InferenceType.OBSERVATION, env_copy, action, child_id)
+        )
 
+        return child
+
+    def policy_player_mcts(self, context: SearchContext) -> bool:
+        """Execute one step of MCTS. Returns True if waiting for inference."""
+        node = context.current_node
+        node.N += 1
+
+        if not node.children and not node.done:
+            action, needs_rollout = self.select_action(node, context.mutant_id)
+
+            if needs_rollout:
+                context.waiting_for_inference = True
+                context.pending_inference_type = InferenceType.VALUE
+                return True
+
+            if action is None:
+                context.done = True
+                return False
+
+            child = self.create_child(node, action, context.mutant_id)
+            context.waiting_for_inference = True
+            context.pending_inference_type = InferenceType.OBSERVATION
+            context.pending_action = action
+            return True
+
+        if node.children:
+            try:
+                next_tree, next_action, obs, p, p_obs = node.next()
+                next_tree.detach_parent()
+
+                context.current_node = next_tree
+                context.obs_history.append(obs)
+                context.ps_history.append(p)
+                context.p_obs_history.append(p_obs)
+
+                actual_observation, killed, terminal_state = self.take_step(next_action, obs)
+
+                next_tree.observation = actual_observation
+                next_tree.killed = killed
+                next_tree.done = terminal_state
+
+                context.step += 1
+                context.done = terminal_state or killed
+
+                if context.done:
+                    reward = len(self.tests) - context.step
+                    context.reward_e = reward
+                    next_tree.T += reward / len(self.tests)
+                    self.replay_buffer.add(actual_observation, reward, p, p_obs)
+
+                return False
+
+            except ValueError:
+                context.done = True
+                return False
+
+        context.done = True
+        return False
+
+    def resume_context(self, context: SearchContext) -> bool:
+        """Try to resume context. Returns True if still waiting."""
+        if context.pending_inference_type == InferenceType.OBSERVATION:
+            result = self.inference_manager.get_result(context.mutant_id, InferenceType.OBSERVATION)
+            if result is None:
+                return True
+
+            child = context.current_node.children.get(context.pending_action)
+            if child:
+                child.killed = 1 if result > 0.5 else 0
+                child.done = child.killed or len(child.observation.test_sequence) == len(self.tests)
+
+                if self.mutant_count >= self.ROLLOUT_AFTER:
+                    self.inference_manager.request_inference(
+                        InferenceRequest(context.mutant_id, InferenceType.VALUE, child.observation, node_id=child.node_id)
+                    )
+                    self.inference_manager.request_inference(
+                        InferenceRequest(context.mutant_id, InferenceType.POLICY, child.observation, node_id=child.node_id)
+                    )
+                    context.pending_inference_type = InferenceType.VALUE
+                    return True
+                else:
+                    context.waiting_for_inference = False
+                    return False
+
+        elif context.pending_inference_type == InferenceType.VALUE:
+            v_result = self.inference_manager.get_result(context.mutant_id, InferenceType.VALUE)
+            p_result = self.inference_manager.get_result(context.mutant_id, InferenceType.POLICY)
+
+            if v_result is None or p_result is None:
+                return True
+
+            node = context.current_node
+            if not node.children:
+                node.nn_v = v_result if v_result > 0 else 0
+                node.nn_p = p_result
+                node.T += node.nn_v
+            else:
+                child = node.children.get(context.pending_action)
+                if child:
+                    child.nn_v = v_result if v_result > 0 else 0
+                    child.nn_p = p_result
+                    child.T += child.nn_v
+
+            context.waiting_for_inference = False
+            return False
+
+        return False
 
     def execute_test_on_mutant(self, test, mutant):
-        """
-        Execute the test against the mutant and return the outcome.
-        """
-
         if not self.mutant_not_killable:
             self.number_of_tests_executed_on_killable_mutants += 1
 
         self.number_of_tests_executed += 1
 
-        # each mutant, among the other information, has two parameters: killing and nonkilling tests.
-        # right now, for testing purposes, we mock the execution of the test against the mutant by checking if the test
-        # is in the killing tests of the mutant. If it is, the mutant is killed, otherwise it is not.
         outcome = 0
         if len(mutant["testResults"]) > 0:
             if "\\" in list(mutant["testResults"].keys())[0] and "/" in test["test_file_path"]:
@@ -300,170 +620,199 @@ class MCTSAgent:
                         self.current_sut_tests_execution_time += non_killing_test_method["duration"]
                         break
 
-        # Update the kills ranking
         if outcome == 1:
             self.kills_ranking[self.tests.index(test)] = self.kills_ranking[self.tests.index(test)] + 1 if self.tests.index(test) in self.kills_ranking.keys() else 1
             self.kills_ranking = dict(sorted(self.kills_ranking.items(), key=lambda item: item[1], reverse=True))
 
         return outcome
 
-
     def take_step(self, action, env):
-        """
-        Perform all necessary actions on the environment after selecting an action.
-        """
-
-        # Execute the test against the mutant
+        """Perform all necessary actions on the environment after selecting an action."""
         killed = self.execute_test_on_mutant(self.tests[action], self.mutant)
 
-        # train the observation network
+        # Train observation network immediately (small, fast training)
         if (killed == 0 and random.random() < 0.1) or killed == 1:
             self.OBSERVATION_KILL_BUFFER.append([(env, action), killed])
             self.OBSERVATION_KILL_BUFFER = self.OBSERVATION_KILL_BUFFER[-self.OBSERVATION_BUFFER_SIZE:]
-        if len(self.OBSERVATION_KILL_BUFFER) == self.OBSERVATION_BUFFER_SIZE and self.mutant_number % self.OBSERVATION_UPDATE_DELTA == 0:
-            self.loss_o = training_model(self.observation_nn, [observation_to_tensor(x[0][0], x[0][1], self.num_actions) for x in self.OBSERVATION_KILL_BUFFER], [torch.FloatTensor([x[1]]) for x in self.OBSERVATION_KILL_BUFFER], self.observation_nn_opt, self.observation_loss_function)
 
-        state = self.State(env.test_sequence, mutant_operators_list.index(self.mutant["operator"]), action)
+        if len(self.OBSERVATION_KILL_BUFFER) == self.OBSERVATION_BUFFER_SIZE and self.mutant_count % self.OBSERVATION_UPDATE_DELTA == 0:
+            self.loss_o = training_model(
+                self.observation_nn,
+                [observation_to_tensor(x[0][0], x[0][1], self.num_actions) for x in self.OBSERVATION_KILL_BUFFER],
+                [torch.FloatTensor([x[1]]) for x in self.OBSERVATION_KILL_BUFFER],
+                self.observation_nn_opt,
+                self.observation_loss_function
+            )
 
-        terminal_state = False
-        if len(env.test_sequence) == len(self.tests) or killed:
-            terminal_state = True
+        state = self.State(env.test_sequence, env.mutant_operator, action)
+        terminal_state = len(env.test_sequence) == len(self.tests) or killed
 
         return state, killed, terminal_state
 
+    def run(self, mutants):
+        """
+        Process all mutants with parallel inference and training.
+        MCTS runs continuously, inference and training in separate threads.
+        """
+        print(f"[MCTS] Starting with {len(mutants)} mutants, window={self.window_size}, batch={self.inference_batch_size}")
 
-    def run(self, mutant, mutant_number, mutant_not_killable):
+        # Initialize contexts
+        contexts = []
+        for idx, mutant in enumerate(mutants):
+            no_test_killing = True
+            if len(mutant["testResults"]) > 0:
+                for test_file in mutant["testResults"]:
+                    if len(mutant["testResults"][test_file]["failed"]) > 0:
+                        no_test_killing = False
+                        break
 
-        self.mutant_number = mutant_number
+            context = SearchContext(
+                mutant_id=idx,
+                mutant=mutant,
+                mutant_not_killable=no_test_killing,
+                current_node=None,
+                step=1,
+                obs_history=[],
+                ps_history=[],
+                p_obs_history=[],
+                reward_e=0,
+                done=False,
+                waiting_for_inference=False
+            )
+            contexts.append(context)
 
-        self.mutant = mutant
+        # MAIN LOOP - Process mutants in order
+        current_idx = 0
+        total_done = 0
+        mutants_processed_since_batch = 0
+        consecutive_waiting_loops = 0
 
-        self.mutant_not_killable = mutant_not_killable
+        while total_done < len(contexts):
+            context = contexts[current_idx]
 
-        self.done = False
+            # Set global state
+            self.mutant_count = context.mutant_id
+            self.mutant = context.mutant
+            self.mutant_not_killable = context.mutant_not_killable
 
-        if self.tree:
-            # This is not the first run, we select the root node based on the UCT formula
-            scores = [(child.T / child.N) + self.c * sqrt(log(self.mutant_number) / child.N) if child.N > 0 else float('inf') for child in self.root_nodes]
-            possible_trees_indexes = [i for i, x in enumerate(scores) if x == max(scores)]
-            self.tree = self.root_nodes[random.choice(possible_trees_indexes)]
-            self.tree.done = False
-            initial_state = self.State([self.tree.action_index], mutant_operators_list.index(self.mutant["operator"]),
-                                         self.tree.action_index)
-            # since we are at the root node, we immediately execute the action and get the observation
-            _, killed, terminal_state = self.take_step(self.tree.action_index, initial_state)
-            self.tree.observation = initial_state
-            self.tree.killed = killed
-        else:
-            # This is the first run, we create the root nodes for each action and select one at random
-            self.init_tree()
-            node_index = random.choice(range(len(self.tests)))
-            self.tree = self.root_nodes[node_index]
-            _, killed, terminal_state = self.take_step(node_index, self.tree.observation)
-            self.tree.killed = killed
-            self.tree.done = terminal_state
+            # Initialize if needed
+            if not context.done and context.current_node is None:
+                if self.tree:
+                    scores = [(child.T / child.N) + self.c * sqrt(log(self.mutant_count + 1) / child.N)
+                             if child.N > 0 else float('inf') for child in self.root_nodes]
+                    possible_trees_indexes = [i for i, x in enumerate(scores) if x == max(scores)]
+                    tree = self.root_nodes[random.choice(possible_trees_indexes)]
+                    tree.done = False
+                    initial_state = self.State([tree.action_index],
+                                               mutant_operators_list.index(context.mutant["operator"]),
+                                               tree.action_index)
+                    _, killed, terminal_state = self.take_step(tree.action_index, initial_state)
+                    tree.observation = initial_state
+                    tree.killed = killed
+                    tree.done = terminal_state or killed
+                    context.current_node = tree
+                else:
+                    self.init_tree()
+                    node_index = random.choice(range(len(self.tests)))
+                    tree = self.root_nodes[node_index]
+                    _, killed, terminal_state = self.take_step(node_index, tree.observation)
+                    tree.killed = killed
+                    tree.done = terminal_state or killed
+                    if tree.done:
+                        tree.T += len(self.tests) / len(self.tests)
+                    context.current_node = tree
 
-            if self.tree.done:
-                done = True
-                self.tree.T += len(self.tests) / len(self.tests)
+                if context.current_node.parent is None and context.current_node.killed:
+                    context.reward_e = len(self.tests) - context.step + 1
+                    context.current_node.T += len(self.tests) / len(self.tests)
+                    context.done = True
+                    total_done += 1
 
-        loss_v = None
-        loss_p = None
-        reward_e = 0
+            # Try to advance if not waiting
+            made_progress = False
+            if not context.done:
+                if context.waiting_for_inference:
+                    # Try to resume
+                    still_waiting = self.resume_context(context)
+                    if not still_waiting:
+                        made_progress = True
+                        # Advance after resume
+                        while not context.done and not context.waiting_for_inference:
+                            self.policy_player_mcts(context)
+                            if context.waiting_for_inference or context.done:
+                                break
 
-        obs = []
-        ps = []
-        p_obs = []
+                        if context.done:
+                            total_done += 1
+                            # Trigger training
+                            if total_done % self.UPDATE_DELTA == 0:
+                                self.training_manager.request_training()
+                else:
+                    made_progress = True
+                    # Advance freely
+                    while not context.done and not context.waiting_for_inference:
+                        self.policy_player_mcts(context)
+                        if context.waiting_for_inference or context.done:
+                            break
 
-        step = 1
+                    if context.done:
+                        total_done += 1
+                        # Trigger training
+                        if total_done % self.UPDATE_DELTA == 0:
+                            self.training_manager.request_training()
 
-        tree = self.tree
+            # Move to next mutant
+            prev_idx = current_idx
+            current_idx = (current_idx + 1) % len(contexts)
 
-        while not self.done:
+            # Count mutants processed for window trigger
+            if made_progress:
+                mutants_processed_since_batch += 1
+                consecutive_waiting_loops = 0
+            else:
+                consecutive_waiting_loops += 1
 
-            if self.tree.parent is None and self.tree.killed:
-                # Root node killed, we can stop the episode
-                reward_e = len(self.tests) - step
-                self.tree.T += len(self.tests) / len(self.tests)
-                self.done = True
-                break
+            # Trigger inference batch after window_size mutants processed
+            if mutants_processed_since_batch >= self.window_size:
+                print(f"[MCTS] Triggering batch inference (processed {mutants_processed_since_batch} mutants)")
+                self.inference_manager.trigger_event.set()
+                mutants_processed_since_batch = 0
+                # Give inference thread time to work
+                time.sleep(0.01)
 
-            step = step + 1
+            # If we've looped through all mutants without progress, wait for inference
+            if consecutive_waiting_loops >= len(contexts):
+                active_mutants = sum(1 for ctx in contexts if not ctx.done)
+                waiting_mutants = sum(1 for ctx in contexts if ctx.waiting_for_inference and not ctx.done)
 
-            mytree, action, ob, p, p_ob = self.policy_player_mcts(tree)
+                if waiting_mutants > 0 and waiting_mutants == active_mutants:
+                    print(f"[MCTS] All {waiting_mutants} active mutants waiting for inference, triggering batch...")
+                    self.inference_manager.trigger_event.set()
+                    # Wait for inference to complete
+                    time.sleep(0.05)
+                    consecutive_waiting_loops = 0
 
-            actual_observation, killed, terminal_state = self.take_step(action, ob)
+            # Progress logging
+            if total_done > 0 and total_done % 10 == 0:
+                if prev_idx == 0 and current_idx != 0:  # Just completed a full cycle
+                    waiting = sum(1 for ctx in contexts if ctx.waiting_for_inference and not ctx.done)
+                    active = sum(1 for ctx in contexts if not ctx.done and not ctx.waiting_for_inference)
+                    print(f"[MCTS] Progress: {total_done}/{len(contexts)} done, {waiting} waiting, {active} active")
 
-            # We update the tree with the actual observation after executing the action, thereby replacing the placeholder
-            mytree.observation = actual_observation
-            mytree.killed = killed
-            mytree.done = terminal_state
-            ob = actual_observation
+        # Final training
+        self.training_manager.request_training()
+        time.sleep(1.0)  # Wait for final training
 
-            tree = mytree
+        # Get results
+        avg_reward = sum(ctx.reward_e for ctx in contexts) / len(contexts) if contexts else 0
+        loss_v, loss_p = self.training_manager.get_latest_losses()
 
-            self.done = mytree.done
+        # Shutdown threads
+        self.inference_manager.shutdown()
+        self.training_manager.shutdown()
 
-            obs.append(ob)
-            ps.append(p)
-            p_obs.append(p_ob)
+        print(f"[MCTS] Completed. Avg reward: {avg_reward:.2f}")
 
-            current_reward = len(self.tests) - step
-
-            print("Step: ", step, "Sequence: ", ob.test_sequence, "Reward: ", current_reward)
-
-            if self.done:
-                mytree.T += current_reward / len(self.tests) # update the value of the node with the actual reward
-                reward_e = current_reward
-                self.replay_buffer.add(obs[-1], current_reward, ps[-1], p_obs[-1])
-                break
-
-        print('Episode reward: ' + str(reward_e))
-
-        # Networks update
-
-        if (self.mutant_number + 1) % self.UPDATE_DELTA == 0 and len(self.replay_buffer) > self.BATCH_SIZE:
-
-            experiences = self.replay_buffer.sample()
-
-            # Each state has as target value the rewards of the episode
-
-            inputs = [observation_to_tensor(experience.obs, total_number_of_tests=self.num_actions) for experience in experiences]
-            targets = [torch.FloatTensor([experience.v / (self.max_reward)]) for experience in experiences]
-
-            k = 1.0 # parameter to balance the training set, we keep only k% of the inputs and targets with rewards == 0
-
-            balanced_inputs = []
-            balanced_targets = []
-
-            # keep only k% of inputs and targets with rewards == 0
-            for i in range (len(targets)):
-                if experiences[i].v != 0 or random.random() < k:
-                    balanced_inputs.append(inputs[i])
-                    balanced_targets.append(targets[i])
-
-            inputs = balanced_inputs
-            targets = balanced_targets
-
-            loss_v = training_model(self.value_net, inputs, targets, self.value_opt, self.value_loss_function)
-
-            # Each state has as target policy the policy from the next state function
-
-            inputs = [observation_to_tensor(experience.p_obs, total_number_of_tests=self.num_actions) for experience in experiences]
-            targets = [torch.FloatTensor(experience.p) for experience in experiences if experience.p is not None]
-
-            balanced_inputs = []
-            balanced_targets = []
-
-            for i in range (len(targets)):
-                if experiences[i].v != 0 or random.random() < k:
-                    balanced_inputs.append(inputs[i])
-                    balanced_targets.append(targets[i])
-
-            inputs = balanced_inputs
-            targets = balanced_targets
-
-            loss_p = training_model(self.policy_net, inputs, targets, self.policy_opt, self.policy_loss_function)
-
-        return (reward_e, loss_v, loss_p, self.loss_o, self.number_of_tests_executed, self.number_of_tests_executed_on_killable_mutants,
+        return (avg_reward, loss_v, loss_p, self.loss_o,
+                self.number_of_tests_executed, self.number_of_tests_executed_on_killable_mutants,
                 self.UPDATE_DELTA, self.current_sut_tests_execution_time)

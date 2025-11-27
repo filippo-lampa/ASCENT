@@ -27,19 +27,12 @@ def inference(state_tensor, model):
     tensor_in = tensor_in[None]  # Wrap one outer dimension (as for a batch)
     with torch.no_grad():
         output = model(tensor_in.to('cuda' if torch.cuda.is_available() else 'cpu'))
-    output = output.squeeze()  # Remove the outermost batch-size dimension
+    output = output.squeeze()  # Remove the outermost batch dimension
     return output.item() if model.__class__.__name__ == 'ValueNN' or model.__class__.__name__ == 'ObservationNN' \
         else torch.softmax(output, dim=-1)
 
 
 def training_model(model, inputs, targets, opt, loss_function, scheduler=None):
-
-    if model.__class__.__name__ == 'ValueNN':
-        print("Training ValueNN model...")
-    elif model.__class__.__name__ == 'PolicyNN':
-        print("Training PolicyNN model...")
-    else:
-        print("Training ObservationNN model...")
 
     model.train()
     losses = []

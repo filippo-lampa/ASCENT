@@ -45,8 +45,8 @@ class MCTSAgent:
         self.replay_buffer = ReplayBuffer(self.BUFFER_SIZE, self.BATCH_SIZE)
 
         # Init networks
-        self.policy_net = policy_nn
-        self.value_net = value_nn
+        self.policy_net = policy_nn.to(device)
+        self.value_net = value_nn.to(device)
         self.asymmetric_loss_alpha = asymmetric_loss_alpha
         self.value_opt = torch.optim.Adam(self.value_net.parameters(), lr=value_network_learning_rate)
         self.policy_opt = torch.optim.Adam(self.policy_net.parameters(), lr=policy_network_learning_rate)

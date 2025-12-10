@@ -32,34 +32,26 @@ class AsymmetricLoss(nn.Module):
 
 class MCTSAgent:
 
-    def __init__(self, policy_nn=None, value_nn=None, observation_nn=None, tests=None, kills_matrix=None,
+    def __init__(self, policy_nn=None, value_nn=None, tests=None, kills_matrix=None,
                  sut_name=None, number_of_mutants=None, buffer_size=None, batch_size=None, update_delta=None,
-                 observation_update_delta=None, observation_buffer_size=None, rollout_after=None,
-                 asymmetric_loss_alpha=None, c_parameter=None, value_network_learning_rate=None,
-                 policy_network_learning_rate=None, observation_network_learning_rate=None):
+                 rollout_after=None, asymmetric_loss_alpha=None, c_parameter=None, value_network_learning_rate=None,
+                 policy_network_learning_rate=None):
 
         # Init Neural-MCTS parameters
         self.ROLLOUT_AFTER = rollout_after
         self.BUFFER_SIZE = number_of_mutants if buffer_size is None else buffer_size
         self.BATCH_SIZE = batch_size
         self.UPDATE_DELTA = update_delta
-        self.OBSERVATION_UPDATE_DELTA = observation_update_delta
-        self.OBSERVATION_BUFFER_SIZE = observation_buffer_size
-        self.OBSERVATION_KILL_BUFFER = []
         self.replay_buffer = ReplayBuffer(self.BUFFER_SIZE, self.BATCH_SIZE)
 
         # Init networks
         self.policy_net = policy_nn
-        self.observation_nn = observation_nn
         self.value_net = value_nn
         self.asymmetric_loss_alpha = asymmetric_loss_alpha
-        self.observation_nn_opt = torch.optim.Adam(self.observation_nn.parameters(), lr=observation_network_learning_rate)
         self.value_opt = torch.optim.Adam(self.value_net.parameters(), lr=value_network_learning_rate)
         self.policy_opt = torch.optim.Adam(self.policy_net.parameters(), lr=policy_network_learning_rate)
-        self.observation_loss_function = torch.nn.BCEWithLogitsLoss()
         self.value_loss_function = AsymmetricLoss(self.asymmetric_loss_alpha)
         self.policy_loss_function = torch.nn.CrossEntropyLoss(label_smoothing=0.5)
-        self.loss_o = None # current loss of the observation network. used to track the training of the network
 
         # Others
         self.tests = tests
@@ -164,14 +156,14 @@ class MCTSAgent:
                         break
             else:
                 # choose the action index that is in the possible actions and has the highest policy score
+                # choose the action index that is in the possible actions and has the highest policy score
                 action = max(possible_actions, key=lambda x: self.nn_p[x])
 
             env_copy = deepcopy(self.observation)
             env_copy.test_sequence.append(action)
 
-            mutant_killed_prediction = inference(observation_to_tensor(env_copy, action, self.mcts_agent.num_actions), self.mcts_agent.observation_nn)
             placeholder_observation = self.mcts_agent.State(env_copy.test_sequence, env_copy.mutant_operator, action)
-            killed = 1 if mutant_killed_prediction > 1 else 0
+            killed = False
             done = True if len(env_copy.test_sequence) == len(self.mcts_agent.tests) else False
 
             self.children[action] = type(self)(done, killed, self, placeholder_observation, action, self.mcts_agent)
@@ -312,13 +304,6 @@ class MCTSAgent:
 
         # Execute the test against the mutant
         killed = self.execute_test_on_mutant(self.tests[action], self.mutant)
-
-        # train the observation network
-        if (killed == 0 and random.random() < 0.1) or killed == 1:
-            self.OBSERVATION_KILL_BUFFER.append([(env, action), killed])
-            self.OBSERVATION_KILL_BUFFER = self.OBSERVATION_KILL_BUFFER[-self.OBSERVATION_BUFFER_SIZE:]
-        if len(self.OBSERVATION_KILL_BUFFER) == self.OBSERVATION_BUFFER_SIZE and self.mutant_number % self.OBSERVATION_UPDATE_DELTA == 0:
-            self.loss_o = training_model(self.observation_nn, [observation_to_tensor(x[0][0], x[0][1], self.num_actions) for x in self.OBSERVATION_KILL_BUFFER], [torch.FloatTensor([x[1]]) for x in self.OBSERVATION_KILL_BUFFER], self.observation_nn_opt, self.observation_loss_function)
 
         state = self.State(env.test_sequence, mutant_operators_list.index(self.mutant["operator"]), action)
 
@@ -462,5 +447,5 @@ class MCTSAgent:
 
             loss_p = training_model(self.policy_net, inputs, targets, self.policy_opt, self.policy_loss_function)
 
-        return (reward_e, loss_v, loss_p, self.loss_o, self.number_of_tests_executed, self.number_of_tests_executed_on_killable_mutants,
+        return (reward_e, loss_v, loss_p, self.number_of_tests_executed, self.number_of_tests_executed_on_killable_mutants,
                 self.UPDATE_DELTA, self.current_sut_tests_execution_time)

@@ -23,7 +23,6 @@ from utils.consts import mutant_operators_list
 class InferenceType(Enum):
     VALUE = "value"
     POLICY = "policy"
-    OBSERVATION = "observation"
 
 
 @dataclass
@@ -50,6 +49,7 @@ class SearchContext:
     waiting_for_inference: bool
     pending_inference_type: Optional[InferenceType] = None
     pending_action: Optional[int] = None
+    pending_node_id: Optional[int] = None  # Aggiungi questo campo
 
 
 class InferenceManager:
@@ -72,6 +72,9 @@ class InferenceManager:
         self.trigger_event = threading.Event()
         self.mutants_processed_count = 0
         self.count_lock = threading.Lock()
+
+        # Timeout management - ridotto per batch più frequenti
+        self.max_wait_time = 0.5  # Ridotto da 2.0 a 0.5 secondi
 
         # Start inference thread
         self.worker_thread = threading.Thread(target=self._worker, daemon=True)
@@ -105,15 +108,10 @@ class InferenceManager:
     def _worker(self):
         while self.running:
             # Wait for trigger or timeout
-            triggered = self.trigger_event.wait(timeout=0.5)
+            triggered = self.trigger_event.wait(timeout=0.1)  # Ridotto per essere più reattivo
 
-            if not triggered and self.running:
-                # Check if there are pending requests anyway
-                with self.requests_lock:
-                    has_pending = len(self.pending_requests) > 0
-
-                if not has_pending:
-                    continue
+            if not self.running:
+                break
 
             self.trigger_event.clear()
 
@@ -131,7 +129,7 @@ class InferenceManager:
     def _process_batch(self, batch: List[InferenceRequest]):
         """Process batch of requests."""
         # Group by type
-        by_type = {InferenceType.VALUE: [], InferenceType.POLICY: [], InferenceType.OBSERVATION: []}
+        by_type = {InferenceType.VALUE: [], InferenceType.POLICY: []}
         for req in batch:
             by_type[req.inference_type].append(req)
 
@@ -153,10 +151,6 @@ class InferenceManager:
                     model = self.mcts_agent.policy_net
                     inputs = [observation_to_tensor(req.observation, total_number_of_tests=self.mcts_agent.num_actions)
                              for req in chunk]
-                else:
-                    model = self.mcts_agent.observation_nn
-                    inputs = [observation_to_tensor(req.observation, req.action, self.mcts_agent.num_actions)
-                             for req in chunk]
 
                 # Batch inference
                 inputs_tensor = torch.stack(inputs).to('cuda' if torch.cuda.is_available() else 'cpu')
@@ -169,7 +163,7 @@ class InferenceManager:
                         if req.mutant_id not in self.result_dict:
                             self.result_dict[req.mutant_id] = {}
 
-                        if inf_type == InferenceType.VALUE or inf_type == InferenceType.OBSERVATION:
+                        if inf_type == InferenceType.VALUE:
                             result = outputs[j].item()
                         else:
                             result = torch.softmax(outputs[j], dim=-1).cpu().numpy()
@@ -276,12 +270,10 @@ class AsymmetricLoss(nn.Module):
 
 class MCTSAgent:
 
-    def __init__(self, policy_nn=None, value_nn=None, observation_nn=None, tests=None, kills_matrix=None,
+    def __init__(self, policy_nn=None, value_nn=None, tests=None, kills_matrix=None,
                  sut_name=None, number_of_mutants=None, buffer_size=None, batch_size=None, update_delta=None,
-                 observation_update_delta=None, observation_buffer_size=None, rollout_after=None,
-                 asymmetric_loss_alpha=None, c_parameter=None, value_network_learning_rate=None,
-                 policy_network_learning_rate=None, observation_network_learning_rate=None,
-                 inference_batch_size=128, window_size=32):
+                 rollout_after=None, asymmetric_loss_alpha=None, c_parameter=None, value_network_learning_rate=None,
+                 policy_network_learning_rate=None, inference_batch_size=128, window_size=32):
 
         device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
         if torch.cuda.is_available():
@@ -293,23 +285,16 @@ class MCTSAgent:
         self.BUFFER_SIZE = number_of_mutants if buffer_size is None else buffer_size
         self.BATCH_SIZE = batch_size
         self.UPDATE_DELTA = update_delta
-        self.OBSERVATION_UPDATE_DELTA = observation_update_delta
-        self.OBSERVATION_BUFFER_SIZE = observation_buffer_size
-        self.OBSERVATION_KILL_BUFFER = []
         self.replay_buffer = ReplayBuffer(self.BUFFER_SIZE, self.BATCH_SIZE)
 
         # Init networks
         self.policy_net = policy_nn.to(device)
-        self.observation_nn = observation_nn.to(device)
         self.value_net = value_nn.to(device)
         self.asymmetric_loss_alpha = asymmetric_loss_alpha
-        self.observation_nn_opt = torch.optim.Adam(self.observation_nn.parameters(), lr=observation_network_learning_rate)
         self.value_opt = torch.optim.Adam(self.value_net.parameters(), lr=value_network_learning_rate)
         self.policy_opt = torch.optim.Adam(self.policy_net.parameters(), lr=policy_network_learning_rate)
-        self.observation_loss_function = torch.nn.BCEWithLogitsLoss()
         self.value_loss_function = AsymmetricLoss(self.asymmetric_loss_alpha)
         self.policy_loss_function = torch.nn.CrossEntropyLoss(label_smoothing=0.5)
-        self.loss_o = None
 
         # Others
         self.tests = tests
@@ -474,13 +459,9 @@ class MCTSAgent:
         done = len(env_copy.test_sequence) == len(self.tests)
 
         child_id = self._get_node_id()
+        # Non impostiamo killed qui - verrà impostato dopo l'esecuzione reale del test
         child = self.Node(done, False, node, placeholder_obs, action, self, child_id)
         node.children[action] = child
-
-        # Request observation inference
-        self.inference_manager.request_inference(
-            InferenceRequest(mutant_id, InferenceType.OBSERVATION, env_copy, action, child_id)
-        )
 
         return child
 
@@ -495,17 +476,51 @@ class MCTSAgent:
             if needs_rollout:
                 context.waiting_for_inference = True
                 context.pending_inference_type = InferenceType.VALUE
+                context.pending_node_id = node.node_id
                 return True
 
             if action is None:
                 context.done = True
                 return False
 
+            # Crea il figlio e esegui subito il test reale
             child = self.create_child(node, action, context.mutant_id)
-            context.waiting_for_inference = True
-            context.pending_inference_type = InferenceType.OBSERVATION
-            context.pending_action = action
-            return True
+
+            # Esegui il test reale
+            actual_observation, killed, terminal_state = self.take_step(action, child.observation)
+
+            # Aggiorna il figlio con i risultati reali
+            child.observation = actual_observation
+            child.killed = killed
+            child.done = terminal_state
+
+            # Ora richiedi rollout se necessario, con lo stato aggiornato
+            if self.mutant_count >= self.ROLLOUT_AFTER and not child.done:
+                self.inference_manager.request_inference(
+                    InferenceRequest(context.mutant_id, InferenceType.VALUE, child.observation, node_id=child.node_id)
+                )
+                self.inference_manager.request_inference(
+                    InferenceRequest(context.mutant_id, InferenceType.POLICY, child.observation, node_id=child.node_id)
+                )
+                context.waiting_for_inference = True
+                context.pending_inference_type = InferenceType.VALUE
+                context.pending_action = action
+                context.pending_node_id = child.node_id
+                return True
+
+            # Se terminato o non serve rollout, aggiorna subito
+            context.step += 1
+            context.done = child.done
+
+            if context.done:
+                reward = len(self.tests) - context.step
+                context.reward_e = reward
+                child.T += reward / len(self.tests)
+                # Aggiungi dummy p per compatibilità
+                dummy_p = [1.0 / len(self.tests)] * len(self.tests)
+                self.replay_buffer.add(actual_observation, reward, dummy_p, node.observation)
+
+            return False
 
         if node.children:
             try:
@@ -517,14 +532,16 @@ class MCTSAgent:
                 context.ps_history.append(p)
                 context.p_obs_history.append(p_obs)
 
+                # Esegui il test reale
                 actual_observation, killed, terminal_state = self.take_step(next_action, obs)
 
+                # Aggiorna con i risultati reali
                 next_tree.observation = actual_observation
                 next_tree.killed = killed
                 next_tree.done = terminal_state
 
                 context.step += 1
-                context.done = terminal_state or killed
+                context.done = terminal_state
 
                 if context.done:
                     reward = len(self.tests) - context.step
@@ -543,35 +560,37 @@ class MCTSAgent:
 
     def resume_context(self, context: SearchContext) -> bool:
         """Try to resume context. Returns True if still waiting."""
-        if context.pending_inference_type == InferenceType.OBSERVATION:
-            result = self.inference_manager.get_result(context.mutant_id, InferenceType.OBSERVATION)
-            if result is None:
-                return True
-
-            child = context.current_node.children.get(context.pending_action)
-            if child:
-                child.killed = 1 if result > 0.5 else 0
-                child.done = child.killed or len(child.observation.test_sequence) == len(self.tests)
-
-                if self.mutant_count >= self.ROLLOUT_AFTER:
-                    self.inference_manager.request_inference(
-                        InferenceRequest(context.mutant_id, InferenceType.VALUE, child.observation, node_id=child.node_id)
-                    )
-                    self.inference_manager.request_inference(
-                        InferenceRequest(context.mutant_id, InferenceType.POLICY, child.observation, node_id=child.node_id)
-                    )
-                    context.pending_inference_type = InferenceType.VALUE
-                    return True
-                else:
-                    context.waiting_for_inference = False
-                    return False
-
-        elif context.pending_inference_type == InferenceType.VALUE:
+        if context.pending_inference_type == InferenceType.VALUE:
             v_result = self.inference_manager.get_result(context.mutant_id, InferenceType.VALUE)
             p_result = self.inference_manager.get_result(context.mutant_id, InferenceType.POLICY)
 
             if v_result is None or p_result is None:
+                # Inizializza il contatore di attesa se non esiste
+                if not hasattr(context, 'inference_wait_started'):
+                    context.inference_wait_started = time.time()
+
+                elapsed_time = time.time() - context.inference_wait_started
+
+                # Se abbiamo aspettato troppo, forza il trigger del batch
+                if elapsed_time > self.inference_manager.max_wait_time:
+                    print(f"[MCTS] Warning: Long wait for mutant {context.mutant_id} ({elapsed_time:.1f}s), forcing batch processing")
+                    self.inference_manager.trigger_event.set()
+                    # Dai più tempo al thread di inferenza
+                    time.sleep(0.1)
+
+                    # Controlla di nuovo
+                    v_result = self.inference_manager.get_result(context.mutant_id, InferenceType.VALUE)
+                    p_result = self.inference_manager.get_result(context.mutant_id, InferenceType.POLICY)
+
+                    if v_result is None or p_result is None:
+                        # Se ancora non abbiamo risultati, aspetta ancora un po'
+                        return True
+
                 return True
+
+            # Reset timer on success
+            if hasattr(context, 'inference_wait_started'):
+                delattr(context, 'inference_wait_started')
 
             node = context.current_node
             if not node.children:
@@ -630,20 +649,6 @@ class MCTSAgent:
         """Perform all necessary actions on the environment after selecting an action."""
         killed = self.execute_test_on_mutant(self.tests[action], self.mutant)
 
-        # Train observation network immediately (small, fast training)
-        if (killed == 0 and random.random() < 0.1) or killed == 1:
-            self.OBSERVATION_KILL_BUFFER.append([(env, action), killed])
-            self.OBSERVATION_KILL_BUFFER = self.OBSERVATION_KILL_BUFFER[-self.OBSERVATION_BUFFER_SIZE:]
-
-        if len(self.OBSERVATION_KILL_BUFFER) == self.OBSERVATION_BUFFER_SIZE and self.mutant_count % self.OBSERVATION_UPDATE_DELTA == 0:
-            self.loss_o = training_model(
-                self.observation_nn,
-                [observation_to_tensor(x[0][0], x[0][1], self.num_actions) for x in self.OBSERVATION_KILL_BUFFER],
-                [torch.FloatTensor([x[1]]) for x in self.OBSERVATION_KILL_BUFFER],
-                self.observation_nn_opt,
-                self.observation_loss_function
-            )
-
         state = self.State(env.test_sequence, env.mutant_operator, action)
         terminal_state = len(env.test_sequence) == len(self.tests) or killed
 
@@ -686,6 +691,7 @@ class MCTSAgent:
         total_done = 0
         mutants_processed_since_batch = 0
         consecutive_waiting_loops = 0
+        last_progress_time = time.time()
 
         while total_done < len(contexts):
             context = contexts[current_idx]
@@ -777,8 +783,7 @@ class MCTSAgent:
                 print(f"[MCTS] Triggering batch inference (processed {mutants_processed_since_batch} mutants)")
                 self.inference_manager.trigger_event.set()
                 mutants_processed_since_batch = 0
-                # Give inference thread time to work
-                time.sleep(0.01)
+                time.sleep(0.05)
 
             # If we've looped through all mutants without progress, wait for inference
             if consecutive_waiting_loops >= len(contexts):
@@ -788,13 +793,22 @@ class MCTSAgent:
                 if waiting_mutants > 0 and waiting_mutants == active_mutants:
                     print(f"[MCTS] All {waiting_mutants} active mutants waiting for inference, triggering batch...")
                     self.inference_manager.trigger_event.set()
-                    # Wait for inference to complete
-                    time.sleep(0.05)
+                    time.sleep(0.2)
                     consecutive_waiting_loops = 0
+
+            # Forza il batch se ci sono richieste in attesa da troppo tempo
+            current_time = time.time()
+            if current_time - last_progress_time > self.inference_manager.max_wait_time:
+                with self.inference_manager.requests_lock:
+                    if len(self.inference_manager.pending_requests) > 0:
+                        print(f"[MCTS] Forcing batch processing ({len(self.inference_manager.pending_requests)} pending requests)")
+                        self.inference_manager.trigger_event.set()
+                        time.sleep(0.1)
+                last_progress_time = current_time
 
             # Progress logging
             if total_done > 0 and total_done % 10 == 0:
-                if prev_idx == 0 and current_idx != 0:  # Just completed a full cycle
+                if prev_idx == 0 and current_idx != 0:
                     waiting = sum(1 for ctx in contexts if ctx.waiting_for_inference and not ctx.done)
                     active = sum(1 for ctx in contexts if not ctx.done and not ctx.waiting_for_inference)
                     print(f"[MCTS] Progress: {total_done}/{len(contexts)} done, {waiting} waiting, {active} active")
@@ -813,6 +827,5 @@ class MCTSAgent:
 
         print(f"[MCTS] Completed. Avg reward: {avg_reward:.2f}")
 
-        return (avg_reward, loss_v, loss_p, self.loss_o,
-                self.number_of_tests_executed, self.number_of_tests_executed_on_killable_mutants,
+        return (avg_reward, loss_v, loss_p, self.number_of_tests_executed, self.number_of_tests_executed_on_killable_mutants,
                 self.UPDATE_DELTA, self.current_sut_tests_execution_time)

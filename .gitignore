@@ -5,12 +5,15 @@
 # Covers JetBrains IDEs: IntelliJ, RubyMine, PhpStorm, AppCode, PyCharm, CLion, Android Studio, WebStorm and Rider
 # Reference: https://intellij-support.jetbrains.com/hc/en-us/articles/206544839
 
+/experiments/
 /SuMo-Improvements-feature-reinforcement-learning
 /case_studies/**/node_modules
 /case_studies/*/mochawesome-report
 /case_studies/*/sumo/
 /case_studies/*/artifacts
 /case_studies/*/cache
+
+ascent-runner.tar
 
 # User-specific stuff
 .idea/**/workspace.xml

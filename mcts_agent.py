@@ -231,7 +231,7 @@ class MCTSAgent:
                                         mutant_operators_list.index(self.mcts_agent.mutant["operator"]),
                                         next_child.action_index)
 
-            current.nn_p = masked_probs
+            self.nn_p = masked_probs
 
             return next_child, next_child.action_index, next_child.observation, masked_probs, self.observation
 

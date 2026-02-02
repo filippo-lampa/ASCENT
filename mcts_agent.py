@@ -123,24 +123,20 @@ class MCTSAgent:
             self.nn_v = 0 # value from the value network
             self.nn_p = [0] * self.mcts_agent.num_actions # priors from the policy network
 
-
         def getUCBscore(self):
-            if self.N == 0:
-                return float('inf')
-
-            # We need the parent node of the current node
             top_node = self
             if top_node.parent:
                 top_node = top_node.parent
 
-            value_score = (self.T / self.N)
+            exploration = sqrt(log(1 + top_node.N) / (1 + self.N))
+
+            value_score = self.T / (1 + self.N) if self.N > 0 else 0
 
             prior_score = 0
             if self.mcts_agent.mutant_number >= self.mcts_agent.ROLLOUT_AFTER:
-                prior_score = self.mcts_agent.c * self.parent.nn_p[self.action_index] * sqrt(log(top_node.N) / self.N)
+                prior_score = self.mcts_agent.c * self.parent.nn_p[self.action_index] * exploration
 
             return value_score + prior_score
-
 
         def detach_parent(self):
             del self.parent

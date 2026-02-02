@@ -59,24 +59,19 @@ class InferenceManager:
         self.inference_batch_size = inference_batch_size
         self.window_size = window_size
 
-        # Buffer for pending requests (max size = total mutants)
         self.pending_requests = []
         self.requests_lock = threading.Lock()
 
-        # Results storage
         self.result_dict = {}
         self.result_lock = threading.Lock()
 
-        # Thread control
         self.running = True
         self.trigger_event = threading.Event()
         self.mutants_processed_count = 0
         self.count_lock = threading.Lock()
 
-        # Timeout management - ridotto per batch più frequenti
-        self.max_wait_time = 0.5  # Ridotto da 2.0 a 0.5 secondi
+        self.max_wait_time = 0.5
 
-        # Start inference thread
         self.worker_thread = threading.Thread(target=self._worker, daemon=True)
         self.worker_thread.start()
         print("[InferenceManager] Thread started")
@@ -108,7 +103,7 @@ class InferenceManager:
     def _worker(self):
         while self.running:
             # Wait for trigger or timeout
-            triggered = self.trigger_event.wait(timeout=0.1)  # Ridotto per essere più reattivo
+            triggered = self.trigger_event.wait(timeout=0.1)
 
             if not self.running:
                 break

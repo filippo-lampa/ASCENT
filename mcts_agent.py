@@ -352,17 +352,17 @@ class MCTSAgent:
             self.node_id = node_id
 
         def getUCBscore(self):
-            if self.N == 0:
-                return float('inf')
-
             top_node = self
             if top_node.parent:
                 top_node = top_node.parent
 
-            value_score = (self.T / self.N)
+            exploration = sqrt(log(1 + top_node.N) / (1 + self.N))
+
+            value_score = self.T / (1 + self.N) if self.N > 0 else 0
+
             prior_score = 0
-            if self.mcts_agent.mutant_count >= self.mcts_agent.ROLLOUT_AFTER:
-                prior_score = self.mcts_agent.c * self.parent.nn_p[self.action_index] * sqrt(log(top_node.N) / self.N)
+            if self.mcts_agent.mutant_number >= self.mcts_agent.ROLLOUT_AFTER:
+                prior_score = self.mcts_agent.c * self.parent.nn_p[self.action_index] * exploration
 
             return value_score + prior_score
 

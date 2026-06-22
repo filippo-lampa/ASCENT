@@ -88,12 +88,26 @@ def _plot_metric_over_time(ax, runs_matrix, title, ylabel, color):
     cumulative_mean = _running_mean_ignore_nan(mean_values)
     x = np.arange(runs_matrix.shape[1])
 
-    for run in runs_matrix:
-        ax.plot(x, run, color='gray', alpha=0.15, linewidth=0.6)
+    valid_mask = ~np.isnan(mean_values)
 
-    ax.plot(x, mean_values, color=color, linewidth=2.2, label='Average')
-    ax.fill_between(x, mean_values - std_values, mean_values + std_values, color=color, alpha=0.2, label='Std Dev')
-    ax.plot(x, cumulative_mean, color=color, linestyle='--', linewidth=2.0, label='Cumulative Average')
+    for run in runs_matrix:
+        run_mask = ~np.isnan(run)
+        ax.plot(x[run_mask], run[run_mask], color='gray', alpha=0.15, linewidth=0.6)
+
+    ax.plot(x[valid_mask], mean_values[valid_mask], color=color, linewidth=2.2, label='Average')
+
+    ax.fill_between(
+        x[valid_mask],
+        (mean_values - std_values)[valid_mask],
+        (mean_values + std_values)[valid_mask],
+        color=color,
+        alpha=0.2,
+        label='Std Dev'
+    )
+
+    valid_cum_mask = ~np.isnan(cumulative_mean)
+    ax.plot(x[valid_cum_mask], cumulative_mean[valid_cum_mask], color=color, linestyle='--', linewidth=2.0,
+            label='Cumulative Average')
 
     ax.set_title(title)
     ax.set_xlabel('Mutant Index')
@@ -103,49 +117,55 @@ def _plot_metric_over_time(ax, runs_matrix, title, ylabel, color):
 
 def plot_multiple_runs_results(all_runs_rewards, sut_name, should_save=False, save_path=None,
                                all_runs_divergencies=None, all_runs_rank_correlations=None):
-
     rewards_matrix = _stack_runs_with_nan_padding(all_runs_rewards)
     divergencies_matrix = _stack_runs_with_nan_padding(all_runs_divergencies or [])
     rank_corr_matrix = _stack_runs_with_nan_padding(all_runs_rank_correlations or [])
 
-    fig, axes = plt.subplots(3, 1, figsize=(14, 14), sharex=False)
+    metrics_to_plot = [
+        {
+            "matrix": rewards_matrix,
+            "title": f'Average Reward Over Time ({len(all_runs_rewards)} runs) - {sut_name}',
+            "ylabel": 'Reward',
+            "color": 'tab:blue',
+            "filename_suffix": 'rewards'
+        },
+        {
+            "matrix": divergencies_matrix,
+            "title": f'Average Divergency Among Agents Over Time - {sut_name}',
+            "ylabel": 'Symmetric KL Divergence',
+            "color": 'tab:green',
+            "filename_suffix": 'divergencies'
+        },
+        {
+            "matrix": rank_corr_matrix,
+            "title": f'Average Rank Correlation Among Agents Over Time - {sut_name}',
+            "ylabel": 'Spearman Correlation',
+            "color": 'tab:purple',
+            "filename_suffix": 'rank_correlations'
+        }
+    ]
 
-    _plot_metric_over_time(
-        axes[0],
-        rewards_matrix,
-        f'Average Reward Over Time ({len(all_runs_rewards)} runs) - {sut_name}',
-        'Reward',
-        'tab:blue',
-    )
-    _plot_metric_over_time(
-        axes[1],
-        divergencies_matrix,
-        f'Average Divergency Among Agents Over Time - {sut_name}',
-        'Symmetric KL Divergence',
-        'tab:green',
-    )
-    _plot_metric_over_time(
-        axes[2],
-        rank_corr_matrix,
-        f'Average Rank Correlation Among Agents Over Time - {sut_name}',
-        'Spearman Correlation',
-        'tab:purple',
-    )
+    for metric in metrics_to_plot:
 
-    handles, labels = [], []
-    for ax in axes:
-        h, l = ax.get_legend_handles_labels()
-        handles.extend(h)
-        labels.extend(l)
-    if handles:
-        fig.legend(handles, labels, loc='upper right', bbox_to_anchor=(0.98, 0.98), framealpha=1)
+        fig, ax = plt.subplots(figsize=(10, 5))
 
-    fig.tight_layout(rect=[0, 0, 1, 0.97])
+        _plot_metric_over_time(
+            ax,
+            metric["matrix"],
+            metric["title"],
+            metric["ylabel"],
+            metric["color"]
+        )
 
-    if should_save and save_path:
-        fig.savefig(f'{save_path}/multi_run_metrics_{sut_name}.png', bbox_inches='tight', dpi=300)
+        ax.legend(loc='upper right', framealpha=1)
+        fig.tight_layout()
 
-    plt.show()
+        if should_save and save_path:
+            filename = f'{save_path}/multi_run_{metric["filename_suffix"]}_{sut_name}.png'
+            fig.savefig(filename, bbox_inches='tight', dpi=300)
+            logging.info(f"Saved: {filename}")
+
+        plt.show()
 
 
 

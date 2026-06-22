@@ -456,16 +456,17 @@ if __name__ == '__main__':
 
     logging.info(f"{bcolors.HEADER}Launching experiments...{bcolors.ENDC}")
 
+    aggregation_strategy = "weighted_average"
     sut_name = "thorwallet"
     timestamp = time.strftime("%Y%m%d_%H%M%S")
-    run_dir = os.path.join('experiments', f"{sut_name}_{timestamp}")
+    run_dir = os.path.join('experiments', f"{sut_name}_{aggregation_strategy}_{timestamp}")
 
     if not os.path.exists(run_dir):
         os.makedirs(run_dir)
 
-    results_file_name = f'results_{sut_name}_{timestamp}.json'
-    best_params_file_name = f'best_params_{sut_name}_{timestamp}.json'
-    tracker_json_path = os.path.join(run_dir, f'disagreement_{sut_name}_{timestamp}.json')
+    results_file_name = f'results_{sut_name}_{aggregation_strategy}_{timestamp}.json'
+    best_params_file_name = f'best_params_{sut_name}_{aggregation_strategy}_{timestamp}.json'
+    tracker_json_path = os.path.join(run_dir, f'disagreement_{sut_name}_{aggregation_strategy}_{timestamp}.json')
 
     with open(os.path.join(run_dir, results_file_name), 'w') as f:
         json.dump({"executions": []}, f, indent=4)

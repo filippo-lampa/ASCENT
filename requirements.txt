@@ -3,3 +3,5 @@ torch
 numpy >= 2.2.0
 matplotlib >= 3.10.0
 optuna
+scipy
+pandas

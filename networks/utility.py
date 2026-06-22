@@ -9,17 +9,11 @@ def identify_test_place_in_sequence(test_sequence, total_number_of_tests):
             adapted_sequence.append(-1)
     return adapted_sequence
 
-def observation_to_tensor(obs, action_for_observation=None, total_number_of_tests=None):
-    action_tensor = None
-    if action_for_observation is not None:
-        action_embedding = nn.Embedding(total_number_of_tests, 8)
-        action_tensor = action_embedding(torch.tensor(action_for_observation))
+def observation_to_tensor(obs, total_number_of_tests=None):
     test_index_tensor = torch.tensor([obs.test_index], dtype=torch.float32)
     test_sequence_precise_tensor = torch.tensor(identify_test_place_in_sequence(obs.test_sequence, total_number_of_tests), dtype=torch.float32)
     mutant_operator_tensor = torch.tensor([obs.mutant_operator], dtype=torch.float32)
-    if action_for_observation is None:
-        return torch.cat((test_index_tensor, test_sequence_precise_tensor, mutant_operator_tensor))
-    return torch.cat((action_tensor, test_sequence_precise_tensor, mutant_operator_tensor)) #used in the observation network to predict if the mutant is killed or not
+    return torch.cat((test_index_tensor, test_sequence_precise_tensor, mutant_operator_tensor))
 
 
 def inference(state_tensor, model):
@@ -28,8 +22,7 @@ def inference(state_tensor, model):
     with torch.no_grad():
         output = model(tensor_in.to('cuda' if torch.cuda.is_available() else 'cpu'))
     output = output.squeeze()  # Remove the outermost batch-size dimension
-    return output.item() if model.__class__.__name__ == 'ValueNN' or model.__class__.__name__ == 'ObservationNN' \
-        else torch.softmax(output, dim=-1)
+    return output.item() if model.__class__.__name__ == 'ValueNN' else torch.softmax(output, dim=-1)
 
 
 def training_model(model, inputs, targets, opt, loss_function, scheduler=None):
@@ -38,8 +31,6 @@ def training_model(model, inputs, targets, opt, loss_function, scheduler=None):
         print("Training ValueNN model...")
     elif model.__class__.__name__ == 'PolicyNN':
         print("Training PolicyNN model...")
-    else:
-        print("Training ObservationNN model...")
 
     model.train()
     losses = []

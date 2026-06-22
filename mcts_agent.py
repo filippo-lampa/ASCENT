@@ -15,6 +15,7 @@ from utils.consts import mutant_operators_list
 device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
 print("Using device: ", device)
 
+
 class AsymmetricLoss(nn.Module):
     def __init__(self, alpha):  # alpha > 1 penalizes underestimation more
         super(AsymmetricLoss, self).__init__()
@@ -35,7 +36,8 @@ class MCTSAgent:
     def __init__(self, policy_nn=None, value_nn=None, tests=None, kills_matrix=None,
                  sut_name=None, number_of_mutants=None, buffer_size=None, batch_size=None, update_delta=None,
                  rollout_after=None, asymmetric_loss_alpha=None, c_parameter=None, value_network_learning_rate=None,
-                 policy_network_learning_rate=None):
+                 policy_network_learning_rate=None, agents_manager=None, agent_key=None,
+                 diversity_bonus_weight=0.0):
 
         # Init Neural-MCTS parameters
         self.ROLLOUT_AFTER = rollout_after
@@ -57,13 +59,26 @@ class MCTSAgent:
         self.tests = tests
         self.sut_name = sut_name
         self.num_actions = len(self.tests)
-        self.max_reward = len(tests) # the maximum reward of the current episode to scale the values
-        self.kills_ranking = {test: 0 for test in range(len(self.tests))} # kills ranking of the tests, used as heuristic until we start relying on the networks
-        self.done = False # Checks if the episode is done (the mutant is killed or we run out of tests)
+        self.max_reward = len(tests)  # the maximum reward of the current episode to scale the values
+        self.kills_ranking = {test: 0 for test in range(
+            len(self.tests))}  # kills ranking of the tests, used as heuristic until we start relying on the networks
+        self.done = False  # Checks if the episode is done (the mutant is killed or we run out of tests)
         self.current_sut_tests_execution_time = 0
+        self.agents_manager = agents_manager
+
+        self.agent_key = agent_key #"exploration_proposed_test", "exploitation_proposed_test", "diversity_proposed_test"
+
+        self.diversity_bonus_weight = diversity_bonus_weight # When > 0, the UCB score gains an extra term that boosts tests which have been executed less often globally. Only used by the diversity agent.
+
+        # Per-episode bookkeeping (reset at the start of every mutant's episode)
+        self.obs = []
+        self.ps = []
+        self.p_obs = []
+        self.step = 0
+        self.reward_e = 0
 
         # Mutant-related stuff
-        self.mutant_number = None  # number of the current mutant in the prioritization execution
+        self.mutant_number = None
         self.mutant = None
         self.number_of_tests_executed = 0
         self.number_of_tests_executed_on_killable_mutants = 0
@@ -73,7 +88,6 @@ class MCTSAgent:
         self.c = c_parameter
         self.tree = None
         self.root_nodes = []
-
 
     def init_tree(self):
         for i in range(len(self.tests)):
@@ -91,41 +105,50 @@ class MCTSAgent:
         def __init__(self, done, killed, parent, observation, action_index, mcts_agent):
             self.mcts_agent = mcts_agent
             self.children = {}
-            self.T = 0 # sum of rewards
-            self.N = 0 # number of visits
-            self.observation = observation # state of the prioritization
-            self.done = done # if the node is terminal. could be because we ran out of tests or because the mutant is killed
-            self.killed = killed # if the mutant is killed
+            self.T = 0  # sum of rewards
+            self.N = 0  # number of visits
+            self.observation = observation  # state of the prioritization
+            self.done = done  # if the node is terminal. could be because we ran out of tests or because the mutant is killed
+            self.killed = killed  # if the mutant is killed
             self.parent = parent
             self.backup_parent = parent
-            self.action_index = action_index # action index that leads to this node
-            self.nn_v = 0 # value from the value network
-            self.nn_p = [0] * self.mcts_agent.num_actions # priors from the policy network
-    
+            self.action_index = action_index  # action index that leads to this node
+            self.nn_v = 0  # value from the value network
+            self.nn_p = [0] * self.mcts_agent.num_actions  # priors from the policy network
 
         def getUCBscore(self):
             top_node = self
             if top_node.parent:
                 top_node = top_node.parent
 
-            exploration = sqrt(log(1 + top_node.N) / (1 + self.N))
+            exploration = sqrt(top_node.N) / (1 + self.N)
 
+            # exploitation
             value_score = self.T / (1 + self.N) if self.N > 0 else 0
 
+            # exploration
             prior_score = 0
             if self.mcts_agent.mutant_number >= self.mcts_agent.ROLLOUT_AFTER:
-                prior_score = self.mcts_agent.c * self.parent.nn_p[self.action_index] * exploration
+                prior_probability = self.parent.nn_p[self.action_index] if self.parent else (
+                            1.0 / self.mcts_agent.num_actions)
+                prior_score = self.mcts_agent.c * prior_probability * exploration
+            else:
+                uniform_prior = 1.0 / self.mcts_agent.num_actions
+                prior_score = self.mcts_agent.c * uniform_prior * exploration
 
-            return value_score + prior_score
+            diversity_score = 0
+            if self.mcts_agent.diversity_bonus_weight > 0:
+                exec_count = self.mcts_agent.agents_manager.test_execution_counts[self.action_index]
+                diversity_score = self.mcts_agent.diversity_bonus_weight / (1 + exec_count)
+
+            return value_score + prior_score + diversity_score
 
         def detach_parent(self):
             del self.parent
             self.parent = None
 
-
         def get_available_actions(self):
             return [i for i in range(len(self.mcts_agent.tests)) if i not in self.observation.test_sequence]
-
 
         def create_child(self):
             '''
@@ -169,7 +192,6 @@ class MCTSAgent:
             if self.mcts_agent.mutant_number >= self.mcts_agent.ROLLOUT_AFTER:
                 self.children[action].T += self.children[action].nn_v
 
-
         def rollout(self):
             if self.done:
                 return 0, None
@@ -182,9 +204,7 @@ class MCTSAgent:
 
                 return v if v > 0 else 0, p
 
-
-        def next(self):
-
+        def get_ranking(self):
             if self.done:
                 raise ValueError("episode has ended")
 
@@ -194,44 +214,180 @@ class MCTSAgent:
             for child in self.children.values():
                 child.parent = child.backup_parent
 
-            probs = [0] * len(self.children)
-            max_U = max(c.getUCBscore() for c in self.children.values())
+            # Safely extract PUCT scores without fear of infinity values
+            scores = [c.getUCBscore() for c in self.children.values()]
+            max_U = max(scores)
 
-            if max_U == float('inf'):
-                probs = [1 if c.getUCBscore() == float('inf') else 0 for c in self.children.values()]
-            elif max_U == 0:
-                probs = [1 / len(self.children) for c in self.children.values()]
+            if max_U == 0:
+                probs = [1 / len(self.children) for _ in self.children.values()]
             else:
-                for index, node in enumerate(self.children.values()):
-                    probs[index] = node.getUCBscore() / max_U
+                probs = [float(score / max_U) for score in scores]
 
             probs = np.array(probs)
             probs = probs / probs.sum()
 
-            #the next children is the one with the highest UCB score (the one with the highest probability)
-            next_child = list(self.children.items())[np.argmax(probs)][1]
-
-            #mask probabilities of all other actions to 0
+            # mask probabilities of all other actions to 0
             masked_probs = [0] * self.mcts_agent.num_actions
             for index, child in enumerate(self.children.values()):
                 masked_probs[child.action_index] = probs[index]
 
-            #fit the chosen node to the current mutant
-            next_child.observation = self.mcts_agent.State(next_child.observation.test_sequence,
-                                        mutant_operators_list.index(self.mcts_agent.mutant["operator"]),
-                                        next_child.action_index)
-
             self.nn_p = masked_probs
 
-            return next_child, next_child.action_index, next_child.observation, masked_probs, self.observation
+            return masked_probs
 
+        def select_child(self, chosen_action):
+            '''
+            Given the test index chosen by the AgentsManager (after aggregating the
+            rankings of all the agents), return the corresponding child node, fitted
+            to the current mutant. If this node doesn't have a child for `chosen_action` yet (e.g. because
+            another agent's ranking led the aggregator towards an action this agent
+            hadn't expanded), the child is created on the fly.
+            '''
 
-    def policy_player_mcts(self, mytree):
+            if chosen_action not in self.children:
+                env_copy = deepcopy(self.observation)
+                env_copy.test_sequence.append(chosen_action)
 
-        mytree.N += 1 # We increment the number of visits of the current node
+                placeholder_observation = self.mcts_agent.State(env_copy.test_sequence, env_copy.mutant_operator,
+                                                                chosen_action)
+                done = True if len(env_copy.test_sequence) == len(self.mcts_agent.tests) else False
+
+                self.children[chosen_action] = type(self)(done, False, self, placeholder_observation, chosen_action,
+                                                          self.mcts_agent)
+                self.children[chosen_action].nn_v, self.children[chosen_action].nn_p = self.children[
+                    chosen_action].rollout()
+
+                if self.mcts_agent.mutant_number >= self.mcts_agent.ROLLOUT_AFTER:
+                    self.children[chosen_action].T += self.children[chosen_action].nn_v
+
+            next_child = self.children[chosen_action]
+
+            # fit the chosen node to the current mutant
+            next_child.observation = self.mcts_agent.State(next_child.observation.test_sequence,
+                                                           mutant_operators_list.index(
+                                                               self.mcts_agent.mutant["operator"]),
+                                                           next_child.action_index)
+
+            return next_child, next_child.action_index, next_child.observation, self.nn_p, self.observation
+
+    def _update_kills_ranking(self, action_index):
+        '''
+        Update the heuristic kills_ranking with the test that just killed the mutant.
+        '''
+        if action_index in self.kills_ranking:
+            self.kills_ranking[action_index] += 1
+        else:
+            self.kills_ranking[action_index] = 1
+
+        self.kills_ranking = dict(sorted(self.kills_ranking.items(), key=lambda item: item[1], reverse=True))
+
+    def prepare_episode(self, mutant, mutant_number, mutant_not_killable):
+        '''
+        Reset the per-episode state of this agent before prioritizing a new mutant.
+        Must be called (for every agent) before propose_root_ranking().
+        '''
+
+        self.mutant_number = mutant_number
+        self.mutant = mutant
+        self.mutant_not_killable = mutant_not_killable
+
+        self.done = False
+        self.obs = []
+        self.ps = []
+        self.p_obs = []
+        self.step = 1  # the root selection counts as the first step of the episode
+        self.reward_e = 0
+
+        if self.tree is None:
+            # This is the first ever episode for this agent: create the root nodes for each action
+            self.init_tree()
+
+    def propose_root_ranking(self):
+        '''
+        Compute this agent's ranking for the first test using PUCT logic,
+        allowing agents with different 'c' parameters to disagree immediately.
+        '''
+        scores = []
+
+        # Total root level focus can be scaled by the current mutant number
+        parent_n = max(1, self.mutant_number)
+
+        for child in self.root_nodes:
+            # Value score fallback if never visited
+            value_score = (child.T / child.N) if child.N > 0 else 0.0
+
+            # Smooth denominator exploration component
+            exploration = sqrt(parent_n) / (1 + child.N)
+
+            prior_score = 0
+            if self.mutant_number >= self.ROLLOUT_AFTER:
+                # If networks are active, pull from your initialized node policy vector or a default prior
+                prior_prob = child.nn_p[child.action_index] if hasattr(child, 'nn_p') and child.nn_p else (
+                            1.0 / self.num_actions)
+                prior_score = self.c * prior_prob * exploration
+            else:
+                # Cold-start uniform prior so that different 'c' values cause early disagreement
+                uniform_prior = 1.0 / self.num_actions
+                prior_score = self.c * uniform_prior * exploration
+
+            scores.append(value_score + prior_score)
+
+        max_score = max(scores)
+
+        if max_score == 0:
+            probs = [1 / len(scores) for _ in scores]
+        else:
+            probs = [s / max_score for s in scores]
+
+        probs = np.array(probs)
+        probs = probs / probs.sum()
+
+        ranking = [0.0] * self.num_actions
+        for index, child in enumerate(self.root_nodes):
+            ranking[child.action_index] = probs[index]
+
+        return ranking
+
+    def apply_root(self, chosen_action, killed, terminal_state):
+        '''
+        Apply the test chosen by the AgentsManager (after aggregating the agents'
+        root rankings) as the first executed test of the episode, and update this
+        agent's tree accordingly.
+        '''
+
+        self.tree = self.root_nodes[chosen_action]
+        self.tree.done = False
+        self.tree.observation = self.State([chosen_action], mutant_operators_list.index(self.mutant["operator"]),
+                                           chosen_action)
+        self.tree.killed = killed
+        self.tree.done = terminal_state
+
+        if killed == 1:
+            self._update_kills_ranking(chosen_action)
+
+        self.done = terminal_state
+
+        if self.done:
+            current_reward = len(self.tests) - self.step
+            self.reward_e = current_reward
+            self.tree.T += current_reward / len(self.tests)
+
+    def propose_step_ranking(self):
+        '''
+        Perform one MCTS iteration on the current node of this agent's tree
+        (rollout and child expansion) and compute the resulting ranking (score
+        distribution over all tests), based on the UCB scores of the node's
+        children. The ranking is then shared with the AgentsManager, which
+        aggregates it together with the other agents' rankings to decide which
+        test is actually executed next.
+        '''
+
+        self.step += 1
+
+        mytree = self.tree
+        mytree.N += 1  # We increment the number of visits of the current node
 
         if self.mutant_number >= self.ROLLOUT_AFTER:
-
             # perform a rollout to fit the current node to the current mutant, so that the next ucb score will be calculated
             # with the current mutant in mind
             nn_v, nn_p = mytree.rollout()
@@ -241,163 +397,64 @@ class MCTSAgent:
 
         mytree.create_child()
 
-        next_tree, next_action, obs, p, p_obs = mytree.next()
+        return mytree.get_ranking()
 
-        # we detach the current node and returning the sub-tree that starts from the node rooted at the choosen action
+    def apply_step(self, chosen_action, killed, terminal_state, test_sequence):
+        '''
+        Apply the test chosen by the AgentsManager (after aggregating the agents'
+        rankings) as the next executed test of the episode, navigating this
+        agent's tree to (or creating, if needed) the corresponding child node.
+
+        `test_sequence` is the sequence of test indices executed so far in the
+        episode (shared across all agents, since the chosen test is the same for
+        all of them); it is used to fit the observation of the resulting node.
+        '''
+
+        mytree = self.tree
+
+        next_tree, next_action, _, p, p_obs = mytree.select_child(chosen_action)
+
+        # we detach the current node, keeping only the sub-tree rooted at the chosen action
         next_tree.detach_parent()
 
-        return next_tree, next_action, obs, p, p_obs
+        actual_observation = self.State(list(test_sequence), mutant_operators_list.index(self.mutant["operator"]),
+                                        next_action)
 
+        next_tree.observation = actual_observation
+        next_tree.killed = killed
+        next_tree.done = terminal_state
 
-    def execute_test_on_mutant(self, test, mutant):
-        """
-        Execute the test against the mutant and return the outcome.
-        """
+        if killed == 1:
+            self._update_kills_ranking(next_action)
 
-        if not self.mutant_not_killable:
-            self.number_of_tests_executed_on_killable_mutants += 1
+        self.tree = next_tree
+        self.done = terminal_state
 
-        self.number_of_tests_executed += 1
+        self.obs.append(actual_observation)
+        self.ps.append(p)
+        self.p_obs.append(p_obs)
 
-        # each mutant, among the other information, has two parameters: killing and nonkilling tests.
-        # right now, for testing purposes, we mock the execution of the test against the mutant by checking if the test
-        # is in the killing tests of the mutant. If it is, the mutant is killed, otherwise it is not.
-        outcome = 0
-        if len(mutant["testResults"]) > 0:
-            if "\\" in list(mutant["testResults"].keys())[0] and "/" in test["test_file_path"]:
-                test_relative_path = test["test_file_path"].split(self.sut_name)[1].replace("/", "\\")
-            elif "/" in list(mutant["testResults"].keys())[0] and "\\" in test["test_file_path"]:
-                test_relative_path = test["test_file_path"].split(self.sut_name)[1].replace("\\", "/")
-            else:
-                test_relative_path = test["test_file_path"].split(self.sut_name)[1]
+        current_reward = len(self.tests) - self.step
 
-            duration_found = False
+        print("Agent: ", self.agent_key, "Step: ", self.step, "Sequence: ", actual_observation.test_sequence,
+              "Reward: ", current_reward)
 
-            for killing_test_method in mutant["testResults"][test_relative_path]["failed"]:
-                if killing_test_method["title"] == test["test_method_name"]:
-                    self.current_sut_tests_execution_time += killing_test_method["duration"]
-                    duration_found = True
-                    outcome = 1
-                    break
+        if self.done:
+            next_tree.T += current_reward / len(self.tests)  # update the value of the node with the actual reward
+            self.reward_e = current_reward
+            self.replay_buffer.add(self.obs[-1], current_reward, self.ps[-1], self.p_obs[-1])
 
-            if not duration_found:
-                for non_killing_test_method in mutant["testResults"][test_relative_path]["passed"]:
-                    if non_killing_test_method["title"] == test["test_method_name"]:
-                        self.current_sut_tests_execution_time += non_killing_test_method["duration"]
-                        break
+    def finish_episode(self):
+        '''
+        Wrap up the episode for this agent: report the reward obtained and, if it
+        is time to update the networks, train them on a batch sampled from the
+        replay buffer.
+        '''
 
-        # Update the kills ranking
-        if outcome == 1:
-            self.kills_ranking[self.tests.index(test)] = self.kills_ranking[self.tests.index(test)] + 1 if self.tests.index(test) in self.kills_ranking.keys() else 1
-            self.kills_ranking = dict(sorted(self.kills_ranking.items(), key=lambda item: item[1], reverse=True))
-
-        return outcome
-
-
-    def take_step(self, action, env):
-        """
-        Perform all necessary actions on the environment after selecting an action.
-        """
-
-        # Execute the test against the mutant
-        killed = self.execute_test_on_mutant(self.tests[action], self.mutant)
-
-        state = self.State(env.test_sequence, mutant_operators_list.index(self.mutant["operator"]), action)
-
-        terminal_state = False
-        if len(env.test_sequence) == len(self.tests) or killed:
-            terminal_state = True
-
-        return state, killed, terminal_state
-
-
-    def run(self, mutant, mutant_number, mutant_not_killable):
-
-        self.mutant_number = mutant_number
-
-        self.mutant = mutant
-
-        self.mutant_not_killable = mutant_not_killable
-
-        self.done = False
-
-        if self.tree:
-            # This is not the first run, we select the root node based on the UCT formula
-            scores = [(child.T / child.N) + self.c * sqrt(log(self.mutant_number) / child.N) if child.N > 0 else float('inf') for child in self.root_nodes]
-            possible_trees_indexes = [i for i, x in enumerate(scores) if x == max(scores)]
-            self.tree = self.root_nodes[random.choice(possible_trees_indexes)]
-            self.tree.done = False
-            initial_state = self.State([self.tree.action_index], mutant_operators_list.index(self.mutant["operator"]),
-                                         self.tree.action_index)
-            # since we are at the root node, we immediately execute the action and get the observation
-            _, killed, terminal_state = self.take_step(self.tree.action_index, initial_state)
-            self.tree.observation = initial_state
-            self.tree.killed = killed
-        else:
-            # This is the first run, we create the root nodes for each action and select one at random
-            self.init_tree()
-            node_index = random.choice(range(len(self.tests)))
-            self.tree = self.root_nodes[node_index]
-            _, killed, terminal_state = self.take_step(node_index, self.tree.observation)
-            self.tree.killed = killed
-            self.tree.done = terminal_state
-
-            if self.tree.done:
-                done = True
-                self.tree.T += len(self.tests) / len(self.tests)
+        print('Episode reward (' + str(self.agent_key) + '): ' + str(self.reward_e))
 
         loss_v = None
         loss_p = None
-        reward_e = 0
-
-        obs = []
-        ps = []
-        p_obs = []
-
-        step = 1
-
-        tree = self.tree
-
-        while not self.done:
-
-            if self.tree.parent is None and self.tree.killed:
-                # Root node killed, we can stop the episode
-                reward_e = len(self.tests) - step
-                self.tree.T += len(self.tests) / len(self.tests)
-                self.done = True
-                break
-
-            step = step + 1
-
-            mytree, action, ob, p, p_ob = self.policy_player_mcts(tree)
-
-            actual_observation, killed, terminal_state = self.take_step(action, ob)
-
-            # We update the tree with the actual observation after executing the action, thereby replacing the placeholder
-            mytree.observation = actual_observation
-            mytree.killed = killed
-            mytree.done = terminal_state
-            ob = actual_observation
-
-            tree = mytree
-
-            self.done = mytree.done
-
-            obs.append(ob)
-            ps.append(p)
-            p_obs.append(p_ob)
-
-            current_reward = len(self.tests) - step
-
-            print("Step: ", step, "Sequence: ", ob.test_sequence, "Reward: ", current_reward)
-
-            if self.done:
-                mytree.T += current_reward / len(self.tests) # update the value of the node with the actual reward
-                reward_e = current_reward
-                self.replay_buffer.add(obs[-1], current_reward, ps[-1], p_obs[-1])
-                break
-
-        print('Episode reward: ' + str(reward_e))
 
         # Networks update
 
@@ -407,16 +464,17 @@ class MCTSAgent:
 
             # Each state has as target value the rewards of the episode
 
-            inputs = [observation_to_tensor(experience.obs, total_number_of_tests=self.num_actions) for experience in experiences]
+            inputs = [observation_to_tensor(experience.obs, total_number_of_tests=self.num_actions) for experience in
+                      experiences]
             targets = [torch.FloatTensor([experience.v / (self.max_reward)]) for experience in experiences]
 
-            k = 1.0 # parameter to balance the training set, we keep only k% of the inputs and targets with rewards == 0
+            k = 1.0  # parameter to balance the training set, we keep only k% of the inputs and targets with rewards == 0
 
             balanced_inputs = []
             balanced_targets = []
 
             # keep only k% of inputs and targets with rewards == 0
-            for i in range (len(targets)):
+            for i in range(len(targets)):
                 if experiences[i].v != 0 or random.random() < k:
                     balanced_inputs.append(inputs[i])
                     balanced_targets.append(targets[i])
@@ -428,13 +486,14 @@ class MCTSAgent:
 
             # Each state has as target policy the policy from the next state function
 
-            inputs = [observation_to_tensor(experience.p_obs, total_number_of_tests=self.num_actions) for experience in experiences]
+            inputs = [observation_to_tensor(experience.p_obs, total_number_of_tests=self.num_actions) for experience in
+                      experiences]
             targets = [torch.FloatTensor(experience.p) for experience in experiences if experience.p is not None]
 
             balanced_inputs = []
             balanced_targets = []
 
-            for i in range (len(targets)):
+            for i in range(len(targets)):
                 if experiences[i].v != 0 or random.random() < k:
                     balanced_inputs.append(inputs[i])
                     balanced_targets.append(targets[i])
@@ -444,5 +503,4 @@ class MCTSAgent:
 
             loss_p = training_model(self.policy_net, inputs, targets, self.policy_opt, self.policy_loss_function)
 
-        return (reward_e, loss_v, loss_p, self.number_of_tests_executed, self.number_of_tests_executed_on_killable_mutants,
-                self.UPDATE_DELTA, self.current_sut_tests_execution_time)
+        return (self.reward_e, loss_v, loss_p)

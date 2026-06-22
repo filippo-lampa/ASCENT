@@ -1,10 +1,7 @@
-import itertools
 import json
 import os
 import re
 import time
-
-import optuna
 
 import numpy as np
 
@@ -12,9 +9,9 @@ from mcts_agent import MCTSAgent
 
 from utils.logger import bcolors
 from utils.plotting import plot_mutant_prioritization_results
-from utils.consts import baseline_results_per_project, suts_names
 from networks.policy_nn import PolicyNN
 from networks.value_nn import ValueNN
+from agents_manager import AgentsManager, AggregationStrategy
 
 class Prioritizer:
     '''
@@ -66,6 +63,21 @@ class Prioritizer:
                     duplicates.remove(test['test_id'])
         return tests
 
+    def _safe_series_mean(self, values):
+        """
+        Return the mean of a numeric series while ignoring None/NaN values.
+        """
+        cleaned = []
+        for value in values:
+            if value is None:
+                continue
+            value = float(value)
+            if np.isnan(value):
+                continue
+            cleaned.append(value)
+
+        return float(np.mean(cleaned)) if cleaned else np.nan
+
     def load_tests(self):
         """
         load test methods from the tests files within the test folder
@@ -98,9 +110,7 @@ class Prioritizer:
 
         return tests
 
-    def execute(self, execution_id=0, buffer_size=None, batch_size=None,
-                update_delta=None, rollout_after=None, asymmetric_loss_alpha=None, c_parameter=None, value_lr=None,
-                policy_lr=None, policy_net=None, value_net=None, kills_matrix=None):
+    def execute(self, execution_id=0, networks=None, kills_matrix=None, run_idx=None, num_runs=None):
         '''
         Execute the prioritizer.
         '''
@@ -111,6 +121,11 @@ class Prioritizer:
         total_number_of_tests_executed = 0
         number_of_tests_executed_on_killable_mutants = 0
 
+        # Track experiment-level timing
+        global_start_time = None
+        if run_idx is not None and num_runs is not None:
+            global_start_time = round(time.time() * 1000)
+
         #get start time in milliseconds
         start_time = round(time.time() * 1000)
 
@@ -118,10 +133,35 @@ class Prioritizer:
 
         # Track rewards per mutant for statistical analysis
         rewards_per_mutant = []
+        avg_divergence_per_mutant = []
+        avg_rank_correlation_per_mutant = []
 
-        mcts = MCTSAgent(policy_net, value_net, self.tests, kills_matrix,
-                              self.sut_name, len(self.mutants), buffer_size, batch_size, update_delta,
-                            rollout_after, asymmetric_loss_alpha, c_parameter, value_lr, policy_lr)
+        agents_manager = AgentsManager(self.sut_name, self.tests)
+
+        exploration_mcts = MCTSAgent(networks["exploration"]["policy_net"], networks["exploration"]["value_net"], self.tests, kills_matrix,
+                              self.sut_name, len(self.mutants), len(self.mutants), 40, 1,
+                            45, 6.0, 3.0, 0.001,
+                                     0.0001, agents_manager, agent_key="exploration_proposed_test")
+
+        exploitation_mcts = MCTSAgent(networks["exploitation"]["policy_net"], networks["exploitation"]["value_net"],
+                                     self.tests, kills_matrix,
+                                     self.sut_name, len(self.mutants), len(self.mutants), 40, 1,
+                                     45, 6.0, 0.5, 0.001,
+                                      0.0001, agents_manager, agent_key="exploitation_proposed_test")
+
+        # The diversity agent optimizes search to select tests maximizing Diversity(t)=1−max(similarity(t,t′)) where t′∈ Executed
+        diversity_mcts = MCTSAgent(networks["diversity"]["policy_net"], networks["diversity"]["value_net"],
+                                     self.tests, kills_matrix,
+                                     self.sut_name, len(self.mutants), len(self.mutants), 40, 1,
+                                     45, 6.0, 2.0, 0.001,
+                                   0.0001, agents_manager, agent_key="diversity_proposed_test",
+                                   diversity_bonus_weight=1.0)
+
+        agents_manager.add_agents([exploration_mcts, exploitation_mcts, diversity_mcts])
+
+        aggregation_strategy = AggregationStrategy.WEIGHTED_MEAN
+
+        networks_update_freq = exploration_mcts.UPDATE_DELTA
 
         mutant_count = 0
 
@@ -140,26 +180,66 @@ class Prioritizer:
                         no_test_killing = False
                         break
 
-            print(f"{bcolors.HEADER}Processing mutant {index} ({mutant['id']}) out of {len(self.mutants)}{bcolors.ENDC}")
+            def format_time(ms):
+                seconds = ms // 1000
+                minutes = seconds // 60
+                hours = minutes // 60
+                seconds = seconds % 60
+                minutes = minutes % 60
+                
+                if hours > 0:
+                    return f"{hours}h {minutes}m {seconds}s"
+                elif minutes > 0:
+                    return f"{minutes}m {seconds}s"
+                else:
+                    return f"{seconds}s"
 
-            (reward, v_loss, p_loss, number_of_tests_executed, number_of_tests_executed_on_killable_mutants,
-             networks_update_freq, current_sut_tests_execution_time) = mcts.run(mutant, mutant_count, no_test_killing)
+            current_time = round(time.time() * 1000)
+            elapsed_time = current_time - start_time
+            
+            progress_str = f"Processing mutant {index} ({mutant['id']}) out of {len(self.mutants)}"
+            
+            if index > 0:
+                avg_time_per_mutant = elapsed_time / index
+                remaining_mutants = len(self.mutants) - index
+                estimated_remaining_time = avg_time_per_mutant * remaining_mutants
+                
+                progress_str += f" | Elapsed: {format_time(elapsed_time)} | Est. Remaining: {format_time(estimated_remaining_time)}"
 
-            sut_tests_execution_time += current_sut_tests_execution_time
+            # add total experiments ETA if running multiple experiments
+            if run_idx is not None and num_runs is not None:
+                total_elapsed = current_time - global_start_time
+                current_progress = (run_idx + (index / len(self.mutants))) / num_runs
+                
+                if current_progress > 0:
+                    total_estimated_time = total_elapsed / current_progress
+                    total_remaining_time = total_estimated_time - total_elapsed
+                    progress_str += f" [Run {run_idx + 1}/{num_runs}] Total Est. Remaining: {format_time(int(total_remaining_time))}"
+            
+            print(f"{bcolors.HEADER}{progress_str}{bcolors.ENDC}")
+
+            episode_results = agents_manager.run_episode(mutant, mutant_count, no_test_killing, aggregation_strategy)
+
+            reward, v_loss, p_loss = episode_results["agent_results"][0]
+
+            avg_divergence_per_mutant.append(self._safe_series_mean(episode_results["avg_sym_kl_over_time"]))
+            avg_rank_correlation_per_mutant.append(self._safe_series_mean(episode_results["avg_spearman_over_time"]))
+
+            number_of_tests_executed_on_killable_mutants = agents_manager.number_of_tests_executed_on_killable_mutants
 
             if not no_test_killing:
                 rewards.append(reward)
                 moving_average.append(np.mean(rewards))
                 rewards_per_mutant.append(reward)
             else:
-                rewards_per_mutant.append(None)  # Track non-killable mutants
+                rewards_per_mutant.append(np.nan)
             if v_loss is not None:
                 v_losses.append(v_loss)
                 moving_average_v_losses.append(np.mean(v_losses))
             if p_loss is not None:
                 p_losses.append(p_loss)
                 moving_average_p_losses.append(np.mean(p_losses))
-            total_number_of_tests_executed = number_of_tests_executed
+            total_number_of_tests_executed = agents_manager.number_of_tests_executed
 
             print(f"{bcolors.OKGREEN}Total number of tests executed so far: {total_number_of_tests_executed}{bcolors.ENDC}")
             print(f"{bcolors.OKGREEN}Total number of tests executed on killable mutants so far: "
@@ -183,161 +263,46 @@ class Prioritizer:
                                                    execution_id=execution_id)
         end_time = round(time.time() * 1000)
 
+        sut_tests_execution_time = agents_manager.current_sut_tests_execution_time
+
         execution_time = end_time - start_time
         print(f"{bcolors.OKGREEN}Execution time: {round(execution_time, 2)} seconds{bcolors.ENDC}")
 
-        return (total_number_of_tests_executed, number_of_tests_executed_on_killable_mutants, rewards, moving_average,
-                v_losses, p_losses, moving_average_v_losses, moving_average_p_losses, execution_time,
-                sut_tests_execution_time, rewards_per_mutant)
-
-    def objective(self, trial):
-
-        all_params = ['c_parameter', 'asymmetric_loss_alpha', 'rollout_after', 'update_delta', 'buffer_size', 'batch_size']
-
-        chosen = trial.suggest_categorical("chosen_params", list(itertools.combinations(all_params, 5)))
-
-        params = {
-            'value_network_learning_rate': 0.001,
-            'policy_network_learning_rate': 0.0001
+        return {
+            "total_number_of_tests_executed": total_number_of_tests_executed,
+            "number_of_tests_executed_on_killable_mutants": number_of_tests_executed_on_killable_mutants,
+            "rewards": rewards,
+            "moving_average": moving_average,
+            "v_losses": v_losses,
+            "p_losses": p_losses,
+            "moving_average_v_losses": moving_average_v_losses,
+            "moving_average_p_losses": moving_average_p_losses,
+            "execution_time": execution_time,
+            "sut_tests_execution_time": sut_tests_execution_time,
+            "rewards_per_mutant": rewards_per_mutant,
+            "avg_divergence_per_mutant": avg_divergence_per_mutant,
+            "avg_rank_correlation_per_mutant": avg_rank_correlation_per_mutant,
         }
 
-        defaults = {
-            'c_parameter': 1.0,
-            'batch_size': 40,
-            'asymmetric_loss_alpha': 6.0,
-            'rollout_after': 45,
-            'update_delta': 1,
-            'buffer_size': len(self.mutants)
-        }
-
-        for name in all_params:
-            if name in chosen:
-                if name == 'c_parameter':
-                    params[name] = trial.suggest_categorical(name, [0.1, 1.0, 2.0, 3.0, 5.0])
-                elif name == 'batch_size':
-                    params[name] = trial.suggest_categorical(name, [16, 32, 40, 64, 128])
-                elif name == 'asymmetric_loss_alpha':
-                    params[name] = trial.suggest_categorical(name, [1.0, 3.25, 5.5, 7.75, 10.0])
-                elif name == 'rollout_after':
-                    params[name] = trial.suggest_categorical(name, [0, 25, 50, 75, 100])
-                elif name == 'update_delta':
-                    params[name] = trial.suggest_categorical(name, [1, 3, 5, 7, 10])
-                elif name == 'buffer_size':
-                    params[name] = trial.suggest_categorical(name, [int(len(self.mutants) * factor) for factor in [0.2, 0.4, 0.6, 0.8, 1.0]])
-            else:
-                params[name] = defaults[name]
-
-        #kills matrix is a dictionary that stores, for each test, the mutants that it kills. This is shared across all mutants
-        kills_matrix = {test['test_id']: [] for test in self.tests}
-
-        #init neural networks
-        nn_input_size = 1 + 1 + len(self.tests)
-        value_net = ValueNN(nn_input_size)
-        policy_net = PolicyNN(nn_input_size, len(self.tests))
-
-        # Execute prioritizer using these hyperparameters
-        performance = self.execute(
-            execution_id = self.execution_id,
-            buffer_size = params['buffer_size'],
-            batch_size = params['batch_size'],
-            update_delta = params['update_delta'],
-            rollout_after = params['rollout_after'],
-            asymmetric_loss_alpha = params['asymmetric_loss_alpha'],
-            c_parameter = params['c_parameter'],
-            value_lr = params['value_network_learning_rate'],
-            policy_lr = params['policy_network_learning_rate'],
-            policy_net = policy_net,
-            value_net = value_net,
-            kills_matrix = kills_matrix
-        )
-
-        # Save results
-        result = {
-            "execution_id": self.execution_id,
-            "sut_name": self.sut_name,
-            "parameters": {
-                "buffer_size": params["buffer_size"],
-                "batch_size": params["batch_size"],
-                "update_delta": params["update_delta"],
-                "rollout_after": params["rollout_after"],
-                "asymmetric_loss_alpha": params["asymmetric_loss_alpha"],
-                "c_parameter": params["c_parameter"],
-                "value_network_learning_rate": params["value_network_learning_rate"],
-                "policy_network_learning_rate": params["policy_network_learning_rate"],
-            },
-            "total_tests_executed": performance[0],
-            "baseline_total_tests_executed": baseline_results_per_project[self.sut_name + '_baseline_total_tests_executed'],
-            "total_tests_executed_on_killable_mutants": performance[1],
-            "baseline_total_tests_executed_on_killable_mutants": baseline_results_per_project[self.sut_name + '_baseline_total_tests_executed_on_killable_mutants'],
-            "percentual_improvement_on_killable_mutants": (
-                (baseline_results_per_project[self.sut_name + '_baseline_total_tests_executed_on_killable_mutants'] - performance[1]) /
-                baseline_results_per_project[self.sut_name + '_baseline_total_tests_executed_on_killable_mutants']) * 100
-                if baseline_results_per_project[self.sut_name + '_baseline_total_tests_executed_on_killable_mutants'] > 0 else 0,
-            "average_number_of_tests_needed_to_kill_a_mutant": np.mean([len(test['test_id']) for test in self.tests]),
-            "execution_time": performance[10],
-            "tests_execution_time": performance[9],
-            "total_execution_time": performance[8] + performance[9]
-        }
-
-        #update results json file
-        with open('experiments/' + self.results_file_name, 'r+', encoding='utf-8') as f:
-            results = json.load(f)
-            results['executions'].append(result)
-            f.seek(0)
-            json.dump(results, f, indent=4)
-
-
-        self.execution_id += 1
-
-        return performance[0]  # Return the total number of tests executed as the objective value for minimization
-
-    def launch_experiments(self):
-        """
-        Execute the prioritizer multiple times on the same mutants and tests, with different parameters selected through grid search.
-        """
-
-        study = optuna.create_study(direction="minimize", sampler=optuna.samplers.RandomSampler())
-        study.optimize(self.objective, n_trials=3)
-
-        #print best parameters for the SUT in the best_params file in the experiments folder
-        print("Best parameters:", study.best_params)
-        with open('experiments/' + self.best_params_file_name, 'w') as f:
-            json.dump(study.best_params, f, indent=4)
-
-        # retrieve the relative execution from the json (check the entry with the same parameters and return its execution id)
-        with open('experiments/' + self.results_file_name, 'r') as f:
-            results = json.load(f)
-            executions = results.get("executions", [])
-            for execution in executions:
-                if execution["parameters"] == study.best_params:
-                    print(f"Best execution ID: {execution['execution_id']}")
-                    break
-            else:
-                print("No matching execution found for the best parameters.")
 
     def launch_single_prioritization(self, num_runs=1):
         """
         Execute the prioritizer multiple times on the same mutants and tests with the same parameters.
-        Collects results from all runs for statistical analysis.
-
-        Args:
-            num_runs: Number of times to run the prioritization with the same parameters
+        Collects results from all runs for statistical analysis. In this branch, we leverage multiple mcts agents
+        with different exploration parameters and then aggregate the results before choosing the next test to execute.
         """
-        params = {
-            'value_network_learning_rate': 0.001,
-            'policy_network_learning_rate': 0.0001,
-            'c_parameter': 2.0,
-            'batch_size': 40,
-            'asymmetric_loss_alpha': 6.0,
-            'rollout_after': 45,
-            'update_delta': 1,
-            'buffer_size': len(self.mutants)
-        }
 
         all_runs_rewards = []
+        all_runs_divergencies = []
+        all_runs_rank_correlations = []
         all_runs_performances = []
 
+        overall_start_time = round(time.time() * 1000)
+        run_times = []
+
         for run_idx in range(num_runs):
+            run_start_time = round(time.time() * 1000)
+            
             print(f"{bcolors.HEADER}Starting run {run_idx + 1}/{num_runs}{bcolors.ENDC}")
 
             #kills matrix is a dictionary that stores, for each test, the mutants that it kills. This is shared across all mutants
@@ -345,43 +310,94 @@ class Prioritizer:
 
             #init neural networks
             nn_input_size = 1 + 1 + len(self.tests)
-            value_net = ValueNN(nn_input_size)
-            policy_net = PolicyNN(nn_input_size, len(self.tests))
 
-            # Execute prioritizer using these hyperparameters
+            # exploration agent nns
+            exploration_agent_value_net = ValueNN(nn_input_size)
+            exploration_agent_policy_net = PolicyNN(nn_input_size, len(self.tests))
+
+            # exploitation agent nns
+            exploitation_agent_value_net = ValueNN(nn_input_size)
+            exploitation_agent_policy_net = PolicyNN(nn_input_size, len(self.tests))
+
+            # diversity agent nns
+            diversity_agent_value_net = ValueNN(nn_input_size)
+            diversity_agent_policy_net = PolicyNN(nn_input_size, len(self.tests))
+
+            networks = {
+                'exploration': {
+                    'value_net': exploration_agent_value_net,
+                    'policy_net': exploration_agent_policy_net
+                },
+                'exploitation': {
+                    'value_net': exploitation_agent_value_net,
+                    'policy_net': exploitation_agent_policy_net
+                },
+                'diversity': {
+                    'value_net': diversity_agent_value_net,
+                    'policy_net': diversity_agent_policy_net
+                }
+            }
+
+            # Execute prioritizer using these hyperparameters, passing run information for ETA tracking
             performance = self.execute(
                 execution_id = self.execution_id + run_idx,
-                buffer_size = params['buffer_size'],
-                batch_size = params['batch_size'],
-                update_delta = params['update_delta'],
-                rollout_after = params['rollout_after'],
-                asymmetric_loss_alpha = params['asymmetric_loss_alpha'],
-                c_parameter = params['c_parameter'],
-                value_lr = params['value_network_learning_rate'],
-                policy_lr = params['policy_network_learning_rate'],
-                policy_net = policy_net,
-                value_net = value_net,
-                kills_matrix = kills_matrix
+                networks = networks,
+                run_idx = run_idx,
+                num_runs = num_runs
             )
+            
+            run_end_time = round(time.time() * 1000)
+            run_duration = run_end_time - run_start_time
+            run_times.append(run_duration)
 
-            all_runs_rewards.append(performance[10])  # rewards_per_mutant
+            all_runs_rewards.append(performance["rewards_per_mutant"])
+            all_runs_divergencies.append(performance["avg_divergence_per_mutant"])
+            all_runs_rank_correlations.append(performance["avg_rank_correlation_per_mutant"])
             all_runs_performances.append(performance)
 
             print(f"{bcolors.OKGREEN}Run {run_idx + 1} completed.{bcolors.ENDC}")
-            print(f"Total tests executed: {performance[0]}")
-            print(f"Total tests executed on killable mutants: {performance[1]}")
+            print(f"Total tests executed: {performance['total_number_of_tests_executed']}")
+            print(f"Total tests executed on killable mutants: {performance['number_of_tests_executed_on_killable_mutants']}")
+
+            if run_idx < num_runs - 1:
+                def format_time(ms):
+                    seconds = ms // 1000
+                    minutes = seconds // 60
+                    hours = minutes // 60
+                    seconds = seconds % 60
+                    minutes = minutes % 60
+                    
+                    if hours > 0:
+                        return f"{hours}h {minutes}m {seconds}s"
+                    elif minutes > 0:
+                        return f"{minutes}m {seconds}s"
+                    else:
+                        return f"{seconds}s"
+                
+                avg_run_time = sum(run_times) / len(run_times)
+                remaining_runs = num_runs - (run_idx + 1)
+                estimated_remaining_time = avg_run_time * remaining_runs
+                
+                print(f"{bcolors.OKBLUE}Average time per run: {format_time(int(avg_run_time))} | "
+                      f"Est. time for remaining {remaining_runs} run(s): {format_time(int(estimated_remaining_time))}{bcolors.ENDC}\n")
 
         # Plot aggregated results
         from utils.plotting import plot_multiple_runs_results
-        plot_multiple_runs_results(all_runs_rewards, self.sut_name,
-                                   should_save=True, save_path='experiments/plots')
+        plot_multiple_runs_results(
+            all_runs_rewards,
+            self.sut_name,
+            True,
+            'experiments/plots',
+            all_runs_divergencies,
+            all_runs_rank_correlations,
+        )
 
         # Print summary statistics
         print(f"\n{bcolors.HEADER}Summary across {num_runs} runs for SUT {self.sut_name}:{bcolors.ENDC}")
-        avg_tests = np.mean([p[0] for p in all_runs_performances])
-        std_tests = np.std([p[0] for p in all_runs_performances])
-        avg_killable = np.mean([p[1] for p in all_runs_performances])
-        std_killable = np.std([p[1] for p in all_runs_performances])
+        avg_tests = np.mean([p["total_number_of_tests_executed"] for p in all_runs_performances])
+        std_tests = np.std([p["total_number_of_tests_executed"] for p in all_runs_performances])
+        avg_killable = np.mean([p["number_of_tests_executed_on_killable_mutants"] for p in all_runs_performances])
+        std_killable = np.std([p["number_of_tests_executed_on_killable_mutants"] for p in all_runs_performances])
 
         print(f"Total tests executed: {avg_tests:.2f} ± {std_tests:.2f}")
         print(f"Total tests on killable mutants: {avg_killable:.2f} ± {std_killable:.2f}")
@@ -425,7 +441,7 @@ if __name__ == '__main__':
             file_path = os.path.join('experiments/plots', file)
             if os.path.isfile(file_path):
                 os.remove(file_path)
-
+    '''
     #execute the prioritizer on each project
     for sut_name in suts_names:
         test_folder_path = os.path.join('case_studies', sut_name, 'test')
@@ -438,7 +454,7 @@ if __name__ == '__main__':
         prioritizer.launch_experiments()
 
     '''
-    sut_name = "thorwallet"
+    sut_name = "bakerfi"
     test_folder_path = os.path.join('case_studies', sut_name, 'test')
     mutants_path = os.path.join('sumo_results', sut_name, 'mutations.json')
     prioritizer = Prioritizer(test_folder_path, mutants_path, sut_name, 30, 10, results_file_name, best_params_file_name)
@@ -446,5 +462,4 @@ if __name__ == '__main__':
     prioritizer.mutants = prioritizer.load_mutants()
     prioritizer.tests = prioritizer.load_tests()
     print(f"{bcolors.OKBLUE}Loaded {len(prioritizer.mutants)} mutants and {len(prioritizer.tests)} tests for {sut_name}{bcolors.ENDC}")
-    prioritizer.launch_single_prioritization(num_runs=1)  # Run 5 times for statistical significance
-    '''
+    prioritizer.launch_single_prioritization(num_runs=5)  # Run 5 times for statistical significance

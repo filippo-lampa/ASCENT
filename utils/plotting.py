@@ -40,110 +40,109 @@ def plot_mutant_prioritization_results(rewards, moving_average, v_losses, p_loss
     plt.show()
 
 
-def plot_multiple_runs_results(all_runs_rewards, sut_name, should_save=False, save_path=None):
+def _stack_runs_with_nan_padding(all_runs_series):
+    """Pad run series to max length with NaN so we can compute column-wise stats."""
+    if not all_runs_series:
+        return np.empty((0, 0), dtype=float)
 
-    num_runs = len(all_runs_rewards)
+    cleaned_runs = []
+    for run in all_runs_series:
+        values = []
+        for value in (run or []):
+            if value is None:
+                values.append(np.nan)
+            else:
+                values.append(float(value))
+        cleaned_runs.append(np.array(values, dtype=float))
 
-    rewards_matrix = []
-    for run_rewards in all_runs_rewards:
-        killable_rewards = [r for r in run_rewards if r is not None]
-        rewards_matrix.append(killable_rewards)
+    max_len = max((len(run) for run in cleaned_runs), default=0)
+    matrix = np.full((len(cleaned_runs), max_len), np.nan, dtype=float)
+    for i, run in enumerate(cleaned_runs):
+        matrix[i, :len(run)] = run
+    return matrix
 
-    min_length = min(len(r) for r in rewards_matrix)
-    rewards_matrix = [r[:min_length] for r in rewards_matrix]
-    rewards_array = np.array(rewards_matrix)
 
-    mean_rewards = np.mean(rewards_array, axis=0)
-    std_rewards = np.std(rewards_array, axis=0)
+def _running_mean_ignore_nan(series):
+    """Cumulative mean that skips NaN values."""
+    out = []
+    cumulative_sum = 0.0
+    count = 0
+    for value in series:
+        if not np.isnan(value):
+            cumulative_sum += value
+            count += 1
+        out.append(cumulative_sum / count if count else np.nan)
+    return np.array(out, dtype=float)
 
-    cumulative_means = []
-    cumulative_stds = []
-    for i in range(1, len(mean_rewards) + 1):
-        cumulative_means.append(np.mean(mean_rewards[:i]))
-        cum_run_means = [np.mean(run[:i]) for run in rewards_matrix]
-        cumulative_stds.append(np.std(cum_run_means))
 
-    cumulative_means = np.array(cumulative_means)
-    cumulative_stds = np.array(cumulative_stds)
+def _plot_metric_over_time(ax, runs_matrix, title, ylabel, color):
+    """Plot per-run traces, mean +/- std, and cumulative mean for one metric."""
+    if runs_matrix.size == 0:
+        ax.set_title(title)
+        ax.text(0.5, 0.5, 'No data available', transform=ax.transAxes, ha='center', va='center')
+        return
 
-    x = np.arange(len(mean_rewards))
+    mean_values = np.nanmean(runs_matrix, axis=0)
+    std_values = np.nanstd(runs_matrix, axis=0)
+    cumulative_mean = _running_mean_ignore_nan(mean_values)
+    x = np.arange(runs_matrix.shape[1])
 
-    fig, ax1 = plt.subplots(figsize=(14, 7))
+    for run in runs_matrix:
+        ax.plot(x, run, color='gray', alpha=0.15, linewidth=0.6)
 
-    # Push axis patches behind everything
-    ax1.set_zorder(0)
-    ax1.patch.set_visible(False)
+    ax.plot(x, mean_values, color=color, linewidth=2.2, label='Average')
+    ax.fill_between(x, mean_values - std_values, mean_values + std_values, color=color, alpha=0.2, label='Std Dev')
+    ax.plot(x, cumulative_mean, color=color, linestyle='--', linewidth=2.0, label='Cumulative Average')
 
-    # First axis (mean rewards)
-    color1 = 'tab:blue'
-    ax1.set_xlabel('Mutant Index')
-    ax1.set_ylabel('Mean Reward', color=color1)
+    ax.set_title(title)
+    ax.set_xlabel('Mutant Index')
+    ax.set_ylabel(ylabel)
+    ax.grid(True, alpha=0.3)
 
-    # Individual runs
-    for run in rewards_matrix:
-        ax1.plot(x, run, color='gray', alpha=0.15, linewidth=0.5, zorder=1)
 
-    # Mean reward
-    line_mean = ax1.plot(x, mean_rewards, color=color1, linewidth=2.5, label='Mean Reward', zorder=4)
+def plot_multiple_runs_results(all_runs_rewards, sut_name, should_save=False, save_path=None,
+                               all_runs_divergencies=None, all_runs_rank_correlations=None):
 
-    # Std shaded
-    ax1.fill_between(x,
-                     mean_rewards - std_rewards,
-                     mean_rewards + std_rewards,
-                     color=color1,
-                     alpha=0.25,
-                     label='Mean Std Dev',
-                     zorder=2)
+    rewards_matrix = _stack_runs_with_nan_padding(all_runs_rewards)
+    divergencies_matrix = _stack_runs_with_nan_padding(all_runs_divergencies or [])
+    rank_corr_matrix = _stack_runs_with_nan_padding(all_runs_rank_correlations or [])
 
-    ax1.tick_params(axis='y', labelcolor=color1)
-    ax1.grid(True, alpha=0.3)
+    fig, axes = plt.subplots(3, 1, figsize=(14, 14), sharex=False)
 
-    # Second axis
-    ax2 = ax1.twinx()
-    ax2.set_zorder(0)
-    ax2.patch.set_visible(False)
-
-    color2 = 'tab:orange'
-    ax2.set_ylabel('Cumulative Average Reward', color=color2)
-
-    line_cum = ax2.plot(x, cumulative_means, color=color2,
-                        linewidth=2.5, linestyle='--',
-                        label='Cumulative Mean Reward',
-                        zorder=5)
-
-    ax2.fill_between(x,
-                     cumulative_means - cumulative_stds,
-                     cumulative_means + cumulative_stds,
-                     color=color2,
-                     alpha=0.25,
-                     label='Cumulative Std Dev',
-                     zorder=3)
-
-    ax2.tick_params(axis='y', labelcolor=color2)
-
-    # Gather legend items
-    lines1, labels1 = ax1.get_legend_handles_labels()
-    lines2, labels2 = ax2.get_legend_handles_labels()
-
-    # LEGEND ATTACHED TO FIGURE (most important fix)
-    fig_legend = fig.legend(
-        lines1 + lines2,
-        labels1 + labels2,
-        loc='upper right',
-        bbox_to_anchor=(0.98, 0.98),
-        framealpha=1
+    _plot_metric_over_time(
+        axes[0],
+        rewards_matrix,
+        f'Average Reward Over Time ({len(all_runs_rewards)} runs) - {sut_name}',
+        'Reward',
+        'tab:blue',
+    )
+    _plot_metric_over_time(
+        axes[1],
+        divergencies_matrix,
+        f'Average Divergency Among Agents Over Time - {sut_name}',
+        'Symmetric KL Divergence',
+        'tab:green',
+    )
+    _plot_metric_over_time(
+        axes[2],
+        rank_corr_matrix,
+        f'Average Rank Correlation Among Agents Over Time - {sut_name}',
+        'Spearman Correlation',
+        'tab:purple',
     )
 
-    fig_legend.set_zorder(1000)
+    handles, labels = [], []
+    for ax in axes:
+        h, l = ax.get_legend_handles_labels()
+        handles.extend(h)
+        labels.extend(l)
+    if handles:
+        fig.legend(handles, labels, loc='upper right', bbox_to_anchor=(0.98, 0.98), framealpha=1)
 
-    plt.title(f'Reward Trends Across {num_runs} Runs for SUT: {sut_name}',
-              fontsize=14, pad=20)
-
-    fig.tight_layout()
+    fig.tight_layout(rect=[0, 0, 1, 0.97])
 
     if should_save and save_path:
-        fig.savefig(f'{save_path}/multi_run_combined_{sut_name}.png',
-                    bbox_inches='tight', dpi=300)
+        fig.savefig(f'{save_path}/multi_run_metrics_{sut_name}.png', bbox_inches='tight', dpi=300)
 
     plt.show()
 
@@ -316,4 +315,4 @@ def plot_broken_y_axis(experiments_path=None):
     plt.show()
 
 if __name__ == '__main__':
-    plot_broken_y_axis(experiments_path=Path(r'C:\Users\Filippo\Projects\ASCENT\experiments\randomized_params'))
+    #plot_broken_y_axis(experiments_path=Path(r'C:\Users\Filippo\Projects\ASCENT\experiments\randomized_params'))

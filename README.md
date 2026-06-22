@@ -98,6 +98,21 @@ Incorporate the data from the Surya CFG and the Hardhat coverage matrix into you
 ```
 npx sumo addMutationsContext
 ```
+## 🔬 Reproducing Paper Experiments
+
+The experiments in the accompanying paper (Neural-MCTS Test Prioritization for Smart Contract Mutation Testing) are organized across dedicated branches:
+
+| Branch | Description |
+|--------|-------------|
+| `main` | Default configuration and baseline comparison |
+| `experiments` | Grid-sampled hyperparameter configurations |
+| `isolated_parameters` | One-parameter-at-a-time sensitivity analysis |
+| `coverage_state` | Enhanced state: test coverage feature |
+| `power_scores_state` | Enhanced state: mutation operator power scores |
+| `test_performances_variance_state` | Enhanced state: test outcome variance |
+| `inference_parallelization` | Asynchronous Neural-MCTS with batched inference and training |
+
+To reproduce a specific experiment, check out the corresponding branch and follow the instructions in the **Running Tests Prioritization and Execution** section below.
 
 ## :zap: Running Tests Prioritization and Execution 
 

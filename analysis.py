@@ -5,6 +5,7 @@ import matplotlib.pyplot as plt
 from scipy.stats import pearsonr
 import numpy as np
 
+from experiment_tracker import (analyze_experiment, analyze_pair_disagreement, analyze_disagreement_vs_reward)
 
 def load_data(path):
     with open(path, "r") as f:
@@ -152,6 +153,10 @@ def evaluate_consensus_configuration(executions, consensus_params):
         "avg_prioritized": float(np.mean(prioritized_tests)),
     }
 
+def analyze_committee(tracker_json_path):
+    analyze_experiment(tracker_json_path)
+    analyze_pair_disagreement(tracker_json_path)
+    analyze_disagreement_vs_reward(tracker_json_path)
 
 def main(path, allowed_grid, top_percent=10):
 

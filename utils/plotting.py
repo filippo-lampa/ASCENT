@@ -315,4 +315,4 @@ def plot_broken_y_axis(experiments_path=None):
     plt.show()
 
 if __name__ == '__main__':
-    #plot_broken_y_axis(experiments_path=Path(r'C:\Users\Filippo\Projects\ASCENT\experiments\randomized_params'))
+    plot_broken_y_axis(experiments_path=Path(r'C:\Users\Filippo\Projects\ASCENT\experiments\randomized_params'))

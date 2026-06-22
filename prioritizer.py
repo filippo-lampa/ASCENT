@@ -12,6 +12,8 @@ from utils.plotting import plot_mutant_prioritization_results
 from networks.policy_nn import PolicyNN
 from networks.value_nn import ValueNN
 from agents_manager import AgentsManager, AggregationStrategy
+from experiment_tracker import ExperimentTracker, analyze_experiment, analyze_pair_disagreement, analyze_disagreement_vs_reward
+from analysis import analyze_committee
 
 class Prioritizer:
     '''
@@ -19,7 +21,8 @@ class Prioritizer:
     For each mutant in a set of mutants, the prioritizer will learn to execute the tests in a
     way that maximizes the chance to kill the mutant as soon as possible.
     '''
-    def __init__(self, tests_folder_path, mutants_path, sut_name, plot_delta, average_delta, results_file_name, best_params_file_name):
+    def __init__(self, tests_folder_path, mutants_path, sut_name, plot_delta, average_delta, results_file_name,
+                 best_params_file_name, tracker_json_path='experiments/disagreement.json'):
         self.tests_folder_path = tests_folder_path
         self.mutants_path = mutants_path
         self.sut_name = sut_name
@@ -30,6 +33,7 @@ class Prioritizer:
         self.execution_id = 0
         self.results_file_name = results_file_name
         self.best_params_file_name = best_params_file_name
+        self.tracker_json_path = tracker_json_path
 
     def load_mutants(self):
         '''
@@ -138,6 +142,18 @@ class Prioritizer:
 
         agents_manager = AgentsManager(self.sut_name, self.tests)
 
+        from experiment_tracker import ExperimentTracker
+        tracker = ExperimentTracker(
+            json_path=self.tracker_json_path,
+            sut_name=self.sut_name,
+            experiment_id=execution_id,
+            run_idx=run_idx if run_idx is not None else 0,
+            num_mutants=len(self.mutants),
+            num_tests=len(self.tests),
+            aggregation_strategy=AggregationStrategy.WEIGHTED_MEAN.value,
+        )
+        tracker.begin_run()
+
         exploration_mcts = MCTSAgent(networks["exploration"]["policy_net"], networks["exploration"]["value_net"], self.tests, kills_matrix,
                               self.sut_name, len(self.mutants), len(self.mutants), 40, 1,
                             45, 6.0, 3.0, 0.001,
@@ -218,7 +234,14 @@ class Prioritizer:
             
             print(f"{bcolors.HEADER}{progress_str}{bcolors.ENDC}")
 
-            episode_results = agents_manager.run_episode(mutant, mutant_count, no_test_killing, aggregation_strategy)
+            tracker.begin_mutant(
+                mutant_idx=index,
+                mutant_id=mutant["id"],
+                operator=mutant["operator"],
+                killable=not no_test_killing,
+            )
+
+            episode_results = agents_manager.run_episode(mutant, mutant_count, no_test_killing, aggregation_strategy, tracker=tracker)
 
             reward, v_loss, p_loss = episode_results["agent_results"][0]
 
@@ -226,6 +249,12 @@ class Prioritizer:
             avg_rank_correlation_per_mutant.append(self._safe_series_mean(episode_results["avg_spearman_over_time"]))
 
             number_of_tests_executed_on_killable_mutants = agents_manager.number_of_tests_executed_on_killable_mutants
+
+            episode_steps = len(episode_results["avg_sym_kl_over_time"])
+            tracker.end_mutant(
+                reward=float(reward) if not no_test_killing else None,
+                tests_to_kill=episode_steps if not no_test_killing else None,
+            )
 
             if not no_test_killing:
                 rewards.append(reward)
@@ -266,6 +295,13 @@ class Prioritizer:
         sut_tests_execution_time = agents_manager.current_sut_tests_execution_time
 
         execution_time = end_time - start_time
+
+        tracker.end_run(
+            total_tests_executed=total_number_of_tests_executed,
+            total_tests_on_killable=number_of_tests_executed_on_killable_mutants,
+            execution_time_ms=execution_time,
+        )
+
         print(f"{bcolors.OKGREEN}Execution time: {round(execution_time, 2)} seconds{bcolors.ENDC}")
 
         return {
@@ -454,7 +490,7 @@ if __name__ == '__main__':
         prioritizer.launch_experiments()
 
     '''
-    sut_name = "bakerfi"
+    sut_name = "thorwallet"
     test_folder_path = os.path.join('case_studies', sut_name, 'test')
     mutants_path = os.path.join('sumo_results', sut_name, 'mutations.json')
     prioritizer = Prioritizer(test_folder_path, mutants_path, sut_name, 30, 10, results_file_name, best_params_file_name)
@@ -462,4 +498,9 @@ if __name__ == '__main__':
     prioritizer.mutants = prioritizer.load_mutants()
     prioritizer.tests = prioritizer.load_tests()
     print(f"{bcolors.OKBLUE}Loaded {len(prioritizer.mutants)} mutants and {len(prioritizer.tests)} tests for {sut_name}{bcolors.ENDC}")
-    prioritizer.launch_single_prioritization(num_runs=5)  # Run 5 times for statistical significance
+    prioritizer.launch_single_prioritization(num_runs=2)  # Run 5 times for statistical significance
+
+
+    tracker_json_path = os.path.join('experiments', 'disagreement.json')
+    analyze_committee(tracker_json_path)
+

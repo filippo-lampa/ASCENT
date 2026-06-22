@@ -206,7 +206,7 @@ class AgentsManager:
 
         print("----------------------------------------\n")
 
-    def run_episode(self, mutant, mutant_number, mutant_not_killable, aggregation_strategy):
+    def run_episode(self, mutant, mutant_number, mutant_not_killable, aggregation_strategy, tracker=None):
         """
         Run a full prioritization episode for a single mutant, driving all the
         registered MCTS agents (exploration, exploitation, diversity) in
@@ -224,6 +224,9 @@ class AgentsManager:
 
         This continues until the mutant is killed or all tests have been
         executed.
+
+        `tracker` is an optional ExperimentTracker instance.  When provided,
+        every step's disagreement metrics are recorded automatically.
         """
 
         for agent in self.agents:
@@ -232,7 +235,7 @@ class AgentsManager:
         avg_sym_kl_over_time = []
         avg_spearman_over_time = []
 
-        # choose the first test of the episode
+        # ── root step ─────────────────────────────────────────────────────────
         self.reset_step_solutions()
         for agent in self.agents:
             ranking = agent.propose_root_ranking()
@@ -250,9 +253,22 @@ class AgentsManager:
         for agent in self.agents:
             agent.apply_root(chosen_action, killed, terminal_state)
 
+        if tracker is not None:
+            agent_top_picks = {
+                key: list(map(int, np.argsort(ranking)[::-1][:3]))
+                for key, ranking in self._valid_proposals().items()
+            }
+            tracker.record_step(
+                step_idx=0,
+                chosen_test_idx=chosen_action,
+                killed=bool(killed),
+                metrics=root_metrics,
+                agent_top_picks=agent_top_picks,
+            )
+
         done = terminal_state
 
-        # following iterations
+        # ── subsequent steps ──────────────────────────────────────────────────
         while not done:
             self.reset_step_solutions()
             for agent in self.agents:
@@ -263,14 +279,30 @@ class AgentsManager:
             avg_sym_kl_over_time.append(step_metrics["avg_sym_kl"])
             avg_spearman_over_time.append(step_metrics["avg_spearman"])
 
+            # Snapshot proposals BEFORE aggregate_solutions clears/uses them
+            current_proposals = self._valid_proposals()
+
             chosen_action = self.aggregate_solutions(aggregation_strategy, disagreement_metrics=step_metrics)
 
-            env = MCTSAgent.State(env.test_sequence + [chosen_action], mutant_operators_list.index(mutant["operator"]),
-                                  chosen_action)
+            env = MCTSAgent.State(env.test_sequence + [chosen_action],
+                                  mutant_operators_list.index(mutant["operator"]), chosen_action)
             _, killed, terminal_state = self.take_step(chosen_action, env, mutant, mutant_not_killable)
 
             for agent in self.agents:
                 agent.apply_step(chosen_action, killed, terminal_state, env.test_sequence)
+
+            if tracker is not None:
+                agent_top_picks = {
+                    key: list(map(int, np.argsort(ranking)[::-1][:3]))
+                    for key, ranking in current_proposals.items()
+                }
+                tracker.record_step(
+                    step_idx=len(env.test_sequence) - 1,
+                    chosen_test_idx=chosen_action,
+                    killed=bool(killed),
+                    metrics=step_metrics,
+                    agent_top_picks=agent_top_picks,
+                )
 
             done = terminal_state
 

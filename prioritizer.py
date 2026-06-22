@@ -15,7 +15,8 @@ from utils.plotting import plot_mutant_prioritization_results
 from networks.policy_nn import PolicyNN
 from networks.value_nn import ValueNN
 from agents_manager import AgentsManager, AggregationStrategy
-from experiment_tracker import ExperimentTracker, analyze_experiment, analyze_pair_disagreement, analyze_disagreement_vs_reward
+from experiment_tracker import ExperimentTracker, analyze_experiment, analyze_pair_disagreement, \
+    analyze_disagreement_vs_reward
 from analysis import analyze_committee
 
 
@@ -25,8 +26,9 @@ class Prioritizer:
     For each mutant in a set of mutants, the prioritizer will learn to execute the tests in a
     way that maximizes the chance to kill the mutant as soon as possible.
     '''
+
     def __init__(self, tests_folder_path, mutants_path, sut_name, plot_delta, average_delta, results_file_name,
-                 best_params_file_name, tracker_json_path='experiments/disagreement.json'):
+                 best_params_file_name, tracker_json_path='experiments/disagreement.json', run_dir='experiments'):
         self.tests_folder_path = tests_folder_path
         self.mutants_path = mutants_path
         self.sut_name = sut_name
@@ -38,6 +40,7 @@ class Prioritizer:
         self.results_file_name = results_file_name
         self.best_params_file_name = best_params_file_name
         self.tracker_json_path = tracker_json_path
+        self.run_dir = run_dir
 
     def load_mutants(self):
         '''
@@ -57,7 +60,6 @@ class Prioritizer:
                 mutants_list.append(mutant)
 
         return mutants_list
-
 
     def remove_duplicates(self, tests):
         test_ids = [test['test_id'] for test in tests]
@@ -112,7 +114,7 @@ class Prioritizer:
                         for test_method_name in test_method_names
                     ])
 
-        #remove eventual duplicates
+        # remove eventual duplicates
         tests = self.remove_duplicates(tests)
 
         return tests
@@ -133,10 +135,11 @@ class Prioritizer:
         if run_idx is not None and num_runs is not None:
             global_start_time = round(time.time() * 1000)
 
-        #get start time in milliseconds
+        # get start time in milliseconds
         start_time = round(time.time() * 1000)
 
-        (rewards, moving_average, v_losses, p_losses, moving_average_v_losses, moving_average_p_losses) = [[] for _ in range(6)]
+        (rewards, moving_average, v_losses, p_losses, moving_average_v_losses, moving_average_p_losses) = [[] for _ in
+                                                                                                           range(6)]
 
         # Track rewards per mutant for statistical analysis
         rewards_per_mutant = []
@@ -157,22 +160,23 @@ class Prioritizer:
         )
         tracker.begin_run()
 
-        exploration_mcts = MCTSAgent(networks["exploration"]["policy_net"], networks["exploration"]["value_net"], self.tests, kills_matrix,
-                              self.sut_name, len(self.mutants), len(self.mutants), 40, 1,
-                            45, 6.0, 3.0, 0.001,
+        exploration_mcts = MCTSAgent(networks["exploration"]["policy_net"], networks["exploration"]["value_net"],
+                                     self.tests, kills_matrix,
+                                     self.sut_name, len(self.mutants), len(self.mutants), 40, 100,
+                                     45, 6.0, 3.0, 0.001,
                                      0.0001, agents_manager, agent_key="exploration_proposed_test")
 
         exploitation_mcts = MCTSAgent(networks["exploitation"]["policy_net"], networks["exploitation"]["value_net"],
-                                     self.tests, kills_matrix,
-                                     self.sut_name, len(self.mutants), len(self.mutants), 40, 1,
-                                     45, 6.0, 0.5, 0.001,
+                                      self.tests, kills_matrix,
+                                      self.sut_name, len(self.mutants), len(self.mutants), 40, 100,
+                                      45, 6.0, 0.5, 0.001,
                                       0.0001, agents_manager, agent_key="exploitation_proposed_test")
 
         # The diversity agent optimizes search to select tests maximizing Diversity(t)=1−max(similarity(t,t′)) where t′∈ Executed
         diversity_mcts = MCTSAgent(networks["diversity"]["policy_net"], networks["diversity"]["value_net"],
-                                     self.tests, kills_matrix,
-                                     self.sut_name, len(self.mutants), len(self.mutants), 40, 1,
-                                     45, 6.0, 2.0, 0.001,
+                                   self.tests, kills_matrix,
+                                   self.sut_name, len(self.mutants), len(self.mutants), 40, 100,
+                                   45, 6.0, 2.0, 0.001,
                                    0.0001, agents_manager, agent_key="diversity_proposed_test",
                                    diversity_bonus_weight=1.0)
 
@@ -184,10 +188,10 @@ class Prioritizer:
 
         mutant_count = 0
 
-        #shuffle mutants before execution
-        #np.random.shuffle(self.mutants)
+        # shuffle mutants before execution
+        # np.random.shuffle(self.mutants)
 
-        for index,mutant in enumerate(self.mutants):
+        for index, mutant in enumerate(self.mutants):
 
             mutant_count += 1
 
@@ -205,7 +209,7 @@ class Prioritizer:
                 hours = minutes // 60
                 seconds = seconds % 60
                 minutes = minutes % 60
-                
+
                 if hours > 0:
                     return f"{hours}h {minutes}m {seconds}s"
                 elif minutes > 0:
@@ -215,26 +219,26 @@ class Prioritizer:
 
             current_time = round(time.time() * 1000)
             elapsed_time = current_time - start_time
-            
+
             progress_str = f"Processing mutant {index} ({mutant['id']}) out of {len(self.mutants)}"
-            
+
             if index > 0:
                 avg_time_per_mutant = elapsed_time / index
                 remaining_mutants = len(self.mutants) - index
                 estimated_remaining_time = avg_time_per_mutant * remaining_mutants
-                
+
                 progress_str += f" | Elapsed: {format_time(elapsed_time)} | Est. Remaining: {format_time(estimated_remaining_time)}"
 
             # add total experiments ETA if running multiple experiments
             if run_idx is not None and num_runs is not None:
                 total_elapsed = current_time - global_start_time
                 current_progress = (run_idx + (index / len(self.mutants))) / num_runs
-                
+
                 if current_progress > 0:
                     total_estimated_time = total_elapsed / current_progress
                     total_remaining_time = total_estimated_time - total_elapsed
                     progress_str += f" [Run {run_idx + 1}/{num_runs}] Total Est. Remaining: {format_time(int(total_remaining_time))}"
-            
+
             logging.info(f"{bcolors.HEADER}{progress_str}{bcolors.ENDC}")
 
             tracker.begin_mutant(
@@ -244,7 +248,8 @@ class Prioritizer:
                 killable=not no_test_killing,
             )
 
-            episode_results = agents_manager.run_episode(mutant, mutant_count, no_test_killing, aggregation_strategy, tracker=tracker)
+            episode_results = agents_manager.run_episode(mutant, mutant_count, no_test_killing, aggregation_strategy,
+                                                         tracker=tracker)
 
             reward, v_loss, p_loss = episode_results["agent_results"][0]
 
@@ -273,9 +278,10 @@ class Prioritizer:
                 moving_average_p_losses.append(np.mean(p_losses))
             total_number_of_tests_executed = agents_manager.number_of_tests_executed
 
-            logging.debug(f"{bcolors.OKGREEN}Total number of tests executed so far: {total_number_of_tests_executed}{bcolors.ENDC}")
+            logging.debug(
+                f"{bcolors.OKGREEN}Total number of tests executed so far: {total_number_of_tests_executed}{bcolors.ENDC}")
             logging.debug(f"{bcolors.OKGREEN}Total number of tests executed on killable mutants so far: "
-                  f"{number_of_tests_executed_on_killable_mutants}{bcolors.ENDC}")
+                          f"{number_of_tests_executed_on_killable_mutants}{bcolors.ENDC}")
 
             """
             Uncomment the following lines to plot the results every 'plot_delta' mutants.
@@ -286,12 +292,14 @@ class Prioritizer:
             """
 
             if index == len(self.mutants) - 1:
-                if not os.path.exists('experiments/plots'):
-                    os.makedirs('experiments/plots')
+                plots_dir = os.path.join(self.run_dir, 'plots')
+                if not os.path.exists(plots_dir):
+                    os.makedirs(plots_dir)
 
-                plot_mutant_prioritization_results(rewards, moving_average, moving_average_v_losses, moving_average_p_losses,
+                plot_mutant_prioritization_results(rewards, moving_average, moving_average_v_losses,
+                                                   moving_average_p_losses,
                                                    networks_update_freq, self.average_delta,
-                                                   self.sut_name, should_save=True, save_path='experiments/plots',
+                                                   self.sut_name, should_save=True, save_path=plots_dir,
                                                    execution_id=execution_id)
         end_time = round(time.time() * 1000)
 
@@ -323,7 +331,6 @@ class Prioritizer:
             "avg_rank_correlation_per_mutant": avg_rank_correlation_per_mutant,
         }
 
-
     def launch_single_prioritization(self, num_runs=1):
         """
         Execute the prioritizer multiple times on the same mutants and tests with the same parameters.
@@ -341,13 +348,13 @@ class Prioritizer:
 
         for run_idx in range(num_runs):
             run_start_time = round(time.time() * 1000)
-            
+
             logging.info(f"{bcolors.HEADER}Starting run {run_idx + 1}/{num_runs}{bcolors.ENDC}")
 
-            #kills matrix is a dictionary that stores, for each test, the mutants that it kills. This is shared across all mutants
+            # kills matrix is a dictionary that stores, for each test, the mutants that it kills. This is shared across all mutants
             kills_matrix = {test['test_id']: [] for test in self.tests}
 
-            #init neural networks
+            # init neural networks
             nn_input_size = 1 + 1 + len(self.tests)
 
             # exploration agent nns
@@ -379,12 +386,12 @@ class Prioritizer:
 
             # Execute prioritizer using these hyperparameters, passing run information for ETA tracking
             performance = self.execute(
-                execution_id = self.execution_id + run_idx,
-                networks = networks,
-                run_idx = run_idx,
-                num_runs = num_runs
+                execution_id=self.execution_id + run_idx,
+                networks=networks,
+                run_idx=run_idx,
+                num_runs=num_runs
             )
-            
+
             run_end_time = round(time.time() * 1000)
             run_duration = run_end_time - run_start_time
             run_times.append(run_duration)
@@ -396,7 +403,8 @@ class Prioritizer:
 
             logging.debug(f"{bcolors.OKGREEN}Run {run_idx + 1} completed.{bcolors.ENDC}")
             logging.debug(f"Total tests executed: {performance['total_number_of_tests_executed']}")
-            logging.debug(f"Total tests executed on killable mutants: {performance['number_of_tests_executed_on_killable_mutants']}")
+            logging.debug(
+                f"Total tests executed on killable mutants: {performance['number_of_tests_executed_on_killable_mutants']}")
 
             if run_idx < num_runs - 1:
                 def format_time(ms):
@@ -405,20 +413,20 @@ class Prioritizer:
                     hours = minutes // 60
                     seconds = seconds % 60
                     minutes = minutes % 60
-                    
+
                     if hours > 0:
                         return f"{hours}h {minutes}m {seconds}s"
                     elif minutes > 0:
                         return f"{minutes}m {seconds}s"
                     else:
                         return f"{seconds}s"
-                
+
                 avg_run_time = sum(run_times) / len(run_times)
                 remaining_runs = num_runs - (run_idx + 1)
                 estimated_remaining_time = avg_run_time * remaining_runs
-                
+
                 logging.debug(f"{bcolors.OKBLUE}Average time per run: {format_time(int(avg_run_time))} | "
-                      f"Est. time for remaining {remaining_runs} run(s): {format_time(int(estimated_remaining_time))}{bcolors.ENDC}\n")
+                              f"Est. time for remaining {remaining_runs} run(s): {format_time(int(estimated_remaining_time))}{bcolors.ENDC}\n")
 
         # Plot aggregated results
         from utils.plotting import plot_multiple_runs_results
@@ -426,7 +434,7 @@ class Prioritizer:
             all_runs_rewards,
             self.sut_name,
             True,
-            'experiments/plots',
+            os.path.join(self.run_dir, 'plots'),
             all_runs_divergencies,
             all_runs_rank_correlations,
         )
@@ -448,62 +456,39 @@ if __name__ == '__main__':
 
     logging.info(f"{bcolors.HEADER}Launching experiments...{bcolors.ENDC}")
 
-    if not os.path.exists('experiments'):
-        os.makedirs('experiments')
+    sut_name = "thorwallet"
+    timestamp = time.strftime("%Y%m%d_%H%M%S")
+    run_dir = os.path.join('experiments', f"{sut_name}_{timestamp}")
 
-    next_experiment_id = 0
-    if os.path.exists('experiments/results.json'):
-        existing_files = [f for f in os.listdir('experiments') if f.startswith('results')]
-        experiment_ids = [int(re.search(r'results_(\d+)\.json', f).group(1)) for f in existing_files if
-                          re.search(r'results_(\d+)\.json', f)]
-        next_experiment_id = max(experiment_ids) + 1 if experiment_ids else 1
+    if not os.path.exists(run_dir):
+        os.makedirs(run_dir)
 
-    results_file_name = 'results.json' if next_experiment_id == 0 else f'results_{next_experiment_id}.json'
+    results_file_name = f'results_{sut_name}_{timestamp}.json'
+    best_params_file_name = f'best_params_{sut_name}_{timestamp}.json'
+    tracker_json_path = os.path.join(run_dir, f'disagreement_{sut_name}_{timestamp}.json')
 
-    next_best_params_id = 0
-    if os.path.exists('experiments/best_params.json'):
-        existing_files = [f for f in os.listdir('experiments') if f.startswith('best_params')]
-        best_params_ids = [int(re.search(r'best_params_(\d+)\.json', f).group(1)) for f in existing_files if
-                           re.search(r'best_params_(\d+)\.json', f)]
-        next_best_params_id = max(best_params_ids) + 1 if best_params_ids else 1
-
-    best_params_file_name = 'best_params.json' if next_best_params_id == 0 else f'best_params_{next_best_params_id}.json'
-
-    with open('experiments/' + results_file_name, 'w') as f:
+    with open(os.path.join(run_dir, results_file_name), 'w') as f:
         json.dump({"executions": []}, f, indent=4)
 
-    #empty the experiments/plots folder
-    if not os.path.exists('experiments/plots'):
-        os.makedirs('experiments/plots')
-    else:
-        for file in os.listdir('experiments/plots'):
-            file_path = os.path.join('experiments/plots', file)
-            if os.path.isfile(file_path):
-                os.remove(file_path)
-    '''
-    #execute the prioritizer on each project
-    for sut_name in suts_names:
-        test_folder_path = os.path.join('case_studies', sut_name, 'test')
-        mutants_path = os.path.join('sumo_results', sut_name, 'mutations.json')
-        prioritizer = Prioritizer(test_folder_path, mutants_path, sut_name, 30, 10, results_file_name, best_params_file_name)
-        logging.debug(f"{bcolors.OKBLUE}Executing prioritizer for {sut_name}{bcolors.ENDC}")
-        prioritizer.mutants = prioritizer.load_mutants()
-        prioritizer.tests = prioritizer.load_tests()
-        logging.debug(f"{bcolors.OKBLUE}Loaded {len(prioritizer.mutants)} mutants and {len(prioritizer.tests)} tests for {sut_name}{bcolors.ENDC}")
-        prioritizer.launch_experiments()
+    # Emptying directory logic removed as a fresh folder is now created for every standalone run.
+    plots_dir = os.path.join(run_dir, 'plots')
+    if not os.path.exists(plots_dir):
+        os.makedirs(plots_dir)
 
-    '''
-    sut_name = "thorwallet"
     test_folder_path = os.path.join('case_studies', sut_name, 'test')
     mutants_path = os.path.join('sumo_results', sut_name, 'mutations.json')
-    prioritizer = Prioritizer(test_folder_path, mutants_path, sut_name, 30, 10, results_file_name, best_params_file_name)
+
+    prioritizer = Prioritizer(
+        test_folder_path, mutants_path, sut_name, 30, 10,
+        results_file_name, best_params_file_name,
+        tracker_json_path=tracker_json_path, run_dir=run_dir
+    )
+
     logging.info(f"{bcolors.OKBLUE}Executing single prioritization for {sut_name}{bcolors.ENDC}")
     prioritizer.mutants = prioritizer.load_mutants()
     prioritizer.tests = prioritizer.load_tests()
-    logging.info(f"{bcolors.OKBLUE}Loaded {len(prioritizer.mutants)} mutants and {len(prioritizer.tests)} tests for {sut_name}{bcolors.ENDC}")
+    logging.info(
+        f"{bcolors.OKBLUE}Loaded {len(prioritizer.mutants)} mutants and {len(prioritizer.tests)} tests for {sut_name}{bcolors.ENDC}")
     prioritizer.launch_single_prioritization(num_runs=2)  # Run 5 times for statistical significance
 
-
-    tracker_json_path = os.path.join('experiments', 'disagreement.json')
     analyze_committee(tracker_json_path)
-

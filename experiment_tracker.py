@@ -432,7 +432,7 @@ def analyze_experiment(json_path: str, experiment_id: int | None = None) -> dict
         },
     }
 
-    _print_analysis(result)
+    _print_analysis(result, json_path)
     return result
 
 
@@ -777,30 +777,34 @@ def _aggregate_run_stats(runs: list[dict]) -> dict:
     return result
 
 
-def _print_analysis(result: dict) -> None:
-    logging.info("\n" + "=" * 60)
-    logging.info("EXPERIMENT ANALYSIS REPORT")
-    logging.info("=" * 60)
+def _print_analysis(result: dict, json_path: str) -> None:
+    # Prepare the output text buffer
+    lines = []
+
+    lines.append("\n" + "=" * 60)
+    lines.append("EXPERIMENT ANALYSIS REPORT")
+    lines.append("=" * 60)
 
     for eid, payload in result["by_experiment"].items():
-        logging.info(f"\n  Experiment {eid}")
-        logging.info(f"  {'─' * 40}")
+        lines.append(f"\n  Experiment {eid}")
+        lines.append(f"  {'─' * 40}")
         for rid, stats in payload["by_run"].items():
-            logging.info(f"    Run {rid}:")
-            logging.info(f"      KL divergence   : {stats['mean_sym_kl']:.4f} ± {stats['std_sym_kl']:.4f}")
+            lines.append(f"    Run {rid}:")
+            lines.append(f"      KL divergence   : {stats['mean_sym_kl']:.4f} ± {stats['std_sym_kl']:.4f}")
             sp_str = (
                 f"{stats['mean_spearman']:.4f} ± {stats['std_spearman']:.4f}"
                 if stats["mean_spearman"] is not None
                 else "n/a"
             )
-            logging.info(f"      Rank correlation: {sp_str}")
+            lines.append(f"      Rank correlation: {sp_str}")
             if stats["mean_reward"] is not None:
-                logging.info(f"      Reward          : {stats['mean_reward']:.2f} ± {stats['std_reward']:.2f}")
+                lines.append(f"      Reward          : {stats['mean_reward']:.2f} ± {stats['std_reward']:.2f}")
             if stats["mean_tests_to_kill"] is not None:
-                logging.info(f"      Tests to kill   : {stats['mean_tests_to_kill']:.2f} ± {stats['std_tests_to_kill']:.2f}")
-            logging.info(f"      Mutants (killable/total): {stats['num_killable_mutants']}/{stats['num_mutants']}")
+                lines.append(
+                    f"      Tests to kill   : {stats['mean_tests_to_kill']:.2f} ± {stats['std_tests_to_kill']:.2f}")
+            lines.append(f"      Mutants (killable/total): {stats['num_killable_mutants']}/{stats['num_mutants']}")
             if stats.get("mean_agreement_rate_full") is not None:
-                logging.info(
+                lines.append(
                     f"      Agreement — full: {stats['mean_agreement_rate_full']:.1%}  "
                     f"soft: {stats['mean_agreement_rate_soft']:.1%}  "
                     f"partial: {stats['mean_agreement_rate_partial']:.1%}  "
@@ -808,27 +812,45 @@ def _print_analysis(result: dict) -> None:
                 )
 
         ar = payload["across_runs"]
-        logging.info(f"    Across {ar['num_runs']} runs:")
-        logging.info(f"      KL divergence   : {ar['across_runs_mean_sym_kl']:.4f} ± {ar['across_runs_std_sym_kl']:.4f}")
+        lines.append(f"    Across {ar['num_runs']} runs:")
+        lines.append(
+            f"      KL divergence   : {ar['across_runs_mean_sym_kl']:.4f} ± {ar['across_runs_std_sym_kl']:.4f}")
         sp_str = (
             f"{ar['across_runs_mean_spearman']:.4f} ± {ar['across_runs_std_spearman']:.4f}"
             if ar.get("across_runs_mean_spearman") is not None
             else "n/a"
         )
-        logging.info(f"      Rank correlation: {sp_str}")
+        lines.append(f"      Rank correlation: {sp_str}")
 
     g = result["global"]
-    logging.info(f"\n  GLOBAL ({g['num_runs_total']} runs across {g['num_experiments']} experiment(s))")
-    logging.info(f"  {'─' * 40}")
-    logging.info(f"    KL divergence   : {g['mean_sym_kl']:.4f} ± {g['std_sym_kl']:.4f}")
+    lines.append(f"\n  GLOBAL ({g['num_runs_total']} runs across {g['num_experiments']} experiment(s))")
+    lines.append(f"  {'─' * 40}")
+    lines.append(f"    KL divergence   : {g['mean_sym_kl']:.4f} ± {g['std_sym_kl']:.4f}")
     sp_str = (
         f"{g['mean_spearman']:.4f} ± {g['std_spearman']:.4f}"
         if g["mean_spearman"] is not None
         else "n/a"
     )
-    logging.info(f"    Rank correlation: {sp_str}")
+    lines.append(f"    Rank correlation: {sp_str}")
     if g["mean_reward"] is not None:
-        logging.info(f"    Reward          : {g['mean_reward']:.2f} ± {g['std_reward']:.2f}")
+        lines.append(f"    Reward          : {g['mean_reward']:.2f} ± {g['std_reward']:.2f}")
     if g["mean_tests_to_kill"] is not None:
-        logging.info(f"    Tests to kill   : {g['mean_tests_to_kill']:.2f} ± {g['std_tests_to_kill']:.2f}")
-    logging.info("=" * 60 + "\n")
+        lines.append(f"    Tests to kill   : {g['mean_tests_to_kill']:.2f} ± {g['std_tests_to_kill']:.2f}")
+    lines.append("=" * 60 + "\n")
+
+    # 1. Log everything to the logging system
+    for line in lines:
+        logging.info(line)
+
+    # 2. Write everything out to a .txt file
+    # Generates a report text file in the same directory as the json tracker file
+    base_dir = os.path.dirname(json_path) if os.path.dirname(json_path) else "."
+    base_name = os.path.splitext(os.path.basename(json_path))[0]
+    txt_report_path = os.path.join(base_dir, f"report_{base_name}.txt")
+
+    try:
+        with open(txt_report_path, "w", encoding="utf-8") as fh:
+            fh.write("\n".join(lines))
+        logging.info(f"Experiment analysis report successfully written to: {txt_report_path}")
+    except Exception as e:
+        logging.error(f"Failed to write report text file: {e}")

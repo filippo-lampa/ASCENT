@@ -5,6 +5,7 @@ from scipy.stats import pearsonr
 import matplotlib.pyplot as plt
 import os
 import argparse
+import logging
 
 def load_json(path):
     with open(path, "r") as f:
@@ -77,17 +78,17 @@ def main():
 
     correlations, p_values = compute_correlations(df, target)
 
-    print("\nPearson Correlation Coefficients:")
+    logging.info("\nPearson Correlation Coefficients:")
     for k, v in correlations.items():
-        print(f"{k}: {v}")
+        logging.info(f"{k}: {v}")
 
-    print("\nP-values:")
+    logging.info("\nP-values:")
     for k, v in p_values.items():
-        print(f"{k}: {v}")
+        logging.info(f"{k}: {v}")
 
-    print("\nGenerating plots...")
+    logging.info("\nGenerating plots...")
     plot_parameters(df, target)
-    print("Plots saved in 'plots/' directory.")
+    logging.info("Plots saved in 'plots/' directory.")
 
 if __name__ == "__main__":
     main()

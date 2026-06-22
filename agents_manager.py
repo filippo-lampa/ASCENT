@@ -1,5 +1,6 @@
 from enum import Enum
 import numpy as np
+import logging
 
 from mcts_agent import MCTSAgent
 from utils.consts import mutant_operators_list
@@ -118,7 +119,7 @@ class AgentsManager:
         if len(ranking) != len(self.tests):
             raise ValueError(f"Ranking length {len(ranking)} != number of tests {len(self.tests)}")
         self.step_solutions[agent_proposing] = list(ranking)
-        print(f"Agent '{agent_proposing}' shared ranking: {ranking}")
+        logging.debug(f"Agent '{agent_proposing}' shared ranking: {ranking}")
 
     def reset_step_solutions(self):
         """
@@ -195,16 +196,16 @@ class AgentsManager:
 
     def _log_disagreement_metrics(self, metrics):
 
-        print("\n--- Committee Disagreement Analysis ---")
+        logging.debug("\n--- Committee Disagreement Analysis ---")
 
         for item in metrics.get("pairwise", []):
             corr = item["spearman"]
             corr_text = f"{corr:.4f}" if isinstance(corr, float) else "scipy required"
-            print(f"[{item['agent_a']} vs {item['agent_b']}]:")
-            print(f"  -> Symmetric KL Divergence: {item['sym_kl']:.4f}")
-            print(f"  -> Spearman Correlation:    {corr_text}")
+            logging.debug(f"[{item['agent_a']} vs {item['agent_b']}]:")
+            logging.debug(f"  -> Symmetric KL Divergence: {item['sym_kl']:.4f}")
+            logging.debug(f"  -> Spearman Correlation:    {corr_text}")
 
-        print("----------------------------------------\n")
+        logging.debug("----------------------------------------\n")
 
     def run_episode(self, mutant, mutant_number, mutant_not_killable, aggregation_strategy, tracker=None):
         """
@@ -330,7 +331,7 @@ class AgentsManager:
         required_agents = {"exploration_proposed_test", "exploitation_proposed_test", "diversity_proposed_test"}
         proposals = self._valid_proposals()
         missing = required_agents - set(proposals.keys())
-        print(f"Aggregating solutions with strategy {aggregation_strategy}. Proposals received from agents: {list(proposals.keys())}")
+        logging.debug(f"Aggregating solutions with strategy {aggregation_strategy}. Proposals received from agents: {list(proposals.keys())}")
         if missing:
             raise RuntimeError(f"Missing proposals from agents: {sorted(list(missing))}")
 
@@ -382,7 +383,7 @@ class AgentsManager:
 
         # Return index of highest score (deterministic tie-breaker: lowest index)
         best_idx = scores.index(max(scores))
-        print(f"Aggregated scores (arithmetic mean): {scores}, best test index: {best_idx}")
+        logging.debug(f"Aggregated scores (arithmetic mean): {scores}, best test index: {best_idx}")
         return best_idx
 
     def aggregate_geometric_mean(self):
@@ -412,7 +413,7 @@ class AgentsManager:
 
         # Return index of highest score
         best_idx = scores.index(max(scores))
-        print(f"Aggregated scores (geometric mean): {scores}, best test index: {best_idx}")
+        logging.debug(f"Aggregated scores (geometric mean): {scores}, best test index: {best_idx}")
         return best_idx
 
     def aggregate_weighted_mean(self):
@@ -446,7 +447,7 @@ class AgentsManager:
 
         # Return index of highest score
         best_idx = scores.index(max(scores))
-        print(f"Aggregated scores (weighted mean): {scores}, best test index: {best_idx}")
+        logging.debug(f"Aggregated scores (weighted mean): {scores}, best test index: {best_idx}")
         return best_idx
 
     def aggregate_borda_count(self):
@@ -478,5 +479,5 @@ class AgentsManager:
 
         # Return index of lowest rank sum (best consensus)
         best_idx = rank_sums.index(min(rank_sums))
-        print(f"Aggregated rank sums (Borda count): {rank_sums}, best test index: {best_idx}")
+        logging.debug(f"Aggregated rank sums (Borda count): {rank_sums}, best test index: {best_idx}")
         return best_idx

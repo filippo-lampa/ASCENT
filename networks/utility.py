@@ -1,5 +1,6 @@
 import numpy as np
 import torch
+import logging
 from torch import nn
 
 def identify_test_place_in_sequence(test_sequence, total_number_of_tests):
@@ -28,9 +29,9 @@ def inference(state_tensor, model):
 def training_model(model, inputs, targets, opt, loss_function, scheduler=None):
 
     if model.__class__.__name__ == 'ValueNN':
-        print("Training ValueNN model...")
+        logging.debug("Training ValueNN model...")
     elif model.__class__.__name__ == 'PolicyNN':
-        print("Training PolicyNN model...")
+        logging.debug("Training PolicyNN model...")
 
     model.train()
     losses = []

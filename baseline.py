@@ -3,6 +3,7 @@ import json
 import os
 import re
 import sys
+import logging
 
 import numpy as np
 
@@ -21,7 +22,7 @@ class Baseline:
         '''
         Load mutants from a file.
         '''
-        print(f"{bcolors.HEADER}Loading mutants from {self.mutants_path}{bcolors.ENDC}")
+        logging.debug(f"{bcolors.HEADER}Loading mutants from {self.mutants_path}{bcolors.ENDC}")
 
         with open(self.mutants_path, 'r', encoding='utf-8') as f:
             mutants = json.load(f)
@@ -48,7 +49,7 @@ class Baseline:
         """
         create an array with test path and test name by reading the tests in the folder at self.tests_folder_path
         """
-        print(f"{bcolors.HEADER}Loading tests from {self.tests_folder_path}{bcolors.ENDC}")
+        logging.debug(f"{bcolors.HEADER}Loading tests from {self.tests_folder_path}{bcolors.ENDC}")
 
         test_files_counter = 0
 
@@ -77,7 +78,7 @@ class Baseline:
         tests = self.remove_duplicates(tests)
 
         test_methods_counter = len(tests)
-        print(f"Found {test_files_counter} test files and {test_methods_counter} test methods")
+        logging.debug(f"Found {test_files_counter} test files and {test_methods_counter} test methods")
         return tests
 
 
@@ -121,16 +122,16 @@ class Baseline:
                         test_relative_path = test["test_file_path"].split(sut_name)[1]
                     for killing_test_method in mutant["testResults"][test_relative_path]["failed"]:
                         if killing_test_method["title"] == test["test_method_name"]:
-                            print(f"Mutant {mutant['id']} killed by test {test['test_id']} after {tests_executed} tests")
+                            logging.debug(f"Mutant {mutant['id']} killed by test {test['test_id']} after {tests_executed} tests")
                             tests_needed_list.append(tests_executed)
                             killed = True
                             break
                 if killed:
                     break
 
-        print(f"Total tests executed: {total_tests_executed} on a total of {len(mutants)} mutants")
-        print(f"Total tests executed on killable mutants: {total_tests_executed_on_killable_mutants}")
-        print(f"Average number of tests needed to kill a mutant: {np.mean(tests_needed_list)}")
+        logging.debug(f"Total tests executed: {total_tests_executed} on a total of {len(mutants)} mutants")
+        logging.debug(f"Total tests executed on killable mutants: {total_tests_executed_on_killable_mutants}")
+        logging.debug(f"Average number of tests needed to kill a mutant: {np.mean(tests_needed_list)}")
 
         return total_tests_executed, total_tests_executed_on_killable_mutants
 
@@ -142,12 +143,12 @@ class Baseline:
         number_of_tests_executed_list = []
         number_of_tests_on_killable_mutants_list = []
         for i in range(n_times):
-            print(f"Execution {i+1}")
+            logging.debug(f"Execution {i+1}")
             number_tests_executed, number_of_tests_on_killable_mutants = self.execute(np.random.permutation(mutants), np.random.permutation(tests), sut_name)
             number_of_tests_executed_list.append(number_tests_executed)
             number_of_tests_on_killable_mutants_list.append(number_of_tests_on_killable_mutants)
-        print(f"Average number of tests executed over {n_times} executions: {np.mean(number_of_tests_executed_list)}")
-        print(f"Average number of tests executed on killable mutants over {n_times} executions: {np.mean(number_of_tests_on_killable_mutants_list)}")
+        logging.debug(f"Average number of tests executed over {n_times} executions: {np.mean(number_of_tests_executed_list)}")
+        logging.debug(f"Average number of tests executed on killable mutants over {n_times} executions: {np.mean(number_of_tests_on_killable_mutants_list)}")
 
 
 if __name__ == '__main__':

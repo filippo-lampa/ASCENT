@@ -4,6 +4,7 @@ import os
 import matplotlib.pyplot as plt
 from scipy.stats import pearsonr
 import numpy as np
+import logging
 
 from experiment_tracker import (analyze_experiment, analyze_pair_disagreement, analyze_disagreement_vs_reward)
 
@@ -164,46 +165,46 @@ def main(path, allowed_grid, top_percent=10):
 
     param_names, X, y = extract_parameters(executions)
 
-    print("\nCorrelation results")
-    print("------------------")
+    logging.info("\nCorrelation results")
+    logging.info("------------------")
     correlations = compute_correlations(param_names, X, y)
     for p, (corr, pval) in correlations.items():
-        print(f"{p}: corr={corr:.4f}, p={pval:.4f}")
+        logging.info(f"{p}: corr={corr:.4f}, p={pval:.4f}")
 
-    print("\nGlobal improvement statistics")
-    print("-----------------------------")
+    logging.info("\nGlobal improvement statistics")
+    logging.info("-----------------------------")
     global_stats = compute_global_statistics(executions)
     for k, v in global_stats.items():
-        print(f"{k}: {v}")
+        logging.info(f"{k}: {v}")
 
-    print(f"\nTop {top_percent} percent improvement")
-    print("--------------------------------------")
+    logging.info(f"\nTop {top_percent} percent improvement")
+    logging.info("--------------------------------------")
     top_stats = top_percent_improvement(executions, top_percent)
     for k, v in top_stats.items():
-        print(f"{k}: {v}")
+        logging.info(f"{k}: {v}")
 
-    print("\nConsensus parameters from top percent")
-    print("-------------------------------------")
+    logging.info("\nConsensus parameters from top percent")
+    logging.info("-------------------------------------")
     consensus_params = compute_consensus_parameters(executions, allowed_grid, top_percent)
     for k, v in consensus_params.items():
-        print(f"{k}: {v}")
+        logging.info(f"{k}: {v}")
 
     consensus_eval = evaluate_consensus_configuration(executions, consensus_params)
 
     if consensus_eval:
-        print("\nConsensus configuration evaluation")
-        print("----------------------------------")
+        logging.info("\nConsensus configuration evaluation")
+        logging.info("----------------------------------")
         for k, v in consensus_eval.items():
-            print(f"{k}: {v}")
+            logging.info(f"{k}: {v}")
     else:
-        print("\nNo runs matched the consensus configuration")
+        logging.info("\nNo runs matched the consensus configuration")
 
-    print("\nBest single run")
-    print("----------------")
+    logging.info("\nBest single run")
+    logging.info("----------------")
     best_params, best_value = best_single_run(executions)
-    print(f"Best improvement: {best_value}")
+    logging.info(f"Best improvement: {best_value}")
     for k, v in best_params.items():
-        print(f"{k}: {v}")
+        logging.info(f"{k}: {v}")
 
     plot_parameters(param_names, X, y)
 

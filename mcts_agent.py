@@ -3,6 +3,7 @@ import numpy as np
 from copy import deepcopy
 from math import *
 import random
+import logging
 
 import torch
 from sympy.physics.units import current
@@ -13,7 +14,7 @@ from networks.utility import inference, training_model, observation_to_tensor
 from utils.consts import mutant_operators_list
 
 device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
-print("Using device: ", device)
+logging.info("Using device: ", device)
 
 
 class AsymmetricLoss(nn.Module):
@@ -161,7 +162,7 @@ class MCTSAgent:
             possible_actions = self.get_available_actions()
 
             if len(possible_actions) == 0:
-                print("no possible actions")
+                logging.debug("no possible actions")
                 return
 
             action = random.choice(possible_actions)
@@ -436,7 +437,7 @@ class MCTSAgent:
 
         current_reward = len(self.tests) - self.step
 
-        print("Agent: ", self.agent_key, "Step: ", self.step, "Sequence: ", actual_observation.test_sequence,
+        logging.debug("Agent: ", self.agent_key, "Step: ", self.step, "Sequence: ", actual_observation.test_sequence,
               "Reward: ", current_reward)
 
         if self.done:
@@ -451,7 +452,7 @@ class MCTSAgent:
         replay buffer.
         '''
 
-        print('Episode reward (' + str(self.agent_key) + '): ' + str(self.reward_e))
+        logging.debug('Episode reward (' + str(self.agent_key) + '): ' + str(self.reward_e))
 
         loss_v = None
         loss_p = None

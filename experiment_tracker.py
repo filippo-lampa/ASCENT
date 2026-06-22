@@ -79,6 +79,7 @@ import math
 import os
 from datetime import datetime, timezone
 from typing import Any
+import logging
 
 import numpy as np
 
@@ -381,7 +382,7 @@ def analyze_experiment(json_path: str, experiment_id: int | None = None) -> dict
         experiments = [e for e in experiments if e["experiment_id"] == experiment_id]
 
     if not experiments:
-        print("No matching experiments found.")
+        logging.info("No matching experiments found.")
         return {}
 
     by_experiment: dict = {}
@@ -481,10 +482,10 @@ def analyze_pair_disagreement(json_path: str, experiment_id: int | None = None) 
             "num_steps": len(bucket["sym_kl"]),
         }
 
-    print("\n--- Per-pair disagreement analysis ---")
+    logging.debug("\n--- Per-pair disagreement analysis ---")
     for key, stats in result.items():
         sp = f"{stats['mean_spearman']:.4f} ± {stats['std_spearman']:.4f}" if stats["mean_spearman"] is not None else "n/a"
-        print(
+        logging.debug(
             f"  {key}\n"
             f"    KL:      {stats['mean_sym_kl']:.4f} ± {stats['std_sym_kl']:.4f}  (n={stats['num_steps']} steps)\n"
             f"    Spearman: {sp}"
@@ -566,9 +567,9 @@ def analyze_disagreement_vs_reward(json_path: str, experiment_id: int | None = N
     except ImportError:
         pass
 
-    print(f"\n--- Disagreement vs reward ({len(points)} killable mutant episodes) ---")
-    print(f"  Spearman(KL, tests_to_kill):        {corr_kl}")
-    print(f"  Spearman(rank_corr, tests_to_kill): {corr_sp}")
+    logging.debug(f"\n--- Disagreement vs reward ({len(points)} killable mutant episodes) ---")
+    logging.debug(f"  Spearman(KL, tests_to_kill):        {corr_kl}")
+    logging.debug(f"  Spearman(rank_corr, tests_to_kill): {corr_sp}")
 
     return {
         "data_points": points,
@@ -704,25 +705,25 @@ def analyze_agent_agreement(json_path: str, experiment_id: int | None = None) ->
     }
 
     # Print summary
-    print("\n--- Committee top-3 agreement analysis ---")
+    logging.debug("\n--- Committee top-3 agreement analysis ---")
     r = result["rates"]
-    print(f"  Total steps analysed: {result['total_steps']}")
-    print(f"  Full agreement  (all agents #1): {r['full']:.1%}")
-    print(f"  Soft agreement  (all in top-3) : {r['soft']:.1%}")
-    print(f"  Partial         (≥1 in top-3)  : {r['partial']:.1%}")
-    print(f"  No agreement    (none in top-3): {r['none']:.1%}")
-    print(f"\n  Killable mutants only:")
+    logging.debug(f"  Total steps analysed: {result['total_steps']}")
+    logging.debug(f"  Full agreement  (all agents #1): {r['full']:.1%}")
+    logging.debug(f"  Soft agreement  (all in top-3) : {r['soft']:.1%}")
+    logging.debug(f"  Partial         (≥1 in top-3)  : {r['partial']:.1%}")
+    logging.debug(f"  No agreement    (none in top-3): {r['none']:.1%}")
+    logging.debug(f"\n  Killable mutants only:")
     rk = result["by_killable"]["killable"]["rates"]
     if any(v is not None for v in rk.values()):
-        print(f"    Full: {rk['full']:.1%}  Soft: {rk['soft']:.1%}  "
+        logging.debug(f"    Full: {rk['full']:.1%}  Soft: {rk['soft']:.1%}  "
               f"Partial: {rk['partial']:.1%}  None: {rk['none']:.1%}")
     c = result["disagreement_outcome_correlation"]
     if c["spearman_none_rate_vs_tests_to_kill"] is not None:
-        print(f"\n  Spearman(none_rate, tests_to_kill): "
+        logging.debug(f"\n  Spearman(none_rate, tests_to_kill): "
               f"{c['spearman_none_rate_vs_tests_to_kill']:.4f}")
-        print(f"  Spearman(full_rate, tests_to_kill): "
+        logging.debug(f"  Spearman(full_rate, tests_to_kill): "
               f"{c['spearman_full_rate_vs_tests_to_kill']:.4f}")
-    print("------------------------------------------\n")
+    logging.debug("------------------------------------------\n")
 
     return result
 
@@ -777,29 +778,29 @@ def _aggregate_run_stats(runs: list[dict]) -> dict:
 
 
 def _print_analysis(result: dict) -> None:
-    print("\n" + "=" * 60)
-    print("EXPERIMENT ANALYSIS REPORT")
-    print("=" * 60)
+    logging.info("\n" + "=" * 60)
+    logging.info("EXPERIMENT ANALYSIS REPORT")
+    logging.info("=" * 60)
 
     for eid, payload in result["by_experiment"].items():
-        print(f"\n  Experiment {eid}")
-        print(f"  {'─' * 40}")
+        logging.info(f"\n  Experiment {eid}")
+        logging.info(f"  {'─' * 40}")
         for rid, stats in payload["by_run"].items():
-            print(f"    Run {rid}:")
-            print(f"      KL divergence   : {stats['mean_sym_kl']:.4f} ± {stats['std_sym_kl']:.4f}")
+            logging.info(f"    Run {rid}:")
+            logging.info(f"      KL divergence   : {stats['mean_sym_kl']:.4f} ± {stats['std_sym_kl']:.4f}")
             sp_str = (
                 f"{stats['mean_spearman']:.4f} ± {stats['std_spearman']:.4f}"
                 if stats["mean_spearman"] is not None
                 else "n/a"
             )
-            print(f"      Rank correlation: {sp_str}")
+            logging.info(f"      Rank correlation: {sp_str}")
             if stats["mean_reward"] is not None:
-                print(f"      Reward          : {stats['mean_reward']:.2f} ± {stats['std_reward']:.2f}")
+                logging.info(f"      Reward          : {stats['mean_reward']:.2f} ± {stats['std_reward']:.2f}")
             if stats["mean_tests_to_kill"] is not None:
-                print(f"      Tests to kill   : {stats['mean_tests_to_kill']:.2f} ± {stats['std_tests_to_kill']:.2f}")
-            print(f"      Mutants (killable/total): {stats['num_killable_mutants']}/{stats['num_mutants']}")
+                logging.info(f"      Tests to kill   : {stats['mean_tests_to_kill']:.2f} ± {stats['std_tests_to_kill']:.2f}")
+            logging.info(f"      Mutants (killable/total): {stats['num_killable_mutants']}/{stats['num_mutants']}")
             if stats.get("mean_agreement_rate_full") is not None:
-                print(
+                logging.info(
                     f"      Agreement — full: {stats['mean_agreement_rate_full']:.1%}  "
                     f"soft: {stats['mean_agreement_rate_soft']:.1%}  "
                     f"partial: {stats['mean_agreement_rate_partial']:.1%}  "
@@ -807,27 +808,27 @@ def _print_analysis(result: dict) -> None:
                 )
 
         ar = payload["across_runs"]
-        print(f"    Across {ar['num_runs']} runs:")
-        print(f"      KL divergence   : {ar['across_runs_mean_sym_kl']:.4f} ± {ar['across_runs_std_sym_kl']:.4f}")
+        logging.info(f"    Across {ar['num_runs']} runs:")
+        logging.info(f"      KL divergence   : {ar['across_runs_mean_sym_kl']:.4f} ± {ar['across_runs_std_sym_kl']:.4f}")
         sp_str = (
             f"{ar['across_runs_mean_spearman']:.4f} ± {ar['across_runs_std_spearman']:.4f}"
             if ar.get("across_runs_mean_spearman") is not None
             else "n/a"
         )
-        print(f"      Rank correlation: {sp_str}")
+        logging.info(f"      Rank correlation: {sp_str}")
 
     g = result["global"]
-    print(f"\n  GLOBAL ({g['num_runs_total']} runs across {g['num_experiments']} experiment(s))")
-    print(f"  {'─' * 40}")
-    print(f"    KL divergence   : {g['mean_sym_kl']:.4f} ± {g['std_sym_kl']:.4f}")
+    logging.info(f"\n  GLOBAL ({g['num_runs_total']} runs across {g['num_experiments']} experiment(s))")
+    logging.info(f"  {'─' * 40}")
+    logging.info(f"    KL divergence   : {g['mean_sym_kl']:.4f} ± {g['std_sym_kl']:.4f}")
     sp_str = (
         f"{g['mean_spearman']:.4f} ± {g['std_spearman']:.4f}"
         if g["mean_spearman"] is not None
         else "n/a"
     )
-    print(f"    Rank correlation: {sp_str}")
+    logging.info(f"    Rank correlation: {sp_str}")
     if g["mean_reward"] is not None:
-        print(f"    Reward          : {g['mean_reward']:.2f} ± {g['std_reward']:.2f}")
+        logging.info(f"    Reward          : {g['mean_reward']:.2f} ± {g['std_reward']:.2f}")
     if g["mean_tests_to_kill"] is not None:
-        print(f"    Tests to kill   : {g['mean_tests_to_kill']:.2f} ± {g['std_tests_to_kill']:.2f}")
-    print("=" * 60 + "\n")
+        logging.info(f"    Tests to kill   : {g['mean_tests_to_kill']:.2f} ± {g['std_tests_to_kill']:.2f}")
+    logging.info("=" * 60 + "\n")

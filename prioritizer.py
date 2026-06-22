@@ -2,6 +2,9 @@ import json
 import os
 import re
 import time
+import logging
+
+logging.basicConfig(level=logging.INFO, format='%(message)s')
 
 import numpy as np
 
@@ -14,6 +17,7 @@ from networks.value_nn import ValueNN
 from agents_manager import AgentsManager, AggregationStrategy
 from experiment_tracker import ExperimentTracker, analyze_experiment, analyze_pair_disagreement, analyze_disagreement_vs_reward
 from analysis import analyze_committee
+
 
 class Prioritizer:
     '''
@@ -39,8 +43,7 @@ class Prioritizer:
         '''
         Load mutants from the mutations file.
         '''
-
-        print(f"{bcolors.HEADER}Loading mutants from {self.mutants_path}{bcolors.ENDC}")
+        logging.info(f"{bcolors.HEADER}Loading mutants from {self.mutants_path}{bcolors.ENDC}")
 
         with open(self.mutants_path, 'r', encoding='utf-8') as f:
             mutants = json.load(f)
@@ -48,7 +51,7 @@ class Prioritizer:
         for contract, contract_mutants in mutants.items():
             for mutant in contract_mutants:
                 if 'operator' not in mutant:
-                    print(f"{bcolors.WARNING}Mutant {mutant['id']} has no operator. Skipping...{bcolors.ENDC}")
+                    logging.debug(f"{bcolors.WARNING}Mutant {mutant['id']} has no operator. Skipping...{bcolors.ENDC}")
                     continue
                 mutant['contract'] = contract
                 mutants_list.append(mutant)
@@ -87,7 +90,7 @@ class Prioritizer:
         load test methods from the tests files within the test folder
         """
 
-        print(f"{bcolors.HEADER}Loading tests from {self.tests_folder_path}{bcolors.ENDC}")
+        logging.info(f"{bcolors.HEADER}Loading tests from {self.tests_folder_path}{bcolors.ENDC}")
 
         test_method_names_regex = re.compile(r'it\([\'\"](.*)[\'\"]')
         tests = []
@@ -119,7 +122,7 @@ class Prioritizer:
         Execute the prioritizer.
         '''
 
-        print(f"{bcolors.OKBLUE}Starting prioritization{bcolors.ENDC}")
+        logging.info(f"{bcolors.OKBLUE}Starting prioritization{bcolors.ENDC}")
 
         sut_tests_execution_time = 0
         total_number_of_tests_executed = 0
@@ -232,7 +235,7 @@ class Prioritizer:
                     total_remaining_time = total_estimated_time - total_elapsed
                     progress_str += f" [Run {run_idx + 1}/{num_runs}] Total Est. Remaining: {format_time(int(total_remaining_time))}"
             
-            print(f"{bcolors.HEADER}{progress_str}{bcolors.ENDC}")
+            logging.info(f"{bcolors.HEADER}{progress_str}{bcolors.ENDC}")
 
             tracker.begin_mutant(
                 mutant_idx=index,
@@ -270,8 +273,8 @@ class Prioritizer:
                 moving_average_p_losses.append(np.mean(p_losses))
             total_number_of_tests_executed = agents_manager.number_of_tests_executed
 
-            print(f"{bcolors.OKGREEN}Total number of tests executed so far: {total_number_of_tests_executed}{bcolors.ENDC}")
-            print(f"{bcolors.OKGREEN}Total number of tests executed on killable mutants so far: "
+            logging.debug(f"{bcolors.OKGREEN}Total number of tests executed so far: {total_number_of_tests_executed}{bcolors.ENDC}")
+            logging.debug(f"{bcolors.OKGREEN}Total number of tests executed on killable mutants so far: "
                   f"{number_of_tests_executed_on_killable_mutants}{bcolors.ENDC}")
 
             """
@@ -302,7 +305,7 @@ class Prioritizer:
             execution_time_ms=execution_time,
         )
 
-        print(f"{bcolors.OKGREEN}Execution time: {round(execution_time, 2)} seconds{bcolors.ENDC}")
+        logging.debug(f"{bcolors.OKGREEN}Execution time: {round(execution_time, 2)} seconds{bcolors.ENDC}")
 
         return {
             "total_number_of_tests_executed": total_number_of_tests_executed,
@@ -339,7 +342,7 @@ class Prioritizer:
         for run_idx in range(num_runs):
             run_start_time = round(time.time() * 1000)
             
-            print(f"{bcolors.HEADER}Starting run {run_idx + 1}/{num_runs}{bcolors.ENDC}")
+            logging.info(f"{bcolors.HEADER}Starting run {run_idx + 1}/{num_runs}{bcolors.ENDC}")
 
             #kills matrix is a dictionary that stores, for each test, the mutants that it kills. This is shared across all mutants
             kills_matrix = {test['test_id']: [] for test in self.tests}
@@ -391,9 +394,9 @@ class Prioritizer:
             all_runs_rank_correlations.append(performance["avg_rank_correlation_per_mutant"])
             all_runs_performances.append(performance)
 
-            print(f"{bcolors.OKGREEN}Run {run_idx + 1} completed.{bcolors.ENDC}")
-            print(f"Total tests executed: {performance['total_number_of_tests_executed']}")
-            print(f"Total tests executed on killable mutants: {performance['number_of_tests_executed_on_killable_mutants']}")
+            logging.debug(f"{bcolors.OKGREEN}Run {run_idx + 1} completed.{bcolors.ENDC}")
+            logging.debug(f"Total tests executed: {performance['total_number_of_tests_executed']}")
+            logging.debug(f"Total tests executed on killable mutants: {performance['number_of_tests_executed_on_killable_mutants']}")
 
             if run_idx < num_runs - 1:
                 def format_time(ms):
@@ -414,7 +417,7 @@ class Prioritizer:
                 remaining_runs = num_runs - (run_idx + 1)
                 estimated_remaining_time = avg_run_time * remaining_runs
                 
-                print(f"{bcolors.OKBLUE}Average time per run: {format_time(int(avg_run_time))} | "
+                logging.debug(f"{bcolors.OKBLUE}Average time per run: {format_time(int(avg_run_time))} | "
                       f"Est. time for remaining {remaining_runs} run(s): {format_time(int(estimated_remaining_time))}{bcolors.ENDC}\n")
 
         # Plot aggregated results
@@ -428,22 +431,22 @@ class Prioritizer:
             all_runs_rank_correlations,
         )
 
-        # Print summary statistics
-        print(f"\n{bcolors.HEADER}Summary across {num_runs} runs for SUT {self.sut_name}:{bcolors.ENDC}")
+        # logging.debug summary statistics
+        logging.info(f"\n{bcolors.HEADER}Summary across {num_runs} runs for SUT {self.sut_name}:{bcolors.ENDC}")
         avg_tests = np.mean([p["total_number_of_tests_executed"] for p in all_runs_performances])
         std_tests = np.std([p["total_number_of_tests_executed"] for p in all_runs_performances])
         avg_killable = np.mean([p["number_of_tests_executed_on_killable_mutants"] for p in all_runs_performances])
         std_killable = np.std([p["number_of_tests_executed_on_killable_mutants"] for p in all_runs_performances])
 
-        print(f"Total tests executed: {avg_tests:.2f} ± {std_tests:.2f}")
-        print(f"Total tests on killable mutants: {avg_killable:.2f} ± {std_killable:.2f}")
+        logging.info(f"Total tests executed: {avg_tests:.2f} ± {std_tests:.2f}")
+        logging.info(f"Total tests on killable mutants: {avg_killable:.2f} ± {std_killable:.2f}")
 
         self.execution_id += num_runs
 
 
 if __name__ == '__main__':
 
-    print(f"{bcolors.HEADER}Launching experiments...{bcolors.ENDC}")
+    logging.info(f"{bcolors.HEADER}Launching experiments...{bcolors.ENDC}")
 
     if not os.path.exists('experiments'):
         os.makedirs('experiments')
@@ -483,10 +486,10 @@ if __name__ == '__main__':
         test_folder_path = os.path.join('case_studies', sut_name, 'test')
         mutants_path = os.path.join('sumo_results', sut_name, 'mutations.json')
         prioritizer = Prioritizer(test_folder_path, mutants_path, sut_name, 30, 10, results_file_name, best_params_file_name)
-        print(f"{bcolors.OKBLUE}Executing prioritizer for {sut_name}{bcolors.ENDC}")
+        logging.debug(f"{bcolors.OKBLUE}Executing prioritizer for {sut_name}{bcolors.ENDC}")
         prioritizer.mutants = prioritizer.load_mutants()
         prioritizer.tests = prioritizer.load_tests()
-        print(f"{bcolors.OKBLUE}Loaded {len(prioritizer.mutants)} mutants and {len(prioritizer.tests)} tests for {sut_name}{bcolors.ENDC}")
+        logging.debug(f"{bcolors.OKBLUE}Loaded {len(prioritizer.mutants)} mutants and {len(prioritizer.tests)} tests for {sut_name}{bcolors.ENDC}")
         prioritizer.launch_experiments()
 
     '''
@@ -494,10 +497,10 @@ if __name__ == '__main__':
     test_folder_path = os.path.join('case_studies', sut_name, 'test')
     mutants_path = os.path.join('sumo_results', sut_name, 'mutations.json')
     prioritizer = Prioritizer(test_folder_path, mutants_path, sut_name, 30, 10, results_file_name, best_params_file_name)
-    print(f"{bcolors.OKBLUE}Executing single prioritization for {sut_name}{bcolors.ENDC}")
+    logging.info(f"{bcolors.OKBLUE}Executing single prioritization for {sut_name}{bcolors.ENDC}")
     prioritizer.mutants = prioritizer.load_mutants()
     prioritizer.tests = prioritizer.load_tests()
-    print(f"{bcolors.OKBLUE}Loaded {len(prioritizer.mutants)} mutants and {len(prioritizer.tests)} tests for {sut_name}{bcolors.ENDC}")
+    logging.info(f"{bcolors.OKBLUE}Loaded {len(prioritizer.mutants)} mutants and {len(prioritizer.tests)} tests for {sut_name}{bcolors.ENDC}")
     prioritizer.launch_single_prioritization(num_runs=2)  # Run 5 times for statistical significance
 
 

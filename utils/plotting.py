@@ -3,6 +3,7 @@ import numpy as np
 import json
 import os
 from pathlib import Path
+import logging
 
 import pandas as pd
 
@@ -180,16 +181,16 @@ def plot_broken_y_axis(experiments_path=None):
                                     best_file = json_file.name
                                     best_execution_id = exec_id
             except (json.JSONDecodeError, KeyError, Exception) as e:
-                print(f"Error reading {json_file}: {e}")
+                logging.debug(f"Error reading {json_file}: {e}")
                 continue
 
         if best_value is not None:
             prior_tests_best.append(best_value)
             avg_value = np.mean(all_values) if all_values else best_value
             prior_tests_avg.append(avg_value)
-            print(f"{project}: best={best_value}, avg={avg_value:.0f} (da {best_file}, execution_id: {best_execution_id})")
+            logging.debug(f"{project}: best={best_value}, avg={avg_value:.0f} (da {best_file}, execution_id: {best_execution_id})")
         else:
-            print(f"{project}: Number of tests not found")
+            logging.debug(f"{project}: Number of tests not found")
 
     default = [322161, 23917, 16472, 8380, 484]
     # sort prioritization by default descending

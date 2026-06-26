@@ -1,6 +1,7 @@
 from enum import Enum
 import numpy as np
 import logging
+import torch
 
 from mcts_agent import MCTSAgent
 from utils.consts import mutant_operators_list
@@ -30,13 +31,19 @@ class AgentsManager:
     are then aggregated by this manager. The resulting test is executed once and applied to all three agents.
     """
 
-    def __init__(self, sut_name, tests):
+    def __init__(self, sut_name, tests, shared_value_net=None, shared_value_net_optimizer=None,
+                 shared_value_loss_fn=None):
         self.agents = []
         self.number_of_tests_executed_on_killable_mutants = 0
         self.current_sut_tests_execution_time = 0
         self.number_of_tests_executed = 0
         self.sut_name = sut_name
         self.tests = tests
+        # Shared value network: owned and trained centrally by the manager.
+        # All agents use this single net for inference; only the manager runs gradient updates.
+        self.shared_value_net = shared_value_net
+        self.shared_value_opt = shared_value_net_optimizer
+        self.shared_value_loss_fn = shared_value_loss_fn
         # Each agent provides a ranking (score distribution) over all tests
         # step_solutions: {agent_name -> list of floats (scores/probabilities) for each test}
         self.step_solutions = {
@@ -50,6 +57,48 @@ class AgentsManager:
 
     def add_agents(self, agents):
         self.agents.extend(agents)
+
+    def train_shared_value_net(self):
+        """
+        Train the shared value network once per update cycle by pooling experiences
+        from all agents' replay buffers.  Called centrally so the shared net receives
+        a single unified gradient update instead of one redundant update per agent.
+
+        Only runs when a shared value net is configured and enough experience has
+        been collected across all agents.
+        """
+        if self.shared_value_net is None:
+            return None
+
+        import random as _random
+        from networks.utility import observation_to_tensor, training_model
+
+        num_actions = len(self.tests)
+        max_reward = num_actions  # mirrors MCTSAgent.max_reward
+
+        all_experiences = []
+        for agent in self.agents:
+            if (agent.mutant_number + 1) % agent.UPDATE_DELTA == 0 and len(agent.replay_buffer) > agent.BATCH_SIZE:
+                all_experiences.extend(agent.replay_buffer.sample())
+
+        if not all_experiences:
+            return None
+
+        k = 1.0
+        inputs, targets = [], []
+        for exp in all_experiences:
+            if exp.v != 0 or _random.random() < k:
+                inputs.append(observation_to_tensor(exp.obs, total_number_of_tests=num_actions))
+                targets.append(torch.FloatTensor([exp.v / max_reward]))
+
+        if not inputs:
+            return None
+
+        loss_v = training_model(self.shared_value_net, inputs, targets,
+                                self.shared_value_opt, self.shared_value_loss_fn)
+        logging.debug(f"Shared value net training loss: {loss_v}")
+        return loss_v
+
 
     def execute_test_on_mutant(self, test, mutant, mutant_not_killable):
         """
@@ -307,8 +356,20 @@ class AgentsManager:
 
             done = terminal_state
 
+        # Finish each agent's episode (trains their individual policy nets).
+        # Then train the shared value net once, pooling experience from all agents.
+        agent_results = [agent.finish_episode() for agent in self.agents]
+        shared_value_loss = self.train_shared_value_net()
+
+        # Propagate the shared value loss back into each agent's result tuple so
+        # callers that expect (reward, loss_v, loss_p) keep working unchanged.
+        if shared_value_loss is not None:
+            agent_results = [
+                (r[0], shared_value_loss, r[2]) for r in agent_results
+            ]
+
         return {
-            "agent_results": [agent.finish_episode() for agent in self.agents],
+            "agent_results": agent_results,
             "avg_sym_kl_over_time": avg_sym_kl_over_time,
             "avg_spearman_over_time": avg_spearman_over_time,
         }

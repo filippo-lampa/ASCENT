@@ -38,7 +38,7 @@ class MCTSAgent:
                  sut_name=None, number_of_mutants=None, buffer_size=None, batch_size=None, update_delta=None,
                  rollout_after=None, asymmetric_loss_alpha=None, c_parameter=None, value_network_learning_rate=None,
                  policy_network_learning_rate=None, agents_manager=None, agent_key=None,
-                 diversity_bonus_weight=0.0):
+                 diversity_bonus_weight=0.0, trains_value_net=True):
 
         # Init Neural-MCTS parameters
         self.ROLLOUT_AFTER = rollout_after
@@ -51,9 +51,16 @@ class MCTSAgent:
         self.policy_net = policy_nn.to(device)
         self.value_net = value_nn.to(device)
         self.asymmetric_loss_alpha = asymmetric_loss_alpha
-        self.value_opt = torch.optim.Adam(self.value_net.parameters(), lr=value_network_learning_rate)
+        # When using a shared value net, only the AgentsManager trains it.
+        # Individual agents still hold a reference (for inference) but skip their own value net update.
+        self.trains_value_net = trains_value_net
+        if self.trains_value_net:
+            self.value_opt = torch.optim.Adam(self.value_net.parameters(), lr=value_network_learning_rate)
+            self.value_loss_function = AsymmetricLoss(self.asymmetric_loss_alpha)
+        else:
+            self.value_opt = None
+            self.value_loss_function = None
         self.policy_opt = torch.optim.Adam(self.policy_net.parameters(), lr=policy_network_learning_rate)
-        self.value_loss_function = AsymmetricLoss(self.asymmetric_loss_alpha)
         self.policy_loss_function = torch.nn.CrossEntropyLoss(label_smoothing=0.5)
 
         # Others
@@ -463,27 +470,26 @@ class MCTSAgent:
 
             experiences = self.replay_buffer.sample()
 
-            # Each state has as target value the rewards of the episode
+            k = 1.0  # keep only k% of inputs/targets with rewards == 0 to balance the training set
 
-            inputs = [observation_to_tensor(experience.obs, total_number_of_tests=self.num_actions) for experience in
-                      experiences]
-            targets = [torch.FloatTensor([experience.v / (self.max_reward)]) for experience in experiences]
+            # Value net training: only done here when this agent owns its own value net.
+            # When a shared value net is used, the AgentsManager trains it centrally
+            # (via train_shared_value_net) using experience pooled from all agents.
+            if self.trains_value_net:
+                inputs = [observation_to_tensor(experience.obs, total_number_of_tests=self.num_actions) for experience in
+                          experiences]
+                targets = [torch.FloatTensor([experience.v / (self.max_reward)]) for experience in experiences]
 
-            k = 1.0  # parameter to balance the training set, we keep only k% of the inputs and targets with rewards == 0
+                balanced_inputs = []
+                balanced_targets = []
 
-            balanced_inputs = []
-            balanced_targets = []
+                for i in range(len(targets)):
+                    if experiences[i].v != 0 or random.random() < k:
+                        balanced_inputs.append(inputs[i])
+                        balanced_targets.append(targets[i])
 
-            # keep only k% of inputs and targets with rewards == 0
-            for i in range(len(targets)):
-                if experiences[i].v != 0 or random.random() < k:
-                    balanced_inputs.append(inputs[i])
-                    balanced_targets.append(targets[i])
-
-            inputs = balanced_inputs
-            targets = balanced_targets
-
-            loss_v = training_model(self.value_net, inputs, targets, self.value_opt, self.value_loss_function)
+                loss_v = training_model(self.value_net, balanced_inputs, balanced_targets,
+                                        self.value_opt, self.value_loss_function)
 
             # Each state has as target policy the policy from the next state function
 

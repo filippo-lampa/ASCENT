@@ -146,7 +146,20 @@ class Prioritizer:
         avg_divergence_per_mutant = []
         avg_rank_correlation_per_mutant = []
 
-        agents_manager = AgentsManager(self.sut_name, self.tests)
+        # Build the shared value net optimizer and loss so the AgentsManager
+        # can train the single shared value network centrally.
+        import torch
+        from mcts_agent import AsymmetricLoss
+        shared_value_net = networks["shared_value_net"]
+        shared_value_opt = torch.optim.Adam(shared_value_net.parameters(), lr=0.001)
+        shared_value_loss_fn = AsymmetricLoss(alpha=6.0)
+
+        agents_manager = AgentsManager(
+            self.sut_name, self.tests,
+            shared_value_net=shared_value_net,
+            shared_value_net_optimizer=shared_value_opt,
+            shared_value_loss_fn=shared_value_loss_fn,
+        )
 
         from experiment_tracker import ExperimentTracker
         tracker = ExperimentTracker(
@@ -162,23 +175,25 @@ class Prioritizer:
 
         exploration_mcts = MCTSAgent(networks["exploration"]["policy_net"], networks["exploration"]["value_net"],
                                      self.tests, kills_matrix,
-                                     self.sut_name, len(self.mutants), len(self.mutants), 40, 100,
+                                     self.sut_name, len(self.mutants), len(self.mutants), 40, 1,
                                      45, 6.0, 3.0, 0.001,
-                                     0.0001, agents_manager, agent_key="exploration_proposed_test")
+                                     0.0001, agents_manager, agent_key="exploration_proposed_test",
+                                     trains_value_net=False)
 
         exploitation_mcts = MCTSAgent(networks["exploitation"]["policy_net"], networks["exploitation"]["value_net"],
                                       self.tests, kills_matrix,
-                                      self.sut_name, len(self.mutants), len(self.mutants), 40, 100,
+                                      self.sut_name, len(self.mutants), len(self.mutants), 40, 1,
                                       45, 6.0, 0.5, 0.001,
-                                      0.0001, agents_manager, agent_key="exploitation_proposed_test")
+                                      0.0001, agents_manager, agent_key="exploitation_proposed_test",
+                                      trains_value_net=False)
 
         # The diversity agent optimizes search to select tests maximizing Diversity(t)=1−max(similarity(t,t′)) where t′∈ Executed
         diversity_mcts = MCTSAgent(networks["diversity"]["policy_net"], networks["diversity"]["value_net"],
                                    self.tests, kills_matrix,
-                                   self.sut_name, len(self.mutants), len(self.mutants), 40, 100,
+                                   self.sut_name, len(self.mutants), len(self.mutants), 40, 1,
                                    45, 6.0, 2.0, 0.001,
                                    0.0001, agents_manager, agent_key="diversity_proposed_test",
-                                   diversity_bonus_weight=1.0)
+                                   diversity_bonus_weight=1.0, trains_value_net=False)
 
         agents_manager.add_agents([exploration_mcts, exploitation_mcts, diversity_mcts])
 
@@ -357,29 +372,30 @@ class Prioritizer:
             # init neural networks
             nn_input_size = 1 + 1 + len(self.tests)
 
-            # exploration agent nns
-            exploration_agent_value_net = ValueNN(nn_input_size)
+            # Shared value network: one instance used by all three agents.
+            # The value net estimates expected reward given a state, which is a
+            # property of the environment, not of any individual agent's strategy.
+            # Each agent's distinct behaviour is preserved through its own policy net
+            # and its unique UCB hyper-parameters (c, diversity_bonus_weight).
+            shared_value_net = ValueNN(nn_input_size)
+
+            # policy networks (one per agent — these encode each agent's distinct strategy)
             exploration_agent_policy_net = PolicyNN(nn_input_size, len(self.tests))
-
-            # exploitation agent nns
-            exploitation_agent_value_net = ValueNN(nn_input_size)
             exploitation_agent_policy_net = PolicyNN(nn_input_size, len(self.tests))
-
-            # diversity agent nns
-            diversity_agent_value_net = ValueNN(nn_input_size)
             diversity_agent_policy_net = PolicyNN(nn_input_size, len(self.tests))
 
             networks = {
+                'shared_value_net': shared_value_net,
                 'exploration': {
-                    'value_net': exploration_agent_value_net,
+                    'value_net': shared_value_net,
                     'policy_net': exploration_agent_policy_net
                 },
                 'exploitation': {
-                    'value_net': exploitation_agent_value_net,
+                    'value_net': shared_value_net,
                     'policy_net': exploitation_agent_policy_net
                 },
                 'diversity': {
-                    'value_net': diversity_agent_value_net,
+                    'value_net': shared_value_net,
                     'policy_net': diversity_agent_policy_net
                 }
             }
@@ -490,6 +506,6 @@ if __name__ == '__main__':
     prioritizer.tests = prioritizer.load_tests()
     logging.info(
         f"{bcolors.OKBLUE}Loaded {len(prioritizer.mutants)} mutants and {len(prioritizer.tests)} tests for {sut_name}{bcolors.ENDC}")
-    prioritizer.launch_single_prioritization(num_runs=2)  # Run 5 times for statistical significance
+    prioritizer.launch_single_prioritization(num_runs=1)  # Run 5 times for statistical significance
 
     analyze_committee(tracker_json_path)

@@ -1,6 +1,6 @@
-# ASCENT Multi-Agent Branch
+# :balance_scale: ASCENT-C: Committee-Based Neural-MCTS Test Prioritization
 
-This branch runs a multi-agent version of ASCENT for mutation-based test prioritization. The prioritization problem, mutant format, test discovery logic, and execution protocol remain ASCENT-compatible. The decision engine is changed from a single Neural-MCTS agent to a committee of specialized agents:
+Multi-agent version of ASCENT for mutation-based test prioritization. The prioritization problem, mutant format, test discovery logic, and execution protocol remain ASCENT-compatible. The decision engine is changed from a single Neural-MCTS agent to a committee of specialized agents:
 
 - **Exploitation agent**: favors historically rewarding tests.
 - **Exploration agent**: favors under-visited regions of the search space.

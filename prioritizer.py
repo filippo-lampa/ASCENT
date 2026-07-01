@@ -1,3 +1,4 @@
+import argparse
 import json
 import os
 import re
@@ -28,7 +29,12 @@ class Prioritizer:
     '''
 
     def __init__(self, tests_folder_path, mutants_path, sut_name, plot_delta, average_delta, results_file_name,
-                 best_params_file_name, tracker_json_path='experiments/disagreement.json', run_dir='experiments'):
+                 best_params_file_name, tracker_json_path='experiments/disagreement.json', run_dir='experiments',
+                 aggregation_strategy=AggregationStrategy.WEIGHTED_MEAN, buffer_size=None, batch_size=40,
+                 update_delta=1, rollout_delay=45, asymmetric_loss_alpha=6.0, exploration_c_parameter=3.0,
+                 exploitation_c_parameter=0.5, diversity_c_parameter=2.0, diversity_bonus_weight=1.5,
+                 value_network_learning_rate=0.001, policy_network_learning_rate=0.0001,
+                 share_value_network=True, shuffle_mutants=False, random_seed=None):
         self.tests_folder_path = tests_folder_path
         self.mutants_path = mutants_path
         self.sut_name = sut_name
@@ -41,6 +47,21 @@ class Prioritizer:
         self.best_params_file_name = best_params_file_name
         self.tracker_json_path = tracker_json_path
         self.run_dir = run_dir
+        self.aggregation_strategy = aggregation_strategy
+        self.buffer_size = buffer_size
+        self.batch_size = batch_size
+        self.update_delta = update_delta
+        self.rollout_delay = rollout_delay
+        self.asymmetric_loss_alpha = asymmetric_loss_alpha
+        self.exploration_c_parameter = exploration_c_parameter
+        self.exploitation_c_parameter = exploitation_c_parameter
+        self.diversity_c_parameter = diversity_c_parameter
+        self.diversity_bonus_weight = diversity_bonus_weight
+        self.value_network_learning_rate = value_network_learning_rate
+        self.policy_network_learning_rate = policy_network_learning_rate
+        self.share_value_network = share_value_network
+        self.shuffle_mutants = shuffle_mutants
+        self.random_seed = random_seed
 
     def load_mutants(self):
         '''
@@ -146,20 +167,7 @@ class Prioritizer:
         avg_divergence_per_mutant = []
         avg_rank_correlation_per_mutant = []
 
-        # Build the shared value net optimizer and loss so the AgentsManager
-        # can train the single shared value network centrally.
-        import torch
-        from mcts_agent import AsymmetricLoss
-        shared_value_net = networks["shared_value_net"]
-        shared_value_opt = torch.optim.Adam(shared_value_net.parameters(), lr=0.001)
-        shared_value_loss_fn = AsymmetricLoss(alpha=6.0)
-
-        agents_manager = AgentsManager(
-            self.sut_name, self.tests,
-            shared_value_net=shared_value_net,
-            shared_value_net_optimizer=shared_value_opt,
-            shared_value_loss_fn=shared_value_loss_fn,
-        )
+        agents_manager = AgentsManager(self.sut_name, self.tests)
 
         from experiment_tracker import ExperimentTracker
         tracker = ExperimentTracker(
@@ -169,42 +177,48 @@ class Prioritizer:
             run_idx=run_idx if run_idx is not None else 0,
             num_mutants=len(self.mutants),
             num_tests=len(self.tests),
-            aggregation_strategy=AggregationStrategy.WEIGHTED_MEAN.value,
+            aggregation_strategy=self.aggregation_strategy.value,
         )
         tracker.begin_run()
 
+        replay_buffer_size = self.buffer_size if self.buffer_size is not None else len(self.mutants)
+
         exploration_mcts = MCTSAgent(networks["exploration"]["policy_net"], networks["exploration"]["value_net"],
                                      self.tests, kills_matrix,
-                                     self.sut_name, len(self.mutants), len(self.mutants), 40, 1,
-                                     45, 6.0, 3.0, 0.001,
-                                     0.0001, agents_manager, agent_key="exploration_proposed_test",
-                                     trains_value_net=False)
+                                     self.sut_name, len(self.mutants), replay_buffer_size, self.batch_size,
+                                     self.update_delta, self.rollout_delay, self.asymmetric_loss_alpha,
+                                     self.exploration_c_parameter, self.value_network_learning_rate,
+                                     self.policy_network_learning_rate, agents_manager,
+                                     agent_key="exploration_proposed_test")
 
         exploitation_mcts = MCTSAgent(networks["exploitation"]["policy_net"], networks["exploitation"]["value_net"],
                                       self.tests, kills_matrix,
-                                      self.sut_name, len(self.mutants), len(self.mutants), 40, 1,
-                                      45, 6.0, 0.5, 0.001,
-                                      0.0001, agents_manager, agent_key="exploitation_proposed_test",
-                                      trains_value_net=False)
+                                      self.sut_name, len(self.mutants), replay_buffer_size, self.batch_size,
+                                      self.update_delta, self.rollout_delay, self.asymmetric_loss_alpha,
+                                      self.exploitation_c_parameter, self.value_network_learning_rate,
+                                      self.policy_network_learning_rate, agents_manager,
+                                      agent_key="exploitation_proposed_test")
 
-        # The diversity agent optimizes search to select tests maximizing Diversity(t)=1−max(similarity(t,t′)) where t′∈ Executed
         diversity_mcts = MCTSAgent(networks["diversity"]["policy_net"], networks["diversity"]["value_net"],
                                    self.tests, kills_matrix,
-                                   self.sut_name, len(self.mutants), len(self.mutants), 40, 1,
-                                   45, 6.0, 2.0, 0.001,
-                                   0.0001, agents_manager, agent_key="diversity_proposed_test",
-                                   diversity_bonus_weight=1.0, trains_value_net=False)
+                                   self.sut_name, len(self.mutants), replay_buffer_size, self.batch_size,
+                                   self.update_delta, self.rollout_delay, self.asymmetric_loss_alpha,
+                                   self.diversity_c_parameter, self.value_network_learning_rate,
+                                   self.policy_network_learning_rate, agents_manager,
+                                   agent_key="diversity_proposed_test",
+                                   diversity_bonus_weight=self.diversity_bonus_weight)
 
         agents_manager.add_agents([exploration_mcts, exploitation_mcts, diversity_mcts])
 
-        aggregation_strategy = AggregationStrategy.WEIGHTED_MEAN
+        aggregation_strategy = self.aggregation_strategy
 
         networks_update_freq = exploration_mcts.UPDATE_DELTA
 
         mutant_count = 0
 
-        # shuffle mutants before execution
-        # np.random.shuffle(self.mutants)
+        if self.shuffle_mutants:
+            rng = np.random.default_rng(None if self.random_seed is None else self.random_seed + (run_idx or 0))
+            rng.shuffle(self.mutants)
 
         for index, mutant in enumerate(self.mutants):
 
@@ -372,30 +386,31 @@ class Prioritizer:
             # init neural networks
             nn_input_size = 1 + 1 + len(self.tests)
 
-            # Shared value network: one instance used by all three agents.
-            # The value net estimates expected reward given a state, which is a
-            # property of the environment, not of any individual agent's strategy.
-            # Each agent's distinct behaviour is preserved through its own policy net
-            # and its unique UCB hyper-parameters (c, diversity_bonus_weight).
-            shared_value_net = ValueNN(nn_input_size)
-
-            # policy networks (one per agent — these encode each agent's distinct strategy)
             exploration_agent_policy_net = PolicyNN(nn_input_size, len(self.tests))
             exploitation_agent_policy_net = PolicyNN(nn_input_size, len(self.tests))
             diversity_agent_policy_net = PolicyNN(nn_input_size, len(self.tests))
 
+            if self.share_value_network:
+                shared_value_net = ValueNN(nn_input_size)
+                exploration_agent_value_net = shared_value_net
+                exploitation_agent_value_net = shared_value_net
+                diversity_agent_value_net = shared_value_net
+            else:
+                exploration_agent_value_net = ValueNN(nn_input_size)
+                exploitation_agent_value_net = ValueNN(nn_input_size)
+                diversity_agent_value_net = ValueNN(nn_input_size)
+
             networks = {
-                'shared_value_net': shared_value_net,
                 'exploration': {
-                    'value_net': shared_value_net,
+                    'value_net': exploration_agent_value_net,
                     'policy_net': exploration_agent_policy_net
                 },
                 'exploitation': {
-                    'value_net': shared_value_net,
+                    'value_net': exploitation_agent_value_net,
                     'policy_net': exploitation_agent_policy_net
                 },
                 'diversity': {
-                    'value_net': shared_value_net,
+                    'value_net': diversity_agent_value_net,
                     'policy_net': diversity_agent_policy_net
                 }
             }
@@ -404,6 +419,7 @@ class Prioritizer:
             performance = self.execute(
                 execution_id=self.execution_id + run_idx,
                 networks=networks,
+                kills_matrix=kills_matrix,
                 run_idx=run_idx,
                 num_runs=num_runs
             )
@@ -468,44 +484,137 @@ class Prioritizer:
         self.execution_id += num_runs
 
 
-if __name__ == '__main__':
+def parse_aggregation_strategy(value):
+    """Parse an aggregation strategy from a command-line string."""
+    normalized = value.strip().lower()
+    aliases = {
+        "arithmetic": "arithmetic_mean",
+        "mean": "arithmetic_mean",
+        "weighted": "weighted_mean",
+        "geometric": "geometric_mean",
+        "borda": "borda_count",
+    }
+    normalized = aliases.get(normalized, normalized)
 
-    logging.info(f"{bcolors.HEADER}Launching experiments...{bcolors.ENDC}")
+    for strategy in AggregationStrategy:
+        if strategy.value == normalized or strategy.name.lower() == normalized:
+            return strategy
 
-    aggregation_strategy = "weighted_average"
-    sut_name = "thorwallet"
-    timestamp = time.strftime("%Y%m%d_%H%M%S")
-    run_dir = os.path.join('experiments', f"{sut_name}_{aggregation_strategy}_{timestamp}")
+    allowed = ", ".join(strategy.value for strategy in AggregationStrategy)
+    raise argparse.ArgumentTypeError(f"Unknown aggregation strategy '{value}'. Allowed values: {allowed}")
 
-    if not os.path.exists(run_dir):
-        os.makedirs(run_dir)
 
-    results_file_name = f'results_{sut_name}_{aggregation_strategy}_{timestamp}.json'
-    best_params_file_name = f'best_params_{sut_name}_{aggregation_strategy}_{timestamp}.json'
-    tracker_json_path = os.path.join(run_dir, f'disagreement_{sut_name}_{aggregation_strategy}_{timestamp}.json')
-
-    with open(os.path.join(run_dir, results_file_name), 'w') as f:
-        json.dump({"executions": []}, f, indent=4)
-
-    # Emptying directory logic removed as a fresh folder is now created for every standalone run.
-    plots_dir = os.path.join(run_dir, 'plots')
-    if not os.path.exists(plots_dir):
-        os.makedirs(plots_dir)
-
-    test_folder_path = os.path.join('case_studies', sut_name, 'test')
-    mutants_path = os.path.join('sumo_results', sut_name, 'mutations.json')
-
-    prioritizer = Prioritizer(
-        test_folder_path, mutants_path, sut_name, 30, 10,
-        results_file_name, best_params_file_name,
-        tracker_json_path=tracker_json_path, run_dir=run_dir
+def build_arg_parser():
+    parser = argparse.ArgumentParser(
+        description="Run multi-agent ASCENT prioritization with command-line parameters."
     )
 
-    logging.info(f"{bcolors.OKBLUE}Executing single prioritization for {sut_name}{bcolors.ENDC}")
+    parser.add_argument("--sut_name", required=True, help="Name of the target project/SUT.")
+    parser.add_argument("--tests_folder", default=None, help="Path to the folder containing the test files.")
+    parser.add_argument("--mutants", default=None, help="Path to the mutations.json file.")
+    parser.add_argument("--coverage", default=None,
+                        help="Accepted for compatibility with the main ASCENT CLI; not used by this multi-agent runner.")
+    parser.add_argument("--aggregation_strategy", type=parse_aggregation_strategy,
+                        default=AggregationStrategy.WEIGHTED_MEAN,
+                        help="Committee aggregation strategy: arithmetic_mean, geometric_mean, weighted_mean, or borda_count.")
+    parser.add_argument("--num_runs", type=int, default=5, help="Number of independent repetitions.")
+    parser.add_argument("--results_root", default="experiments", help="Directory where experiment outputs are stored.")
+    parser.add_argument("--timestamp", default=None, help="Optional timestamp/run suffix. Defaults to current time.")
+    parser.add_argument("--skip_analysis", action="store_true", help="Skip post-run committee analysis.")
+    parser.add_argument("--shuffle_mutants", action="store_true", help="Shuffle mutants independently before each run.")
+    parser.add_argument("--random_seed", type=int, default=None, help="Optional random seed used when shuffling mutants.")
+
+    parser.add_argument("--plot_delta", type=int, default=30, help="Plot every n mutants when intermediate plotting is enabled.")
+    parser.add_argument("--average_delta", type=int, default=10, help="Moving-average window used in plots.")
+    parser.add_argument("--buffer_size", type=int, default=None, help="Replay buffer size. Defaults to the number of mutants.")
+    parser.add_argument("--batch_size", type=int, default=40, help="Batch size for policy/value updates.")
+    parser.add_argument("--update_delta", type=int, default=1, help="Update networks every n episodes.")
+    parser.add_argument("--rollout_delay", type=int, default=45, help="Episodes before neural priors replace the warm-up prior.")
+    parser.add_argument("--asymmetric_loss_alpha", type=float, default=6.0,
+                        help="Underestimation penalty for the asymmetric value loss.")
+
+    parser.add_argument("--exploration_c_parameter", type=float, default=3.0,
+                        help="PUCT exploration coefficient for the exploration agent.")
+    parser.add_argument("--exploitation_c_parameter", type=float, default=0.5,
+                        help="PUCT exploration coefficient for the exploitation agent.")
+    parser.add_argument("--diversity_c_parameter", type=float, default=2.0,
+                        help="PUCT exploration coefficient for the diversity agent.")
+    parser.add_argument("--diversity_bonus_weight", type=float, default=1.0,
+                        help="Inverse-frequency diversity bonus weight.")
+
+    parser.add_argument("--value_network_learning_rate", type=float, default=0.001,
+                        help="Learning rate for the value network.")
+    parser.add_argument("--policy_network_learning_rate", type=float, default=0.0001,
+                        help="Learning rate for the policy networks.")
+    parser.add_argument("--separate_value_networks", action="store_true",
+                        help="Use one value network per agent instead of the default shared value network.")
+
+    return parser
+
+
+def main():
+    logging.info(f"{bcolors.HEADER}Launching multi-agent ASCENT experiments...{bcolors.ENDC}")
+    args = build_arg_parser().parse_args()
+
+    sut_name = args.sut_name
+    aggregation_strategy = args.aggregation_strategy
+    aggregation_name = aggregation_strategy.value
+
+    timestamp = args.timestamp or time.strftime("%Y%m%d_%H%M%S")
+    run_dir = os.path.join(args.results_root, f"{sut_name}_{aggregation_name}_{timestamp}")
+    os.makedirs(run_dir, exist_ok=True)
+
+    results_file_name = f"results_{sut_name}_{aggregation_name}_{timestamp}.json"
+    best_params_file_name = f"best_params_{sut_name}_{aggregation_name}_{timestamp}.json"
+    tracker_json_path = os.path.join(run_dir, f"disagreement_{sut_name}_{aggregation_name}_{timestamp}.json")
+
+    with open(os.path.join(run_dir, results_file_name), "w", encoding="utf-8") as f:
+        json.dump({"executions": []}, f, indent=4)
+
+    os.makedirs(os.path.join(run_dir, "plots"), exist_ok=True)
+
+    tests_folder_path = args.tests_folder or os.path.join("case_studies", sut_name, "test")
+    mutants_path = args.mutants or os.path.join("sumo_results", sut_name, "mutations.json")
+
+    prioritizer = Prioritizer(
+        tests_folder_path=tests_folder_path,
+        mutants_path=mutants_path,
+        sut_name=sut_name,
+        plot_delta=args.plot_delta,
+        average_delta=args.average_delta,
+        results_file_name=results_file_name,
+        best_params_file_name=best_params_file_name,
+        tracker_json_path=tracker_json_path,
+        run_dir=run_dir,
+        aggregation_strategy=aggregation_strategy,
+        buffer_size=args.buffer_size,
+        batch_size=args.batch_size,
+        update_delta=args.update_delta,
+        rollout_delay=args.rollout_delay,
+        asymmetric_loss_alpha=args.asymmetric_loss_alpha,
+        exploration_c_parameter=args.exploration_c_parameter,
+        exploitation_c_parameter=args.exploitation_c_parameter,
+        diversity_c_parameter=args.diversity_c_parameter,
+        diversity_bonus_weight=args.diversity_bonus_weight,
+        value_network_learning_rate=args.value_network_learning_rate,
+        policy_network_learning_rate=args.policy_network_learning_rate,
+        share_value_network=not args.separate_value_networks,
+        shuffle_mutants=args.shuffle_mutants,
+        random_seed=args.random_seed,
+    )
+
+    logging.info(f"{bcolors.OKBLUE}Executing {args.num_runs} run(s) for {sut_name} with {aggregation_name}{bcolors.ENDC}")
     prioritizer.mutants = prioritizer.load_mutants()
     prioritizer.tests = prioritizer.load_tests()
     logging.info(
-        f"{bcolors.OKBLUE}Loaded {len(prioritizer.mutants)} mutants and {len(prioritizer.tests)} tests for {sut_name}{bcolors.ENDC}")
-    prioritizer.launch_single_prioritization(num_runs=1)  # Run 5 times for statistical significance
+        f"{bcolors.OKBLUE}Loaded {len(prioritizer.mutants)} mutants and {len(prioritizer.tests)} tests for {sut_name}{bcolors.ENDC}"
+    )
 
-    analyze_committee(tracker_json_path)
+    prioritizer.launch_single_prioritization(num_runs=args.num_runs)
+
+    if not args.skip_analysis:
+        analyze_committee(tracker_json_path)
+
+
+if __name__ == '__main__':
+    main()

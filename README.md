@@ -209,3 +209,7 @@ python3 prioritizer.py \
 ## Plotting Note
 
 If plots do not show or save correctly, configure the Matplotlib backend for your OS. See the Matplotlib backend documentation: https://matplotlib.org/stable/users/explain/figure/backends.html
+
+## Supplementary Material
+
+The experimental artifacts used for the analysis presented in the paper are available on OSF at https://osf.io/jaqyc/overview?view_only=6806c30fc4cf4aff903b2eb9e1a5c1e0.
